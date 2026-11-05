@@ -2,53 +2,61 @@
   <view class="page">
     <app-page-header title="图片优化" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
+      <app-state-hint
+        v-if="isLoadingOptions"
+        class="content-state"
+        type="loading"
+        title="正在载入优化配置"
+      />
+      <app-state-hint
+        v-else-if="optionsError"
+        class="content-state"
+        type="error"
+        title="优化配置加载失败"
+        description="请检查网络后重试，已选的图片会保留"
+        action-text="重新加载"
+        @action="loadOptimizationOptions"
+      />
       <view class="file">
         <text v-if="selectedImage"> {{ selectedImage.name }}</text>
         <text v-else>请先导入需要优化的图片</text>
-        <button @click="chooseImage">
-          {{ selectedImage ? "更换图片" : "导入图片" }}
+        <button :disabled="isUploading" @click="chooseImage">
+          {{ isUploading ? "导入中…" : selectedImage ? "更换图片" : "导入图片" }}
         </button>
       </view>
-      <view
-        class="preview"
-        :class="{ empty: !selectedImage }"
-        @click="chooseImage"
-      >
-        <image
+      <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
+        <app-image
           v-if="selectedImage"
-          :src="selectedImage.path"
+          class="preview-media"
+          :src="selectedImage.url || selectedImage.path"
           mode="aspectFit"
         />
-        <text v-else class="empty-tip">
-          ＋<small>从相册选择或拍摄图片</small>
-        </text>
+        <text v-else class="empty-tip"> ＋<small>从相册选择或拍摄图片</small> </text>
         <text v-if="selectedImage" class="cover"> 已选封面</text>
-        <text v-if="selectedImage" class="ready">
-          原图解析就绪 · 4K重绘待命</text
-        >
+        <text v-if="selectedImage" class="ready"> 原图解析就绪 · 4K重绘待命</text>
         <text v-if="selectedImage" class="zoom">⌕</text>
       </view>
-      <view class="hint" @click="chooseImage"
-        >　点击重新从系统相册导入或拍摄</view
-      >
-      <view class="heading">优化方向 <small>单选</small></view>
-      <view class="directions">
+      <view class="hint" @click="chooseImage">　点击重新从系统相册导入或拍摄</view>
+      <view v-if="!isLoadingOptions && !optionsError" class="heading">
+        优化方向 <small>单选</small>
+      </view>
+      <view v-if="!isLoadingOptions && !optionsError" class="directions">
         <view
           v-for="item in directions"
-          :key="item.title"
+          :key="item.directionId"
           class="direction"
           :class="{ selected: direction === item.title }"
           @click="direction = item.title"
         >
-          <app-icon :name="item.icon_name" />
+          <app-icon :name="item.iconName" />
           <strong>{{ item.title }}</strong>
           <small>{{ item.description }}</small>
         </view>
       </view>
-      <view class="heading"
-        >重绘强度 <small class="accent">均衡重构（推荐）</small></view
-      >
-      <view class="intensity">
+      <view v-if="!isLoadingOptions && !optionsError" class="heading">
+        重绘强度 <small class="accent">均衡重构（推荐）</small>
+      </view>
+      <view v-if="!isLoadingOptions && !optionsError" class="intensity">
         <text
           v-for="item in intensities"
           :key="item"
@@ -58,28 +66,34 @@
           {{ item }}
         </text>
       </view>
-      <view class="switch-row">
+      <view v-if="!isLoadingOptions && !optionsError" class="switch-row">
         <view>
           <strong>◉　保留原画面部细节</strong>
           <small>避免AI拟合过度导致的五官微变</small>
         </view>
         <switch
           :checked="keepDetail"
-          color="#087c73"
+          color="#05604c"
           @change="keepDetail = $event.detail.value"
         />
       </view>
     </scroll-view>
     <view class="actions">
       <view class="cost">
-        <text>预计消耗 {{ cost }} 灵感点</text>
-        <text>账户结余 800 点</text>
+        <text>预计消耗 {{ costText }} 灵感点</text>
+        <text>账户结余以实际扣减为准</text>
       </view>
       <button
-        :disabled="!selectedImage || isSubmitting"
+        :disabled="
+          !selectedImage ||
+          isSubmitting ||
+          isUploading ||
+          isLoadingOptions ||
+          optionsError
+        "
         @click="startOptimization"
       >
-        开始淬炼重绘（耗{{ cost }}点）
+        {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
       </button>
       <text>云端蒸馏级处理 · 支持高清直存至作品库</text>
     </view>
@@ -87,15 +101,22 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import {
   createImageOptimization,
   getImageOptimizationOptions,
-} from "@/apis/imageOptimization";
+} from "@/apis/image-optimization";
+import { uploadImage } from "@/apis/upload";
 import AppIcon from "@/components/AppIcon/index.vue";
+import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
+import { chooseSingleImage } from "@/utils/image-picker";
+import { getErrorMessage } from "@/utils/request";
 
+const isLoadingOptions = ref(true);
+const optionsError = ref(false);
 const directions = ref([]);
 const intensities = ref([]);
 const direction = ref("");
@@ -104,26 +125,50 @@ const keepDetail = ref(true);
 const selectedImage = ref(null);
 const cost = ref(0);
 const isSubmitting = ref(false);
+const isUploading = ref(false);
 
-// 从系统相册或相机选择待优化图片
-const chooseImage = () => {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ["original", "compressed"],
-    sourceType: ["album", "camera"],
-    success: ({ tempFilePaths, tempFiles }) => {
-      const file = tempFiles?.[0];
-      const path = tempFilePaths[0];
-      selectedImage.value = {
-        path,
-        name: file?.name || path.split("/").pop() || "已选图片",
-      };
-    },
-  });
+const costText = computed(() => (cost.value > 0 ? cost.value : "—"));
+
+// 从系统相册或相机选择图片并上传，失败时保留已有图片
+const chooseImage = async () => {
+  if (isUploading.value) {
+    return;
+  }
+
+  try {
+    const image = await chooseSingleImage();
+
+    isUploading.value = true;
+
+    const uploaded = await uploadImage({
+      filePath: image.path,
+      name: image.name,
+    });
+
+    selectedImage.value = { ...image, url: uploaded.url };
+  } catch (error) {
+    if (!String(error?.errMsg || "").includes("cancel")) {
+      uni.showToast({
+        title: getErrorMessage(error, "选择图片失败"),
+        icon: "none",
+      });
+    }
+  } finally {
+    isUploading.value = false;
+  }
 };
 
 // 校验图片后开始优化任务
 const startOptimization = async () => {
+  if (
+    isSubmitting.value ||
+    isUploading.value ||
+    isLoadingOptions.value ||
+    optionsError.value
+  ) {
+    return;
+  }
+
   if (!selectedImage.value) {
     uni.showToast({ title: "请先导入需要优化的图片", icon: "none" });
     return;
@@ -132,74 +177,98 @@ const startOptimization = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await createImageOptimization({
-      image_path: selectedImage.value.path,
+    const task = await createImageOptimization({
+      imagePath: selectedImage.value.url || selectedImage.value.path,
       direction: direction.value,
       intensity: intensity.value,
-      keep_detail: keepDetail.value,
+      keepDetail: keepDetail.value,
     });
-    if (response.code !== 0) {
-      uni.showToast({
-        title: response.message || "创建任务失败",
-        icon: "none",
-      });
-      return;
-    }
 
     uni.navigateTo({
-      url: `/pages/image-generation/index?mode=optimization&task_id=${response.data.task_id}`,
+      url: `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
+        task.taskId
+      )}`,
+    });
+  } catch (error) {
+    uni.showToast({
+      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
+      icon: "none",
     });
   } finally {
     isSubmitting.value = false;
   }
 };
 
-onMounted(async () => {
-  const response = await getImageOptimizationOptions();
-  if (response.code === 0) {
-    directions.value = response.data.directions;
-    intensities.value = response.data.intensities;
-    direction.value = response.data.default_direction;
-    intensity.value = response.data.default_intensity;
-    cost.value = response.data.cost;
+// 加载优化方向与强度配置，供首次进入与失败重试复用。
+const loadOptimizationOptions = async () => {
+  isLoadingOptions.value = true;
+  optionsError.value = false;
+
+  try {
+    const options = await getImageOptimizationOptions();
+
+    directions.value = options.directions;
+    intensities.value = options.intensities;
+    direction.value = options.defaultDirection;
+    intensity.value = options.defaultIntensity;
+    cost.value = options.cost;
+  } catch (error) {
+    optionsError.value = true;
+  } finally {
+    isLoadingOptions.value = false;
   }
+};
+
+onMounted(() => {
+  loadOptimizationOptions();
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .page {
   height: 100vh;
-  background: #f7f8ff;
-  color: #17343b;
+  overflow: hidden;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .content {
-  height: calc(100vh - 220rpx);
-  padding: 34rpx 40rpx 220rpx;
+  height: calc(100vh - 220rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
+  padding: 34rpx $space-8 220rpx;
   box-sizing: border-box;
+}
+
+.content-state {
+  margin-bottom: $space-5;
 }
 
 .file {
   display: flex;
   align-items: center;
-  font-size: 23rpx;
-  font-weight: 700;
+  gap: $space-3;
+  min-width: 0;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
+}
+
+.file text {
+  flex: 1;
+  min-width: 0;
+  @include text-ellipsis;
 }
 
 .file button {
-  margin-left: auto;
-  height: 54rpx;
-  padding: 0 20rpx;
+  @include tap-area(64rpx);
+  flex-shrink: 0;
+  margin: 0 0 0 auto;
+  padding: 0 $space-4;
   border: 0;
-  border-radius: 28rpx;
-  background: #edf5ff;
-  color: #087c73;
-  font-size: 18rpx;
+  border-radius: $radius-pill;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: $font-size-caption;
+  line-height: 1;
 }
 
 .file button:after {
@@ -209,13 +278,13 @@ page {
 .preview {
   position: relative;
   height: 520rpx;
-  margin-top: 20rpx;
+  margin-top: $space-4;
   overflow: hidden;
-  border-radius: 14rpx;
+  border-radius: $radius-md;
   background: #d8dce4;
 }
 
-.preview image {
+.preview-media {
   width: 100%;
   height: 100%;
 }
@@ -224,20 +293,20 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx dashed #a9bec5;
-  background: #f1f5f7;
+  border: 2rpx dashed $color-line-strong;
+  background: $color-surface-muted;
 }
 
 .empty-tip {
-  color: #7c9399;
-  font-size: 54rpx;
+  color: $color-muted;
+  font-size: $font-size-display;
   text-align: center;
 }
 
 .empty-tip small {
   display: block;
-  margin-top: 14rpx;
-  font-size: 20rpx;
+  margin-top: $space-3;
+  font-size: $font-size-caption;
 }
 
 .cover,
@@ -250,9 +319,9 @@ page {
 
 .cover,
 .ready {
-  padding: 10rpx 16rpx;
-  border-radius: 24rpx;
-  font-size: 17rpx;
+  padding: $space-1 $space-3;
+  border-radius: $radius-xl;
+  font-size: $font-size-caption;
 }
 
 .cover {
@@ -263,65 +332,69 @@ page {
 .ready {
   bottom: 20rpx;
   left: 18rpx;
+  max-width: calc(100% - 100rpx);
+  @include text-ellipsis;
 }
 
 .zoom {
+  @include tap-area(56rpx);
   right: 18rpx;
   bottom: 20rpx;
-  width: 52rpx;
-  height: 52rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
-  text-align: center;
-  line-height: 52rpx;
-  font-size: 30rpx;
+  font-size: $font-size-body;
+  line-height: 1;
 }
 
 .hint {
-  margin-top: 20rpx;
-  padding: 22rpx;
-  border: 1rpx dashed #a9bec5;
-  border-radius: 14rpx;
-  color: #71858b;
+  margin-top: $space-3;
+  padding: $space-4;
+  border: 1rpx dashed $color-line-strong;
+  border-radius: $radius-md;
+  color: $color-muted;
+  font-size: $font-size-caption;
   text-align: center;
-  font-size: 18rpx;
 }
 
 .heading {
   display: flex;
   justify-content: space-between;
-  margin-top: 28rpx;
-  font-size: 22rpx;
-  font-weight: 700;
+  margin-top: $space-6;
+  color: $color-ink;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
 }
 
 .heading small {
-  color: #869497;
-  font-size: 17rpx;
-  font-weight: 400;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-regular;
 }
 
 .heading .accent {
-  color: #087c73;
+  color: $color-primary;
 }
 
 .directions {
   display: flex;
-  gap: 14rpx;
-  margin-top: 14rpx;
+  gap: $space-3;
+  margin-top: $space-3;
 }
 
 .direction {
   flex: 1;
-  padding: 20rpx 8rpx;
-  border: 1rpx solid #dce4ea;
-  border-radius: 16rpx;
-  background: #fff;
+  min-width: 0;
+  padding: $space-4 $space-1;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-md;
+  background: $color-surface;
   text-align: center;
 }
 
 .direction.selected {
-  border-color: #087c73;
-  background: #087c73;
+  border-color: $color-primary;
+  background: $color-primary;
   color: #fff;
 }
 
@@ -332,52 +405,55 @@ page {
 }
 
 .direction strong {
-  margin-top: 12rpx;
-  font-size: 20rpx;
+  margin-top: $space-2;
+  font-size: $font-size-caption;
 }
 
 .direction small {
-  margin-top: 4rpx;
-  color: #8a9a9e;
-  font-size: 16rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-badge;
+  line-height: $line-height-tight;
 }
 
 .direction.selected small {
-  color: #d5f2ed;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .intensity {
   display: flex;
-  margin-top: 14rpx;
-  padding: 8rpx;
-  border-radius: 12rpx;
-  background: #edf2ff;
+  margin-top: $space-3;
+  padding: $space-1;
+  border-radius: $radius-sm;
+  background: $color-primary-light;
 }
 
 .intensity text {
+  @include tap-area(64rpx);
   flex: 1;
-  padding: 12rpx 0;
-  color: #52656d;
+  padding: $space-2 0;
+  color: $color-ink-soft;
   text-align: center;
-  font-size: 18rpx;
+  font-size: $font-size-caption;
 }
 
 .intensity .selected {
-  border-radius: 10rpx;
-  background: #fff;
-  color: #087c73;
-  font-weight: 700;
+  border-radius: $radius-xs;
+  background: $color-surface;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
 }
 
 .switch-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 26rpx;
-  padding: 22rpx;
-  border: 1rpx solid #e2e8ec;
-  border-radius: 16rpx;
-  background: #fff;
+  gap: $space-4;
+  margin-top: $space-5;
+  padding: $space-5;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-md;
+  background: $color-surface;
 }
 
 .switch-row strong,
@@ -386,43 +462,38 @@ page {
 }
 
 .switch-row strong {
-  font-size: 20rpx;
+  font-size: $font-size-aux;
 }
 
 .switch-row small {
-  margin-top: 6rpx;
-  color: #839296;
-  font-size: 16rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .cost {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 6rpx 16rpx;
-  color: #748589;
-  font-size: 17rpx;
+  margin: 0 $space-1 $space-3;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .actions {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 18rpx 40rpx 28rpx;
-  background: rgba(255, 255, 255, 0.96);
+  @include action-bar;
   text-align: center;
 }
 
 .actions button {
   width: 100%;
-  height: 76rpx;
+  height: $tap-size;
   border: 0;
-  border-radius: 24rpx;
-  background: #087c73;
+  border-radius: $radius-xl;
+  background: $color-primary;
   color: #fff;
-  font-size: 22rpx;
-  font-weight: 700;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
 }
 
 .actions button:after {
@@ -430,14 +501,14 @@ page {
 }
 
 .actions button[disabled] {
-  background: #a9b8b8;
-  color: #edf2f2;
+  background: $color-line-strong;
+  color: #f4f6f5;
 }
 
 .actions text {
   display: block;
-  margin-top: 14rpx;
-  color: #819093;
-  font-size: 16rpx;
+  margin-top: $space-3;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 </style>

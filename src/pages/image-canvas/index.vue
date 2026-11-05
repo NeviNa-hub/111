@@ -10,53 +10,74 @@
       <text class="step-count">步骤 3 / 3</text>
       <text class="page-title">第三步：设定画幅并落墨</text>
       <text class="page-desc">厘定比例与画幅张数，即将落笔成卷</text>
-      <view class="summary-card">
-        <view class="summary-title">
-          创作意念回溯 <text @click="editPrompt">修改内容</text>
+      <app-state-hint
+        v-if="isLoadingOptions"
+        class="content-state"
+        type="loading"
+        title="正在载入画幅配置"
+      />
+      <app-state-hint
+        v-else-if="optionsError"
+        class="content-state"
+        type="error"
+        title="画幅配置加载失败"
+        description="请检查网络后重试，已完成的构思与画风不会丢失"
+        action-text="重新加载"
+        @action="loadCanvasOptions"
+      />
+      <view v-if="!isLoadingOptions && !optionsError">
+        <view class="summary-card">
+          <view class="summary-title">
+            创作意念回溯 <text @click="editPrompt">修改内容</text>
+          </view>
+          <view class="summary-row">构想意境　{{ options.prompt }}</view>
+          <view class="summary-row">甄选画风　{{ options.style }}</view>
         </view>
-        <view class="summary-row">构想意境　{{ options.prompt }}</view>
-        <view class="summary-row">甄选画风　{{ options.style }}</view>
-      </view>
-      <view class="section-title">画幅比例 <text>影响构图与空间意象</text></view>
-      <view class="ratio-grid">
-        <view
-          v-for="ratio in options.ratios"
-          :key="ratio.value"
-          class="ratio-card"
-          :class="{ selected: selectedRatio === ratio.value }"
-          @click="selectedRatio = ratio.value"
-        >
-          <view class="ratio-icon"></view>
-          <text class="ratio-name">{{ ratio.name }}</text>
-          <text class="ratio-desc">{{ ratio.description }}</text>
-          <text v-if="selectedRatio === ratio.value" class="chosen">已选</text>
+        <view class="section-title">画幅比例 <text>影响构图与空间意象</text></view>
+        <view class="ratio-grid">
+          <view
+            v-for="ratio in options.ratios"
+            :key="ratio.value"
+            class="ratio-card"
+            :class="{ selected: selectedRatio === ratio.value }"
+            @click="selectedRatio = ratio.value"
+          >
+            <view class="ratio-icon"></view>
+            <text class="ratio-name">{{ ratio.name }}</text>
+            <text class="ratio-desc">{{ ratio.description }}</text>
+            <text v-if="selectedRatio === ratio.value" class="chosen">已选</text>
+          </view>
         </view>
-      </view>
-      <view class="section-title count-title">
-        生成张数 <text>多图可甄选微调意趣</text>
-      </view>
-      <view class="count-list">
-        <view
-          v-for="count in options.counts"
-          :key="count.name"
-          class="count-card"
-          :class="{ selected: selectedCount === count.name }"
-          @click="selectedCount = count.name"
-        >
-          <text>{{ count.name }}</text>
-          <small>消耗 {{ count.cost }} 灵感点</small>
+        <view class="section-title count-title">
+          生成张数 <text>多图可甄选微调意趣</text>
         </view>
-      </view>
-      <view class="cost-card">
-        当前剩余灵感点 <b>240</b>
-        <text>
-          本次需量扣除 <b>{{ selectedCost }} 点</b>
-        </text>
+        <view class="count-list">
+          <view
+            v-for="count in options.counts"
+            :key="count.name"
+            class="count-card"
+            :class="{ selected: selectedCount === count.name }"
+            @click="selectedCount = count.name"
+          >
+            <text>{{ count.name }}</text>
+            <small>消耗 {{ count.cost }} 灵感点</small>
+          </view>
+        </view>
+        <view class="cost-card">
+          当前剩余灵感点 <b>{{ pointsText }}</b>
+          <text>
+            本次需量扣除 <b>{{ selectedCost }} 点</b>
+          </text>
+        </view>
       </view>
     </scroll-view>
     <view class="bottom-actions">
       <button class="previous" @click="goBack">修改画风</button>
-      <button class="generate" :disabled="isSubmitting" @click="generate">
+      <button
+        class="generate"
+        :disabled="isSubmitting || isLoadingOptions || optionsError"
+        @click="generate"
+      >
         研墨成画（扣除 {{ selectedCost }} 点）
       </button>
     </view>
@@ -67,17 +88,30 @@
 import { computed, onMounted, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
-import { createImageGeneration, getImageCanvasOptions } from "@/apis/textToImage";
+import { getAccountOverview } from "@/apis/account";
+import { createImageGeneration, getImageCanvasOptions } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
+import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import { getErrorMessage } from "@/utils/request";
 
 const options = ref({ prompt: "", style: "", ratios: [], counts: [] });
-const selectedRatio = ref("1:1");
-const selectedCount = ref("双张");
+const selectedRatio = ref("");
+const selectedCount = ref("");
+const pointsBalance = ref(null);
 const isSubmitting = ref(false);
+const isLoadingOptions = ref(true);
+const optionsError = ref(false);
 
-const selectedCost = computed(
-  () => options.value.counts.find((item) => item.name === selectedCount.value)?.cost || 4
+const pointsText = computed(() =>
+  pointsBalance.value === null ? "—" : pointsBalance.value
 );
+
+const selectedCost = computed(() => {
+  const matched = options.value.counts.find((item) => item.name === selectedCount.value);
+
+  return matched ? matched.cost : "—";
+});
 
 // 返回上一页修改画风
 const goBack = () => {
@@ -91,12 +125,16 @@ const editPrompt = () => {
 
 // 校验画幅选择并创建生图任务，成功后保存草稿并跳转生成页
 const generate = async () => {
+  if (isSubmitting.value || isLoadingOptions.value || optionsError.value) {
+    return;
+  }
+
   if (!selectedRatio.value || !selectedCount.value) {
     uni.showToast({ title: "请选择画幅比例和生成张数", icon: "none" });
     return;
   }
 
-  const draft = uni.getStorageSync("imageCreationDraft") || {};
+  const draft = readCreationDraft(DRAFT_KEYS.image) || {};
   const requestData = {
     prompt: draft.prompt,
     style: draft.style,
@@ -107,35 +145,66 @@ const generate = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await createImageGeneration(requestData);
-    if (response.code !== 0) {
-      uni.showToast({ title: response.message || "创建任务失败", icon: "none" });
-      return;
-    }
+    const task = await createImageGeneration(requestData);
 
-    uni.setStorageSync("imageCreationDraft", requestData);
+    saveCreationDraft(DRAFT_KEYS.image, requestData);
     uni.navigateTo({
-      url: `/pages/image-generation/index?mode=creation&task_id=${response.data.task_id}`,
+      url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
+        task.taskId
+      )}`,
+    });
+  } catch (error) {
+    uni.showToast({
+      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
+      icon: "none",
     });
   } finally {
     isSubmitting.value = false;
   }
 };
 
-onMounted(async () => {
-  const response = await getImageCanvasOptions();
-  if (response.code === 0) {
-    const draft = uni.getStorageSync("imageCreationDraft") || {};
+// 加载灵感点余额；失败时以占位符展示
+const loadPoints = async () => {
+  try {
+    const data = await getAccountOverview();
+
+    pointsBalance.value = data.pointsBalance;
+  } catch (error) {
+    pointsBalance.value = null;
+  }
+};
+
+// 加载画幅配置，供首次进入与失败重试复用。
+const loadCanvasOptions = async () => {
+  isLoadingOptions.value = true;
+  optionsError.value = false;
+
+  try {
+    const data = await getImageCanvasOptions();
+    const draft = readCreationDraft(DRAFT_KEYS.image) || {};
+
     options.value = {
-      ...response.data,
       prompt: draft.prompt || "",
       style: draft.style || "",
+      ratios: data.ratios,
+      counts: data.counts,
     };
+    selectedRatio.value = data.defaultRatio;
+    selectedCount.value = data.defaultCount;
+  } catch (error) {
+    optionsError.value = true;
+  } finally {
+    isLoadingOptions.value = false;
   }
+};
+
+onMounted(() => {
+  loadCanvasOptions();
+  loadPoints();
 });
 
 onShow(() => {
-  const draft = uni.getStorageSync("imageCreationDraft");
+  const draft = readCreationDraft(DRAFT_KEYS.image);
 
   if (!draft?.prompt || !draft?.style) {
     uni.showToast({ title: "请按顺序完成构思和画风选择", icon: "none" });
@@ -144,193 +213,203 @@ onShow(() => {
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .canvas-page {
   height: 100vh;
   overflow: hidden;
-  background: #f7fafb;
-  color: #16363e;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .step-bar {
-  height: 72rpx;
-  margin: 12rpx 24rpx 0;
-  padding: 8rpx;
+  height: 82rpx;
+  margin: 18rpx $space-7 0;
+  padding: $space-1;
   display: flex;
   align-items: center;
-  border: 1rpx solid #dce9eb;
-  border-radius: 20rpx;
-  background: #fff;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-2xl;
+  background: $color-surface;
+  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: 13rpx 5rpx;
-  border-radius: 15rpx;
-  color: #b3bfc2;
+  padding: $space-2 $space-1;
+  border-radius: $radius-md;
+  color: $color-faint;
   text-align: center;
-  font-size: 19rpx;
+  font-size: $font-size-caption;
   white-space: nowrap;
 }
 
 .step.done {
-  color: #087e76;
+  color: $color-primary-soft;
 }
 
 .step.active {
-  color: #087e76;
-  background: #e8f8f6;
-  font-weight: 700;
+  background: $color-primary;
+  color: #fff;
+  font-weight: $font-weight-bold;
 }
 
 .content {
-  height: calc(100vh - 270rpx);
-  padding: 34rpx 32rpx 170rpx;
+  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
+  padding: 34rpx $space-7 170rpx;
   box-sizing: border-box;
 }
 
 .step-count {
   display: block;
-  color: #759096;
-  font-size: 19rpx;
+  color: $color-muted;
+  font-size: $font-size-caption;
 }
 
 .page-title {
   display: block;
-  margin-top: 10rpx;
-  font: 700 32rpx serif;
+  margin-top: $space-1;
+  color: $color-ink;
+  font-size: $font-size-page-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+}
+
+.content-state {
+  margin-top: $space-6;
 }
 
 .page-desc {
   display: block;
-  margin-top: 8rpx;
-  color: #748a90;
-  font-size: 20rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-aux;
+  line-height: $line-height-normal;
 }
 
 .summary-card {
-  margin-top: 26rpx;
-  padding: 22rpx;
-  border: 1rpx solid #e0e9eb;
-  border-radius: 22rpx;
-  background: #fff;
+  margin-top: $space-5;
+  padding: $space-5;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-xl;
+  background: $color-surface;
 }
 
 .summary-title {
-  padding-bottom: 16rpx;
-  color: #2d5960;
-  font-size: 20rpx;
-  font-weight: 700;
+  padding-bottom: $space-3;
+  color: $color-ink;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
 }
 
 .summary-title text {
   float: right;
-  color: #168c83;
-  font-size: 18rpx;
-  font-weight: 400;
+  color: $color-primary-soft;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-regular;
 }
 
 .summary-row {
-  margin-top: 10rpx;
-  padding: 18rpx;
-  border-radius: 14rpx;
-  background: #f7fafb;
-  color: #70878d;
-  font-size: 19rpx;
+  margin-top: $space-2;
+  padding: $space-4;
+  border-radius: $radius-sm;
+  background: $color-surface-muted;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+  line-height: $line-height-normal;
+  word-break: break-all;
 }
 
 .section-title {
   display: flex;
   justify-content: space-between;
-  margin-top: 26rpx;
-  color: #31545b;
-  font-size: 21rpx;
-  font-weight: 700;
+  margin-top: $space-5;
+  color: $color-ink;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
 }
 
 .section-title text {
-  color: #97a8ad;
-  font-size: 17rpx;
-  font-weight: 400;
+  color: $color-muted;
+  font-size: $font-size-badge;
+  font-weight: $font-weight-regular;
 }
 
 .ratio-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
-  margin-top: 16rpx;
+  gap: $space-3;
+  margin-top: $space-3;
 }
 
 .ratio-card {
   position: relative;
-  padding: 22rpx;
-  border: 1rpx solid #dce7ea;
-  border-radius: 22rpx;
-  background: #fff;
+  min-height: 120rpx;
+  padding: $space-5;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-xl;
+  background: $color-surface;
+  box-sizing: border-box;
 }
 
 .ratio-card.selected {
-  border: 2rpx solid #07998e;
+  border: 2rpx solid $color-primary;
 }
 
 .ratio-icon {
   width: 38rpx;
   height: 38rpx;
-  margin-bottom: 16rpx;
-  color: #96a9b6;
+  margin-bottom: $space-3;
+  color: $color-muted;
   line-height: 38rpx;
 }
 
 .ratio-card.selected .ratio-icon {
-  color: #07998e;
+  color: $color-primary;
 }
 
 .ratio-name {
   display: block;
-  font-size: 22rpx;
-  font-weight: 700;
+  color: $color-ink;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
 }
 
 .ratio-desc {
   display: block;
-  margin-top: 6rpx;
-  color: #98a8ad;
-  font-size: 17rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .chosen {
   position: absolute;
   top: 14rpx;
   right: 14rpx;
-  padding: 5rpx 9rpx;
-  border-radius: 12rpx;
-  background: #07998e;
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  background: $color-primary;
   color: #fff;
-  font-size: 16rpx;
+  font-size: $font-size-badge;
 }
 
 .count-list {
   display: flex;
-  gap: 12rpx;
-  margin-top: 16rpx;
+  gap: $space-2;
+  margin-top: $space-3;
 }
 
 .count-card {
   flex: 1;
-  padding: 20rpx 10rpx;
-  border: 1rpx solid #dce7ea;
-  border-radius: 20rpx;
-  background: #fff;
+  padding: $space-4 $space-1;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-lg;
+  background: $color-surface;
   text-align: center;
 }
 
 .count-card.selected {
-  border: 2rpx solid #07998e;
+  border: 2rpx solid $color-primary;
 }
 
 .count-card text,
@@ -339,49 +418,50 @@ page {
 }
 
 .count-card text {
-  font-size: 23rpx;
+  color: $color-ink;
+  font-size: $font-size-body;
+  font-weight: $font-weight-semibold;
 }
 
 .count-card small {
-  margin-top: 8rpx;
-  color: #9caaae;
-  font-size: 16rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-badge;
+  @include numeric;
 }
 
 .cost-card {
-  margin-top: 22rpx;
-  padding: 24rpx 18rpx;
-  border: 1rpx solid #e0e9eb;
-  border-radius: 22rpx;
-  background: #fff;
-  color: #71858a;
-  font-size: 18rpx;
+  margin-top: $space-5;
+  padding: $space-5 $space-4;
+  border: 1rpx solid $color-warning-line;
+  border-radius: $radius-lg;
+  background: $color-warning-bg;
+  color: $color-warning;
+  font-size: $font-size-caption;
+  line-height: $line-height-normal;
 }
 
 .cost-card b {
-  color: #168c83;
+  color: $color-warning;
+  @include numeric;
 }
 
 .cost-card text {
   float: right;
+  @include numeric;
 }
 
 .bottom-actions {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  @include action-bar;
   display: flex;
-  gap: 14rpx;
-  padding: 18rpx 32rpx 28rpx;
-  border-top: 1rpx solid #e7eeee;
-  background: #fff;
+  gap: $space-3;
 }
 
 .bottom-actions button {
-  height: 70rpx;
-  border-radius: 18rpx;
-  font-size: 20rpx;
+  height: $tap-size;
+  border-radius: $radius-md;
+  font-size: $font-size-body;
+  line-height: 1;
 }
 
 .bottom-actions button:after {
@@ -389,17 +469,18 @@ page {
 }
 
 .previous {
-  width: 150rpx;
-  border: 1rpx solid #e2e9eb;
-  background: #fff;
-  color: #7a8e93;
+  width: 160rpx;
+  flex-shrink: 0;
+  border: 1rpx solid $color-line;
+  background: $color-surface;
+  color: $color-ink-soft;
 }
 
 .generate {
   flex: 1;
   border: 0;
-  background: #07998e;
+  background: $color-primary;
   color: #fff;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
 }
 </style>

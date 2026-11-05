@@ -7,168 +7,170 @@
       <view class="step inactive"><i>2</i><text>甄选画风</text></view>
     </view>
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <!-- <view class="section-kicker">阶段一 · 意象炼境</view> -->
-      <!-- <text class="page-title">落墨构想</text> -->
-      <!-- <text class="page-desc">理顺脑海意象，赋予笔墨生命</text> -->
-
-      <view class="config-card">
+      <app-state-hint
+        v-if="isLoadingOptions"
+        class="content-state"
+        type="loading"
+        title="正在载入生图配置"
+      />
+      <app-state-hint
+        v-else-if="optionsError"
+        class="content-state"
+        type="error"
+        title="生图配置加载失败"
+        description="请检查网络后重试，失败不会影响已保存的草稿"
+        action-text="重新加载"
+        @action="loadCreationOptions"
+      />
+      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
         <view class="config-title"><em>壹 ·</em> 风格定品</view>
         <view class="option-grid">
           <view
             v-for="style in styleOptions"
-            :key="style.name"
+            :key="style.styleId"
             class="option-card"
-            :class="{ selected: selectedStyle === style.name }"
-            @click="selectedStyle = style.name"
+            :class="{ selected: selectedStyleId === style.styleId }"
+            @click="selectedStyleId = style.styleId"
           >
             <text>{{ style.name }}</text>
             <small>{{ style.description }}</small>
           </view>
         </view>
       </view>
-      <view class="config-card">
+      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
         <view class="config-title"><em>贰 ·</em> 画幅比例</view>
         <view class="option-grid four">
           <view
             v-for="ratio in ratios"
-            :key="ratio"
+            :key="ratio.ratioId"
             class="option-card compact"
-            :class="{ selected: selectedRatio === ratio }"
-            @click="selectedRatio = ratio"
-            >{{ ratio }}</view
+            :class="{ selected: selectedRatio === ratio.value }"
+            @click="selectedRatio = ratio.value"
+            >{{ ratio.value }}</view
           >
         </view>
       </view>
-      <view class="config-card">
+      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
         <view class="config-title"><em>叁 ·</em> 生成规则</view>
         <view class="option-grid three">
           <view
             v-for="count in counts"
-            :key="count"
+            :key="count.countId"
             class="option-card compact"
-            :class="{ selected: selectedCount === count }"
-            @click="selectedCount = count"
-            >{{ count }}</view
+            :class="{ selected: selectedCount === count.name }"
+            @click="selectedCount = count.name"
+            >{{ count.name }}</view
           >
         </view>
       </view>
     </scroll-view>
     <view class="next-card">
-      <button @click="goNext">下一步：构想意象</button>
+      <button :disabled="isLoadingOptions || optionsError" @click="goNext">
+        下一步：构想意象
+      </button>
     </view>
   </view>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-import { getImageCreationOptions, getImageStyles } from "@/apis/textToImage";
+import { getImageCanvasOptions, getImageStyles } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
+import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 
-const prompt = ref("");
-const suggestions = ref([]);
-const polishSuffix = ref("");
-const randomPromptText = ref("");
+const isLoadingOptions = ref(true);
+const optionsError = ref(false);
 const styleOptions = ref([]);
-const selectedStyle = ref("");
-const selectedRatio = ref("1:1");
-const selectedCount = ref("双张");
-const ratios = ["1:1", "16:9", "9:16", "4:3"];
-const counts = ["单张", "双张", "四张"];
+const selectedStyleId = ref(null);
+const ratios = ref([]);
+const counts = ref([]);
+const selectedRatio = ref("");
+const selectedCount = ref("");
 
-/**
- * 将灵感词追加到画面主旨，已有内容时用逗号衔接。
- * @param {string} value 待追加的灵感词。
- * @returns {void}
- */
-const appendPrompt = (value) => {
-  prompt.value = prompt.value ? `${prompt.value}，${value}` : value;
-};
-
-// 清空画面主旨输入
-const clearPrompt = () => {
-  prompt.value = "";
-};
-
-// 在现有主旨后追加润色意象，空主旨时使用默认起笔句式
-const polishPrompt = () => {
-  prompt.value = prompt.value
-    ? `${prompt.value}，${polishSuffix.value}`
-    : `江南烟雨中的远山与归舟，${polishSuffix.value}`;
-};
-
-// 用随机意象覆盖当前主旨
-const randomPrompt = () => {
-  prompt.value = randomPromptText.value;
-};
+const selectedStyleName = computed(
+  () =>
+    styleOptions.value.find((style) => style.styleId === selectedStyleId.value)?.name ||
+    ""
+);
 
 // 校验并保存构思草稿，进入画风挑选页
 const goNext = () => {
-  const normalizedPrompt = "待输入意象";
-
-  if (!normalizedPrompt) {
-    uni.showToast({ title: "请先填写画面主旨意象", icon: "none" });
+  if (isLoadingOptions.value || optionsError.value) {
     return;
   }
 
-  if (!selectedStyle.value) {
+  if (!selectedStyleName.value) {
     uni.showToast({ title: "请先选择画风", icon: "none" });
     return;
   }
-  uni.setStorageSync("imageCreationDraft", {
-    style: selectedStyle.value,
+
+  saveCreationDraft(DRAFT_KEYS.image, {
+    style: selectedStyleName.value,
+    styleId: selectedStyleId.value,
     ratio: selectedRatio.value,
     count: selectedCount.value,
   });
   uni.navigateTo({ url: "/pages/image-style/index" });
 };
 
-onMounted(async () => {
-  const response = await getImageCreationOptions();
-  if (response.code === 0) {
-    suggestions.value = response.data.suggestions;
-    polishSuffix.value = response.data.polish_suffix;
-    randomPromptText.value = response.data.random_prompt;
+// 加载画风、画幅与生成张数配置，供首次进入与失败重试复用。
+const loadCreationOptions = async () => {
+  isLoadingOptions.value = true;
+  optionsError.value = false;
+
+  try {
+    const [styleOptionsData, canvasOptionsData] = await Promise.all([
+      getImageStyles(),
+      getImageCanvasOptions(),
+    ]);
+
+    styleOptions.value = styleOptionsData.styles;
+    selectedStyleId.value = styleOptionsData.defaultStyleId;
+    ratios.value = canvasOptionsData.ratios;
+    counts.value = canvasOptionsData.counts;
+    selectedRatio.value = canvasOptionsData.defaultRatio;
+    selectedCount.value = canvasOptionsData.defaultCount;
+  } catch (error) {
+    optionsError.value = true;
+  } finally {
+    isLoadingOptions.value = false;
   }
-  const styleResponse = await getImageStyles();
-  if (styleResponse.code === 0) {
-    styleOptions.value = styleResponse.data.lists;
-    selectedStyle.value = styleResponse.data.default_style;
-  }
+};
+
+onMounted(() => {
+  loadCreationOptions();
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .creation-page {
   height: 100vh;
   overflow: hidden;
-  background: #f9f9f6;
-  color: #2a302e;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .step-bar {
-  height: 70rpx;
-  margin: 12rpx 24rpx 0;
-  padding: 8rpx;
+  height: 82rpx;
+  margin: $space-3 $space-7 0;
+  padding: $space-1;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: 20rpx;
+  border-radius: $radius-2xl;
   background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: 13rpx 10rpx;
-  border-radius: 15rpx;
-  color: #7a8581;
+  padding: $space-2 0;
+  border-radius: $radius-md;
+  color: $color-muted;
   text-align: center;
-  font-size: 20rpx;
+  font-size: $font-size-caption;
   white-space: nowrap;
 }
 
@@ -178,201 +180,65 @@ page {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: 8rpx;
+  margin-right: $space-1;
   border-radius: 50%;
   background: #dfdfd5;
-  color: #7a8581;
+  color: $color-muted;
   font-style: normal;
-  font-size: 18rpx;
-}
-
-.step.active i {
-  background: #3f6656;
-  color: #fff;
+  font-size: $font-size-badge;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 16rpx;
-  background: linear-gradient(90deg, #3f6656, #dfdfd5);
-}
-
-.step.active {
-  color: #3f6656;
-  /* background: #3f6656; */
-  font-weight: 700;
-}
-
-.step-bar .step:nth-child(3) {
-  display: flex;
-}
-
-.step-bar {
-  margin: 18rpx 32rpx 0;
-  height: 82rpx;
-  border-radius: 28rpx;
-  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
+  margin: 0 $space-3;
+  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
 }
 
 .step.active {
   color: #fff;
+  font-weight: $font-weight-bold;
 
-  /* background: #05604c; */
   i {
-    background: #05604c;
+    background: $color-primary;
+    color: #fff;
   }
 }
 
 .content {
-  height: calc(100vh - 270rpx);
-  /* padding: 28rpx 28rpx 160rpx; */
+  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
   padding: 35rpx;
   box-sizing: border-box;
 }
 
-.section-kicker {
-  color: #3f6656;
-  font-size: 21rpx;
-}
-
-.page-title {
-  display: block;
-  margin-top: 14rpx;
-  color: #2a302e;
-  font: 700 32rpx serif;
-}
-
-.page-desc {
-  display: block;
-  margin-top: 8rpx;
-  color: #7a8581;
-  font-size: 21rpx;
-}
-
-.prompt-card {
-  height: 400rpx;
-  margin-top: 28rpx;
-  padding: 24rpx;
-  box-sizing: border-box;
-  border: 1rpx solid #e1e9ea;
-  border-radius: 26rpx;
-  background: #fff;
-  box-shadow: 0 8rpx 22rpx rgba(42, 92, 94, 0.04);
-}
-
-.section-kicker {
-  display: inline-block;
-  padding: 8rpx 16rpx;
-  border: 1rpx solid #9fe8d9;
-  border-radius: 10rpx;
-  background: #f0fffa;
-}
-
-.prompt-label {
-  color: #4d6c72;
-  font-size: 20rpx;
-}
-
-.prompt-label text {
-  float: right;
-  color: #758b91;
-}
-
-.prompt-input {
-  width: 100%;
-  height: 260rpx;
-  margin-top: 18rpx;
-  font-size: 24rpx;
-}
-
-.prompt-actions {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.prompt-actions button,
-.suggestions button {
-  margin: 0;
-  padding: 0 18rpx;
-  height: 54rpx;
-  border: 1rpx solid #dce7ea;
-  border-radius: 14rpx;
-  background: #fff;
-  color: #25464d;
-  font-size: 20rpx;
-}
-
-.prompt-actions button:after,
-.suggestions button:after {
-  border: 0;
-}
-
-.prompt-actions button:first-child {
-  color: #188d84;
-}
-
-.prompt-actions text {
-  margin-left: auto;
-  color: #7d9196;
-  font-size: 19rpx;
-}
-
-.suggestion-head {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 28rpx;
-  color: #168c83;
-  font-size: 20rpx;
-}
-
-.suggestion-head text:last-child {
-  color: #8fa1a6;
-  font-size: 18rpx;
-}
-
-.suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 16rpx;
+.content-state {
+  margin-top: $space-6;
 }
 
 .config-card {
-  margin-top: 30rpx;
-  padding: 30rpx;
-  /* border: 1rpx solid rgba(0, 0, 0, 0.02); */
-  border-radius: 24rpx;
-  background: #fff;
+  margin-top: $space-6;
+  padding: $space-6;
+  border-radius: $radius-xl;
+  background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
 
-.creation-page .prompt-card,
-.creation-page .suggestion-head,
-.creation-page .suggestions {
-  display: none;
-}
-
 .config-title {
-  /* margin: 8rpx 0 16rpx; */
-  padding-bottom: 30rpx;
-  /* background: green; */
-  color: #3F6656;
-  font: 700 30rpx serif;
+  padding-bottom: $space-6;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
 }
 
 .config-title em {
-  color: #d9be9b;
-  /* font-style: normal; */
+  color: $color-accent-clay;
 }
 
 .option-grid {
-  /* background: green; */
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30rpx;
-  /* margin-bottom: 30rpx; */
+  gap: $space-6;
 }
 
 .option-grid.four {
@@ -384,87 +250,84 @@ page {
 }
 
 .option-card {
-  min-height: 70rpx;
-  padding: 20rpx;
+  min-height: 96rpx;
+  padding: $space-4;
   border: 1rpx solid rgba(0, 0, 0, 0.08);
-  border-radius: 18rpx;
+  border-radius: $radius-md;
   background: linear-gradient(135deg, #fcfcfa 0%, #fafbf9 100%);
-  color: #2a302e;
-  font-size: 30rpx;
+  color: $color-ink;
+  font-size: $font-size-body-lg;
 }
 
 .option-card small {
   display: block;
-  margin-top: 10rpx;
-  color: #bbbdbd;
-  font-size: 12rpx;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  line-height: $line-height-tight;
 }
 
 .option-card.compact {
-  min-height: auto;
-  padding: 18rpx 8rpx;
+  min-height: 88rpx;
+  padding: $space-2 $space-1;
   text-align: center;
+  line-height: 1.4;
 }
 
 .option-grid.four .option-card.compact::before {
   display: block;
   width: 38rpx;
   height: 38rpx;
-  margin: 0 auto 10rpx;
-  border: 1rpx solid #7a8581;
+  margin: 0 auto $space-1;
+  border: 1rpx solid $color-muted;
   border-radius: 5rpx;
   content: "";
 }
 
 .option-grid.four .option-card:nth-child(2)::before {
-  /* background: green; */
   width: 48rpx;
   height: 28rpx;
 }
+
 .option-grid.four .option-card:nth-child(3)::before {
   width: 28rpx;
   height: 48rpx;
 }
+
 .option-grid.four .option-card:nth-child(4)::before {
   width: 44rpx;
   height: 34rpx;
 }
 
 .option-card.selected {
-  border: 2rpx solid #05604c;
+  border: 2rpx solid $color-primary;
   background: linear-gradient(135deg, #e6f0ea 0%, #fafbf9 100%);
-  color: #3f6656;
-  font-weight: 700;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
 }
 
 .option-grid.four .option-card.selected::before {
-  border-color: #3f6656;
-  background: #3f6656;
-}
-
-.suggestions button {
-  color: #45666c;
+  border-color: $color-primary;
+  background: $color-primary;
 }
 
 .next-card {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 18rpx 32rpx 28rpx;
-  border-top: 1rpx solid #e7eeee;
-  background: rgba(255, 255, 255, 0.96);
+  @include action-bar;
 }
 
 .next-card button {
   width: 100%;
-  height: 76rpx;
+  height: $tap-size;
   border: 0;
-  border-radius: 22rpx;
-  background: linear-gradient(135deg, #3f6656 0%, #2e4e42 100%);
+  border-radius: $radius-xl;
+  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
   color: #fff;
-  font-size: 26rpx;
-  font-weight: 700;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+}
+
+.next-card button[disabled] {
+  opacity: 0.55;
 }
 
 .next-card button:after {

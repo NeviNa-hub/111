@@ -2,6 +2,21 @@
   <view class="workbench-page">
     <app-page-header title="创作台" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
+      <app-state-hint
+        v-if="isLoading"
+        class="content-state"
+        type="loading"
+        title="正在载入创作台"
+      />
+      <app-state-hint
+        v-else-if="loadError"
+        class="content-state"
+        type="error"
+        title="创作台数据加载失败"
+        description="请检查网络后重试，已创作的草稿不会丢失"
+        action-text="重新加载"
+        @action="loadWorkbenchData"
+      />
       <!-- 01 文字生图 -->
       <view class="tool-card tool-teal">
         <view class="card-heading">
@@ -11,7 +26,7 @@
         </view>
         <text class="card-desc">三步流式构思，从画风择定到纸墨挥毫。</text>
         <view class="card-art">
-          <image
+          <app-image
             class="art-image"
             src="/static/theme/theme-images.png"
             mode="aspectFill"
@@ -21,9 +36,7 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">支持宣纸留白与精细排版</text>
-          <button class="footer-button" @click="startTool('文字生图')">
-            研墨生图
-          </button>
+          <button class="footer-button" @click="startTool('文字生图')">研墨生图</button>
         </view>
       </view>
 
@@ -49,18 +62,16 @@
             </view>
           </view>
           <view class="film-frames">
-            <view v-for="frame in frames" :key="frame" class="film-frame">
+            <view v-for="frame in frames" :key="frame.frameId" class="film-frame">
               <i class="frame-thumb"></i>
-              <small class="frame-label">{{ frame }}</small>
+              <small class="frame-label">{{ frame.name }}</small>
             </view>
+            <text v-if="!frames.length" class="film-empty">分镜待载入</text>
           </view>
         </view>
         <view class="card-footer">
           <text class="footer-note">四镜连贯 · 独立成片</text>
-          <button
-            class="footer-button button-blue"
-            @click="startTool('视频创作')"
-          >
+          <button class="footer-button button-blue" @click="startTool('视频创作')">
             逐帧调度
           </button>
         </view>
@@ -75,12 +86,12 @@
         </view>
         <text class="card-desc">还原本真质感，微米级去噪与旧照色彩修复。</text>
         <view class="compare-art">
-          <image
+          <app-image
             class="art-image compare-before"
             src="/static/theme/theme-optimization-before.png"
             mode="aspectFill"
           />
-          <image
+          <app-image
             class="art-image compare-after"
             src="/static/theme/theme-optimization-after.png"
             mode="aspectFill"
@@ -91,10 +102,7 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">最大支持五千万像素解析</text>
-          <button
-            class="footer-button button-purple"
-            @click="startTool('图片优化')"
-          >
+          <button class="footer-button button-purple" @click="startTool('图片优化')">
             净炼重绘
           </button>
         </view>
@@ -106,10 +114,16 @@
           <text>草稿与便签库</text>
           <text class="draft-subtitle">完整归档</text>
         </view>
-        <view v-for="draft in drafts" :key="draft.draft_id" class="draft-row">
+        <view v-for="draft in drafts" :key="draft.draftId" class="draft-row">
           <text class="draft-name">{{ draft.title }} · {{ draft.time }}</text>
           <text class="draft-status">{{ draft.status }}</text>
         </view>
+        <app-state-hint
+          v-if="!isLoading && !loadError && !drafts.length"
+          type="empty"
+          title="暂无草稿"
+          description="完成一次创作后，草稿会自动归档到这里"
+        />
       </view>
     </scroll-view>
     <app-bottom-nav active="creation" />
@@ -121,11 +135,15 @@ import { onMounted, ref } from "vue";
 
 import { getWorkbenchData } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
+import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
 
 const frames = ref([]);
 const drafts = ref([]);
-const filmChips = ["四开画幅", "轨迹平滑", "60FPS 帧率"];
+const filmChips = ref([]);
+const isLoading = ref(true);
+const loadError = ref(false);
 
 /**
  * 根据工具名称进入对应创作流程或公共待开发页。
@@ -143,109 +161,108 @@ const startTool = (name) => {
     return;
   }
 
+  if (name === "视频创作") {
+    uni.navigateTo({ url: "/pages/video-creation/index" });
+    return;
+  }
+
   uni.navigateTo({
     url: `/pages/under-development/index?title=${encodeURIComponent(name)}`,
   });
 };
 
-onMounted(async () => {
-  const response = await getWorkbenchData();
-  if (response.code === 0) {
-    frames.value = response.data.frames;
-    drafts.value = response.data.drafts;
+// 加载创作台的视频分镜与草稿数据。
+const loadWorkbenchData = async () => {
+  isLoading.value = true;
+  loadError.value = false;
+
+  try {
+    const data = await getWorkbenchData();
+
+    filmChips.value = data.filmChips;
+    frames.value = data.frames;
+    drafts.value = data.drafts;
+  } catch (error) {
+    loadError.value = true;
+    filmChips.value = [];
+    frames.value = [];
+    drafts.value = [];
+  } finally {
+    isLoading.value = false;
   }
+};
+
+onMounted(() => {
+  loadWorkbenchData();
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .workbench-page {
   height: 100vh;
   overflow: hidden;
-  background: #f8fbfc;
-  color: #17343b;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .content {
-  height: calc(100vh - 210rpx);
-  overflow: hidden;
-  padding: 30rpx 32rpx;
+  height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
+  padding: $space-6 $space-7;
+  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
   box-sizing: border-box;
+}
+
+.content-state {
+  margin-bottom: $space-5;
 }
 
 /* ========== 工具卡片通用结构 ========== */
 .tool-card {
-  margin-bottom: 26rpx;
-  padding: 24rpx;
-  border-radius: 28rpx;
-  background: #fff;
-}
-
-.tool-teal {
-  box-shadow: 0 2rpx 10rpx rgba(41, 185, 169, 0.18);
-}
-
-.tool-blue {
-  box-shadow: 0 2rpx 10rpx rgba(50, 156, 232, 0.18);
-}
-
-.tool-purple {
-  box-shadow: 0 2rpx 10rpx rgba(94, 81, 214, 0.18);
+  margin-bottom: $space-5;
+  padding: $space-5;
+  border-radius: $radius-2xl;
+  background: $color-surface;
+  box-shadow: $shadow-card;
 }
 
 /* 卡片标题行 */
 .card-heading {
   display: flex;
   align-items: center;
+  gap: $space-3;
 }
 
 .card-title {
-  font: 700 30rpx serif;
+  flex-shrink: 0;
+  color: $color-ink;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
 }
 
 .card-tag {
-  margin-left: 16rpx;
-  padding: 6rpx 12rpx;
-  border: 1rpx solid #ff6b6b;
-  border-radius: 8rpx;
-  color: #ed5757;
-  font-size: 18rpx;
-}
-
-.tag-blue {
-  border-color: #51a9ff;
-  color: #288ad9;
-}
-
-.tag-purple {
-  border-color: #7476ff;
-  color: #595bdc;
+  flex-shrink: 0;
+  padding: $space-1 $space-2;
+  border: 1rpx solid rgba(5, 96, 76, 0.24);
+  border-radius: $radius-xs;
+  color: $color-primary;
+  font-size: $font-size-badge;
 }
 
 .card-ready {
+  flex-shrink: 0;
   margin-left: auto;
-  color: #179a90;
-  font-size: 20rpx;
-}
-
-.ready-blue {
-  color: #168fd5;
-}
-
-.ready-purple {
-  color: #514ed5;
+  color: $color-primary;
+  font-size: $font-size-caption;
 }
 
 /* 卡片描述 */
 .card-desc {
   display: block;
-  margin: 16rpx 0 20rpx;
-  color: #637980;
-  font-size: 21rpx;
+  margin: $space-3 0 $space-4;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+  line-height: $line-height-normal;
 }
 
 /* 插图画区 */
@@ -255,7 +272,7 @@ page {
   position: relative;
   height: 320rpx;
   overflow: hidden;
-  border-radius: 22rpx;
+  border-radius: $radius-lg;
 }
 
 .art-image {
@@ -270,47 +287,59 @@ page {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 22rpx;
+  gap: $space-3;
+  margin-top: $space-4;
 }
 
 .footer-note {
-  color: #65777e;
-  font-size: 20rpx;
+  min-width: 0;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+  @include text-ellipsis;
 }
 
 .footer-button {
+  @include tap-area(72rpx);
+  flex-shrink: 0;
   margin: 0;
-  height: 56rpx;
-  padding: 0 24rpx;
+  padding: 0 $space-4;
   border: 0;
-  border-radius: 20rpx;
-  background: #08776e;
+  border-radius: $radius-md;
+  background: $color-primary;
   color: #fff;
-  font-size: 20rpx;
-  line-height: 56rpx;
+  font-size: $font-size-caption;
+  line-height: 1;
 }
 
 .footer-button:after {
   border: 0;
 }
 
-.button-blue {
-  background: #00699b;
+/* 三种工具共用墨绿主色，仅保留原有类名占位，避免模板引用失效 */
+.tag-blue,
+.tag-purple {
+  color: $color-primary;
 }
 
+.ready-blue,
+.ready-purple {
+  color: $color-primary;
+}
+
+.button-blue,
 .button-purple {
-  background: #302693;
+  background: $color-primary;
 }
 
 /* ========== 01 文字生图 · 插图角标 ========== */
 .art-chip {
   position: absolute;
-  bottom: 14rpx;
-  padding: 6rpx 12rpx;
-  border-radius: 8rpx;
+  bottom: $space-2;
+  padding: $space-1 $space-2;
+  border-radius: $radius-xs;
   background: rgba(255, 255, 255, 0.9);
-  color: #60747b;
-  font-size: 17rpx;
+  color: $color-ink-soft;
+  font-size: $font-size-badge;
   animation: chip-shake 4s ease-in-out infinite;
 }
 
@@ -358,9 +387,10 @@ page {
 
 .film-name {
   flex-shrink: 0;
-  color: #174f70;
-  font-size: 21rpx;
-  font-weight: 700;
+  color: $color-ink;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
+  @include text-ellipsis;
 }
 
 /* 弹幕滚动区：两组相同内容循环位移，实现无缝滚动 */
@@ -369,13 +399,7 @@ page {
   min-width: 0;
   margin-left: 20rpx;
   overflow: hidden;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 12%,
-    #000 88%,
-    transparent
-  );
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 
 .film-marquee-track {
@@ -398,7 +422,7 @@ page {
 
 .film-meta {
   color: #92a3ac;
-  font-size: 18rpx;
+  font-size: $font-size-badge;
 }
 
 .film-frames {
@@ -412,9 +436,9 @@ page {
  * 模拟胶片分镜的透视感，且窄屏下文字不会换行 */
 .film-frame {
   overflow: hidden;
-  padding: 8rpx;
+  padding: $space-1;
   border: 1rpx solid #a9cde4;
-  border-radius: 14rpx;
+  border-radius: $radius-sm;
   background: #fff;
   text-align: center;
   box-sizing: border-box;
@@ -434,7 +458,7 @@ page {
 
 .film-frame:nth-child(4) {
   flex: 1.1 1 auto;
-  border-color: #50b5ff;
+  border-color: $color-info;
   box-shadow: 0 6rpx 16rpx rgba(50, 156, 232, 0.2);
 }
 
@@ -469,19 +493,25 @@ page {
 
 .frame-label {
   display: block;
-  white-space: nowrap;
+  overflow: hidden;
   color: #5a7888;
-  font-size: 15rpx;
+  font-size: $font-size-badge;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.film-empty {
+  color: $color-muted;
+  font-size: $font-size-caption;
 }
 
 .film-chip {
-  padding: 8rpx 14rpx;
-  /* border: 1rpx solid #dce7ea; */
+  padding: $space-1 $space-2;
   border: 1rpx solid #ccf7d3;
-  border-radius: 18rpx;
+  border-radius: $radius-md;
   background: #fff;
-  color: #60777d;
-  font-size: 17rpx;
+  color: $color-ink-soft;
+  font-size: $font-size-badge;
 }
 
 /* ========== 03 图片优化 · 对比图 ========== */
@@ -498,10 +528,10 @@ page {
   height: 46rpx;
   border-radius: 50%;
   background: #fff;
-  color: #595bdc;
+  color: $color-accent-violet;
   line-height: 46rpx;
   text-align: center;
-  font-size: 26rpx;
+  font-size: $font-size-aux;
   animation: handle-sweep 5s ease-in-out infinite;
 }
 
@@ -551,11 +581,11 @@ page {
   position: absolute;
   z-index: 3;
   bottom: 82rpx;
-  padding: 7rpx 12rpx;
-  border-radius: 8rpx;
+  padding: $space-1 $space-2;
+  border-radius: $radius-xs;
   background: rgba(62, 75, 85, 0.85);
   color: #fff;
-  font-size: 17rpx;
+  font-size: $font-size-badge;
   opacity: 0;
 }
 
@@ -603,60 +633,84 @@ page {
   height: 66rpx;
   background: rgba(124, 130, 153, 0.92);
   color: #fff;
-  font-size: 18rpx;
+  font-size: $font-size-caption;
   line-height: 66rpx;
   text-align: center;
 }
 
 /* ========== 草稿与便签库 ========== */
 .draft-card {
-  margin-bottom: 26rpx;
-  padding: 24rpx;
-  border: 1rpx solid #dce7eb;
-  border-radius: 28rpx;
-  background: #fff;
+  margin-bottom: $space-5;
+  padding: $space-5;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-2xl;
+  background: $color-surface;
 }
 
 .draft-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6rpx;
-  font: 700 29rpx serif;
+  gap: $space-3;
+  margin-bottom: $space-1;
+  color: $color-ink;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
 }
 
 .draft-subtitle {
-  color: #75868c;
-  font: 19rpx sans-serif;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-regular;
 }
 
 .draft-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12rpx;
-  padding: 22rpx 18rpx;
-  border: 1rpx solid #e7e8e8;
-  border-radius: 18rpx;
-  color: #60727a;
-  font-size: 20rpx;
+  gap: $space-3;
+  margin-top: $space-2;
+  padding: $space-4 $space-3;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-md;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+}
+
+.draft-name {
+  flex: 1;
+  min-width: 0;
+  @include text-ellipsis;
 }
 
 .draft-status {
-  padding: 5rpx 12rpx;
+  flex-shrink: 0;
+  padding: $space-1 $space-2;
   border: 1rpx solid #85e4da;
-  border-radius: 8rpx;
-  color: #159d92;
-  font-size: 18rpx;
+  border-radius: $radius-xs;
+  color: $color-primary;
+  font-size: $font-size-badge;
 }
 
 /* ============================================================
  * 桌面 H5 适配：992px 以上切换为固定像素 + 双列栅格
  * ============================================================ */
 @media (min-width: 992px) {
+  /* 桌面断点下 rpx 会随视口放大，这里固定一套 px 刻度 */
+  /* 与全局 rpx 刻度一致：宽屏下 1rpx ≈ 1px */
+  $desktop-micro: $font-size-badge;
+  $desktop-caption: $font-size-caption;
+  $desktop-aux: $font-size-aux;
+  $desktop-body: $font-size-body;
+  $desktop-metric: $font-size-body-lg;
+  $desktop-heading: $font-size-title;
+  $desktop-title: $font-size-page-title;
+
   .content {
-    height: calc(100vh - 160px);
-    max-width: 1200px;
+    height: calc(
+      100vh - #{$header-height} - #{$nav-height} - var(--status-bar-height, 0px)
+    );
+    max-width: $desktop-content-width;
     margin: 0 auto;
     padding: 24px 24px 60px;
     display: grid;
@@ -685,22 +739,22 @@ page {
 
   /* 标题行 */
   .card-title {
-    font-size: 18px;
+    font-size: $desktop-title;
   }
 
   .card-tag {
     margin-left: 10px;
     padding: 3px 8px;
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   .card-ready {
-    font-size: 13px;
+    font-size: $desktop-aux;
   }
 
   .card-desc {
     margin: 10px 0 14px;
-    font-size: 14px;
+    font-size: $desktop-body;
   }
 
   /* 插图画区 */
@@ -714,7 +768,7 @@ page {
   .art-chip {
     bottom: 10px;
     padding: 4px 10px;
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   .chip-left {
@@ -731,13 +785,13 @@ page {
   }
 
   .footer-note {
-    font-size: 13px;
+    font-size: $desktop-aux;
   }
 
   .footer-button {
     height: 36px;
     padding: 0 20px;
-    font-size: 13px;
+    font-size: $desktop-aux;
     line-height: 36px;
   }
 
@@ -747,11 +801,11 @@ page {
   }
 
   .film-name {
-    font-size: 14px;
+    font-size: $desktop-body;
   }
 
   .film-meta {
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   .film-frames {
@@ -781,12 +835,12 @@ page {
   }
 
   .frame-label {
-    font-size: 11px;
+    font-size: $desktop-micro;
   }
 
   .film-chip {
     padding: 5px 10px;
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   /* 桌面端悬停暂停滚动，方便看清内容 */
@@ -798,39 +852,39 @@ page {
   .compare-handle {
     width: 28px;
     height: 28px;
-    font-size: 16px;
+    font-size: $desktop-metric;
     line-height: 28px;
   }
 
   .compare-tag {
     bottom: 56px;
     padding: 5px 10px;
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   .compare-caption {
     height: 40px;
-    font-size: 12px;
+    font-size: $desktop-caption;
     line-height: 40px;
   }
 
   /* 草稿库 */
   .draft-title {
-    font-size: 17px;
+    font-size: $desktop-heading;
   }
 
   .draft-subtitle {
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 
   .draft-row {
     margin-top: 10px;
     padding: 14px 16px;
-    font-size: 14px;
+    font-size: $desktop-body;
   }
 
   .draft-status {
-    font-size: 12px;
+    font-size: $desktop-caption;
   }
 }
 </style>

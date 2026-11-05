@@ -1,7 +1,12 @@
 <template>
   <view class="library-page">
     <app-page-header title="作品库" />
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
+    <scroll-view
+      scroll-y
+      :show-scrollbar="false"
+      class="content"
+      @scrolltolower="loadMore"
+    >
       <view class="summary-row">
         <text class="summary">{{ summary }}</text>
       </view>
@@ -15,27 +20,48 @@
           {{ tab.name }}　{{ tab.count }}
         </text>
       </view>
-      <view class="generating">
-        <view class="generating-label">造物<br />中</view>
-        <view class="generating-body">
-          <text>《宋式水墨远山图》</text>
-          <text class="status"> 墨骨勾勒中（68%）</text>
-          <view class="progress">
-            <view></view>
+      <app-state-hint
+        v-if="isLoading"
+        class="library-state"
+        type="loading"
+        title="正在载入作品库"
+      />
+      <app-state-hint
+        v-else-if="loadError"
+        class="library-state"
+        type="error"
+        title="作品库加载失败"
+        description="请检查网络后重试"
+        action-text="重新加载"
+        @action="loadLibraryData(true)"
+      />
+      <view v-else class="library-body">
+        <view v-if="showGenerating && generating" class="generating">
+          <view class="generating-label">造物<br />中</view>
+          <view class="generating-body">
+            <text>{{ generating.title }}</text>
+            <text class="status">{{ generating.statusText }}</text>
+          </view>
+          <text class="close" @click="showGenerating = false">×</text>
+        </view>
+        <view class="section-title">历史画卷 <text>长按可批量导出</text></view>
+        <view class="work-grid">
+          <view v-for="work in works" :key="work.workId" class="work-card">
+            <view class="art" :class="work.className">
+              <text>逸才意境</text>
+            </view>
+            <text class="more">•••</text>
+            <text class="work-title">{{ work.title }}</text>
           </view>
         </view>
-        <text class="remaining">预计还需 10 秒</text>
-        <text class="close">×</text>
-      </view>
-      <view class="section-title">历史画卷 <text>长按可批量导出</text></view>
-      <view class="work-grid">
-        <view v-for="work in works" :key="work.work_id" class="work-card">
-          <view class="art" :class="work.class_name">
-            <text>逸才意境</text>
-          </view>
-          <text class="more">•••</text>
-          <text class="work-title">{{ work.title }}</text>
-        </view>
+        <app-state-hint
+          v-if="!works.length"
+          class="library-state"
+          type="empty"
+          title="暂无画卷"
+          description="完成一次生图任务后，作品会自动归档到这里"
+        />
+        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />
@@ -43,28 +69,86 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getLibraryData } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
+import { getErrorMessage } from "@/utils/request";
+
+const PAGE_SIZE = 10;
 
 const activeStatus = ref("all");
 const summary = ref("");
 const works = ref([]);
 const tabs = ref([]);
+const generating = ref(null);
+const pageInfo = ref({ page: 1, pageSize: PAGE_SIZE, total: 0 });
+const isLoading = ref(true);
+const isLoadingMore = ref(false);
+const loadError = ref(false);
+const showGenerating = ref(true);
 
-// 加载作品库数据。
-const loadLibraryData = async () => {
-  const response = await getLibraryData({
-    page: 1,
-    page_size: 10,
-    status: activeStatus.value,
-  });
-  if (response.code === 0) {
-    summary.value = response.data.summary;
-    tabs.value = response.data.tabs;
-    works.value = response.data.lists;
+let requestToken = 0;
+
+const hasMore = computed(() => works.value.length < pageInfo.value.total);
+
+/**
+ * 加载作品库数据，并丢弃过期响应避免切换筛选时旧数据覆盖新状态。
+ * @param {boolean} [reset] 是否重置为第一页。
+ * @returns {Promise<void>}
+ */
+const loadLibraryData = async (reset = false) => {
+  const token = ++requestToken;
+  const page = reset ? 1 : pageInfo.value.page + 1;
+
+  if (reset) {
+    isLoading.value = true;
+    loadError.value = false;
+  } else {
+    isLoadingMore.value = true;
+  }
+
+  try {
+    const data = await getLibraryData({
+      page,
+      pageSize: PAGE_SIZE,
+      status: activeStatus.value,
+    });
+
+    if (token !== requestToken) {
+      return;
+    }
+
+    summary.value = data.summary;
+    tabs.value = data.tabs;
+    pageInfo.value = data.pageInfo;
+    generating.value = data.generating;
+    works.value = reset ? data.works : works.value.concat(data.works);
+
+    if (reset) {
+      showGenerating.value = Boolean(data.generating);
+    }
+  } catch (error) {
+    if (token !== requestToken) {
+      return;
+    }
+
+    if (reset) {
+      loadError.value = true;
+      works.value = [];
+    } else {
+      uni.showToast({
+        title: getErrorMessage(error, "加载更多作品失败"),
+        icon: "none",
+      });
+    }
+  } finally {
+    if (token === requestToken) {
+      isLoading.value = false;
+      isLoadingMore.value = false;
+    }
   }
 };
 
@@ -74,31 +158,41 @@ const loadLibraryData = async () => {
  * @returns {Promise<void>}
  */
 const handleTabChange = async (status) => {
+  if (status === activeStatus.value) {
+    return;
+  }
+
   activeStatus.value = status;
-  await loadLibraryData();
+  await loadLibraryData(true);
 };
 
-onMounted(async () => {
-  await loadLibraryData();
+// 滚动到底部时加载下一页
+const loadMore = () => {
+  if (isLoading.value || isLoadingMore.value || !hasMore.value) {
+    return;
+  }
+
+  loadLibraryData();
+};
+
+onMounted(() => {
+  loadLibraryData(true);
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .library-page {
   height: 100vh;
   overflow: hidden;
-  background: #f7f9ff;
-  color: #142b3c;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .content {
-  height: calc(100vh - 214rpx);
-  padding: 30rpx 36rpx 30rpx;
+  height: calc(100vh - 214rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
+  padding: $space-6 $space-7;
+  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -109,148 +203,152 @@ page {
 }
 
 .summary {
-  padding: 10rpx 16rpx;
-  border-radius: 24rpx;
-  background: #eef5fc;
-  color: #546a73;
-  font-size: 19rpx;
+  padding: $space-1 $space-3;
+  border-radius: $radius-pill;
+  background: $color-primary-light;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+  @include numeric;
 }
 
 .summary:first-letter {
-  color: #54bdb6;
+  color: $color-primary;
 }
 
 .tabs {
   display: flex;
-  gap: 10rpx;
-  margin-top: 24rpx;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-top: $space-5;
 }
 
 .tabs text {
-  padding: 18rpx 24rpx;
-  border-radius: 22rpx;
-  background: #fff;
-  color: #55666e;
-  font-size: 22rpx;
+  @include tap-area(64rpx);
+  padding: 0 $space-5;
+  border-radius: $radius-lg;
+  background: $color-surface;
+  color: $color-ink-soft;
+  font-size: $font-size-caption;
+  line-height: 1;
   box-shadow: 0 3rpx 10rpx rgba(38, 70, 88, 0.04);
+  @include numeric;
 }
 
 .tabs text.active {
-  background: #007d73;
+  background: $color-primary;
   color: #fff;
+  font-weight: $font-weight-semibold;
+}
+
+.library-state {
+  margin-top: $space-6;
+}
+
+.load-more {
+  margin-top: $space-5;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  text-align: center;
 }
 
 .generating {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 142rpx;
-  margin-top: 28rpx;
-  padding: 20rpx 22rpx;
-  border: 1rpx solid #e3edf1;
-  border-radius: 20rpx;
-  background: #fff;
+  min-height: 120rpx;
+  margin-top: $space-6;
+  padding: $space-4 $space-5 $space-4 $space-3;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-lg;
+  background: $color-surface;
   box-shadow: 0 5rpx 14rpx rgba(39, 76, 96, 0.08);
 }
 
 .generating-label {
+  flex-shrink: 0;
   width: 64rpx;
-  padding: 8rpx 4rpx;
-  border-radius: 6rpx;
-  background: #fff0f0;
-  color: #d53136;
-  font-weight: 700;
-  line-height: 1.15;
+  padding: $space-1 4rpx;
+  border-radius: $radius-xs;
+  background: #fdf0ef;
+  color: $color-accent-cinnabar;
+  font-size: $font-size-badge;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
   text-align: center;
 }
 
 .generating-body {
   flex: 1;
-  margin-left: 16rpx;
+  min-width: 0;
+  margin-left: $space-3;
 }
 
 .generating-body > text {
   display: block;
-  font-size: 22rpx;
-  font-weight: 700;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
+  @include text-ellipsis;
 }
 
 .generating-body > text:first-child {
-  color: #172e40;
-  font-size: 26rpx;
+  color: $color-ink;
+  font-size: $font-size-aux;
 }
 
 .generating-body .status {
-  margin-top: 14rpx;
-  color: #148f87;
-  font-size: 19rpx;
-  font-weight: 600;
-}
-
-.progress {
-  height: 10rpx;
-  margin-top: 12rpx;
-  border-radius: 8rpx;
-  background: #dcecf1;
-}
-
-.progress view {
-  width: 68%;
-  height: 100%;
-  border-radius: inherit;
-  background: #057e76;
-  box-shadow: 0 0 8rpx rgba(0, 137, 126, 0.22);
-}
-
-.remaining {
-  align-self: flex-end;
-  margin: 0 6rpx 34rpx 20rpx;
-  color: #788b91;
-  font-size: 18rpx;
-  white-space: nowrap;
+  margin-top: $space-2;
+  color: $color-primary;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-semibold;
 }
 
 .close {
   position: absolute;
-  top: 14rpx;
-  right: 18rpx;
-  color: #8a9a9e;
-  font-size: 32rpx;
-  font-weight: 300;
+  top: 0;
+  right: 0;
+  @include tap-area(64rpx);
+  color: $color-muted;
+  font-size: $font-size-title;
+  line-height: 1;
 }
 
 .section-title {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin: 36rpx 0 18rpx;
-  font: 700 28rpx serif;
+  gap: $space-3;
+  margin: $space-7 0 $space-3;
+  color: $color-ink;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
 }
 
 .section-title text {
-  color: #75878c;
-  font: 20rpx sans-serif;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-regular;
 }
 
 .work-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
+  gap: $space-3;
 }
 
 .work-card {
   position: relative;
   overflow: hidden;
-  border-radius: 18rpx;
-  background: #fff;
+  border-radius: $radius-lg;
+  background: $color-surface;
   box-shadow: 0 2rpx 8rpx rgba(30, 55, 70, 0.06);
 }
 
 .art {
-  height: 330rpx;
-  padding: 14rpx;
+  height: 300rpx;
+  padding: $space-3;
   box-sizing: border-box;
   color: #435e61;
-  font-size: 16rpx;
+  font-size: $font-size-caption;
 }
 
 .river-work {
@@ -278,13 +376,17 @@ page {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.88);
   color: #425761;
+  font-size: $font-size-caption;
   text-align: center;
-  line-height: 36rpx;
+  line-height: 40rpx;
 }
 
 .work-title {
   display: block;
-  padding: 18rpx;
-  font: 24rpx serif;
+  padding: $space-4 $space-3;
+  color: $color-ink;
+  font-size: $font-size-aux;
+  line-height: $line-height-normal;
+  @include text-ellipsis;
 }
 </style>

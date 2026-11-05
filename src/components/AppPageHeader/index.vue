@@ -5,20 +5,45 @@
     <view class="header-points">
       <text class="points-icon">✦</text>
       <text class="points-label">灵感点</text>
-      <text class="points-value">800</text>
+      <text class="points-value">{{ pointsText }}</text>
       <text class="points-detail">明细</text>
     </view>
   </view>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-defineProps({
+import { getAccountOverview } from "@/apis/account";
+
+/**
+ * @property {string} title 页头标题。
+ * @property {number|null} points 灵感点余额；无接口数据时传 null，展示占位符。
+ */
+const props = defineProps({
   title: { type: String, required: true },
+  points: { type: Number, default: null },
 });
 
 const canGoBack = ref(false);
+const remotePoints = ref(null);
+
+const pointsText = computed(() => {
+  const value = props.points === null ? remotePoints.value : props.points;
+
+  return value === null ? "—" : value;
+});
+
+// 读取灵感点余额；页头不打扰用户，失败时保留占位
+const loadPoints = async () => {
+  try {
+    const data = await getAccountOverview();
+
+    remotePoints.value = data.pointsBalance;
+  } catch (error) {
+    remotePoints.value = null;
+  }
+};
 
 // 根据当前页面栈决定是否显示返回箭头。
 const updateBackState = () => {
@@ -32,53 +57,59 @@ const handleBack = () => {
 
 onMounted(() => {
   updateBackState();
+  loadPoints();
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .app-page-header {
-  height: 100rpx;
-  padding: 0 35rpx;
+  height: calc(#{$header-height} + var(--status-bar-height, 0px));
+  padding: var(--status-bar-height, 0px) $space-7 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-bottom: 2rpx solid #e5edef;
-  background: #fff;
-  color: #000000;
+  border-bottom: 1rpx solid $color-line;
+  background: $color-surface;
+  color: $color-ink;
 }
 
 .header-title {
   flex: 1;
-  font-size: 33rpx;
-  font-weight: 700;
-  color: #03726bb4;
+  min-width: 0;
+  color: $color-primary;
+  font-size: $font-size-page-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  @include text-ellipsis;
 }
 
 .header-back {
-  width: 44rpx;
-  margin-right: 4rpx;
-  color: #142b3c;
-  font-size: 44rpx;
+  @include tap-area(72rpx);
+  flex-shrink: 0;
+  margin: 0 $space-1 0 (-$space-4);
+  color: $color-ink;
+  font-size: $font-size-display-sm;
   line-height: 1;
-  text-align: left;
 }
 
 .header-points {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding: 10rpx 14rpx;
+  margin-left: $space-3;
+  padding: $space-1 $space-3;
   border: 1rpx solid rgba(95, 133, 117, 0.16);
-  border-radius: 999rpx;
-  background: #e8efea;
-  color: #5f8575;
-  font-size: 18rpx;
+  border-radius: $radius-pill;
+  background: $color-primary-light;
+  color: $color-primary-soft;
+  font-size: $font-size-caption;
   white-space: nowrap;
 }
 
 .points-icon {
-  margin-right: 6rpx;
-  color: #c29b63;
-  font-size: 17rpx;
+  margin-right: $space-1;
+  color: $color-accent-clay;
+  font-size: $font-size-badge;
 }
 
 .points-label {
@@ -86,17 +117,18 @@ onMounted(() => {
 }
 
 .points-value {
-  margin-left: 6rpx;
-  color: #477665;
-  font-size: 20rpx;
-  font-weight: 700;
+  margin-left: $space-1;
+  color: $color-primary;
+  font-size: $font-size-aux;
+  font-weight: $font-weight-bold;
+  @include numeric;
 }
 
 .points-detail {
-  margin-left: 10rpx;
-  padding-left: 10rpx;
+  margin-left: $space-2;
+  padding-left: $space-2;
   border-left: 1rpx solid rgba(95, 133, 117, 0.22);
-  color: #5f8575;
-  font-size: 17rpx;
+  color: $color-primary-soft;
+  font-size: $font-size-badge;
 }
 </style>

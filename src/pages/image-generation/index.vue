@@ -3,52 +3,84 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive } from "vue";
+import { computed, reactive } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 
-import { getImageGenerationStatus } from "@/apis/textToImage";
+import { TASK_STATUS } from "@/apis/constants";
+import { getImageOptimizationTaskStatus } from "@/apis/image-optimization";
+import { getImageTaskStatus } from "@/apis/text-to-image";
 import GenerationProgress from "@/components/GenerationProgress/index.vue";
+import useTaskPolling from "@/hooks/useTaskPolling";
+import { getErrorMessage } from "@/utils/request";
 
-const task = reactive({ mode: "creation", taskId: "", progress: 68 });
+const task = reactive({
+  mode: "creation",
+  taskId: "",
+  progress: 0,
+  statusData: null,
+});
+
+const { start: startPolling } = useTaskPolling({
+  fetchTask: () =>
+    task.mode === "optimization"
+      ? getImageOptimizationTaskStatus(task.taskId)
+      : getImageTaskStatus(task.taskId),
+  interval: 3000,
+  maxAttempts: 60,
+  isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
+  onProgress: (data) => {
+    task.progress = data.progress;
+    task.statusData = data;
+  },
+  onCompleted: (data) => {
+    task.progress = data.progress;
+    task.statusData = data;
+  },
+  onFailed: (error) => {
+    uni.showToast({
+      title: getErrorMessage(error, "任务进度获取失败，请稍后重试"),
+      icon: "none",
+    });
+  },
+});
 
 const progressData = computed(() => {
   const isOptimization = task.mode === "optimization";
+  const status = task.statusData || {};
 
   return {
+    mode: task.mode,
     title: isOptimization ? "图片优化" : "画卷生成中",
-    stage: isOptimization ? "高清图像·重绘中" : "立轴画心·析出中",
-    type: isOptimization ? "无损超清" : "天工化育",
+    progressTitle: status.progressTitle || (isOptimization ? "淬炼重绘" : "研墨成画"),
+    stageLabel: status.stageLabel || "正在连接云端",
+    typeLabel: status.typeLabel || "",
     progress: task.progress,
-    progress_label: "气韵流转",
-    status: isOptimization ? "第二阶段·细节重塑" : "第二阶段·丹青晕染",
-    work_name: isOptimization ? "图片优化任务" : "《宋式水墨远山图》",
-    detail: isOptimization ? "云端蒸馏·高清重绘" : "天宝妙染·竖屏卷",
-    tags: isOptimization
-      ? ["无损超清", "4K重绘", "高清写意"]
-      : ["宋式水墨", "1:1方画心", "高清写意"],
-    cost: isOptimization ? 3 : 10,
-    description: isOptimization
-      ? "云端蒸馏级处理，完成后自动保存至作品库"
-      : "研墨调色，点染山石梧桐与溪桥花茂",
-    estimated_time: "约需 8 秒",
-    tip: "已投入云端渲染池，离开页面不影响任务进度",
+    progressLabel: status.progressLabel || "气韵流转",
+    statusText: status.statusText || "等待云端响应",
+    workName: status.workName || "任务校验中",
+    detail: status.detail || "",
+    tags: status.tags || [],
+    cost: typeof status.cost === "number" ? status.cost : null,
+    description: status.description || "正在获取任务信息",
+    estimatedTime: status.estimatedTime || "",
+    tip: status.tip || "已进入云端处理，期间离开或切换页面不影响生成，可在作品库查看。",
   };
 });
 
 /**
  * 读取任务类型并加载进度。
- * @param {{mode?: string, task_id?: string}} query 页面查询参数。
+ * @param {{mode?: string, taskId?: string}} query 页面查询参数。
  * @returns {void}
  */
 onLoad((query) => {
   task.mode = query.mode === "optimization" ? "optimization" : "creation";
-  task.taskId = query.task_id || "";
-});
+  task.taskId = query.taskId || "";
 
-onMounted(async () => {
-  const response = await getImageGenerationStatus({ task_id: task.taskId });
-  if (response.code === 0) {
-    task.progress = response.data.progress;
+  if (!task.taskId) {
+    uni.showToast({ title: "缺少任务标识", icon: "none" });
+    return;
   }
+
+  startPolling();
 });
 </script>

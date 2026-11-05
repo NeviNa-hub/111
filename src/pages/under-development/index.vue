@@ -42,31 +42,28 @@ const goBack = () => {
 };
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .development-page {
-  height: 100vh;
-  padding: 80rpx 36rpx 140rpx;
-  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f6fafb;
-  color: #17343b;
+  flex-direction: column;
+  height: 100vh;
+  padding: 60rpx $space-7;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow: hidden;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .content-card {
   width: 100%;
-  padding: 64rpx 40rpx;
+  margin: auto;
+  padding: $space-10 $space-8;
   box-sizing: border-box;
-  border: 1rpx solid #dce9ea;
-  border-radius: 28rpx;
-  background: #fff;
-  box-shadow: 0 12rpx 30rpx rgba(35, 77, 79, 0.08);
+  border: 1rpx solid $color-line;
+  border-radius: $radius-2xl;
+  background: $color-surface;
+  box-shadow: $shadow-card;
   text-align: center;
 }
 
@@ -75,9 +72,9 @@ page {
   height: 112rpx;
   margin: 0 auto;
   border-radius: 50%;
-  background: #e7f8f5;
-  color: #168d84;
-  font-size: 52rpx;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: $font-size-display;
   line-height: 112rpx;
 }
 
@@ -87,24 +84,27 @@ page {
 }
 
 .title {
-  margin-top: 32rpx;
-  font-size: 34rpx;
-  font-weight: 700;
+  margin-top: $space-7;
+  color: $color-primary;
+  font-size: $font-size-page-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
 }
 
 .description {
-  margin: 18rpx 0 40rpx;
-  color: #71878c;
-  font-size: 22rpx;
-  line-height: 1.7;
+  margin: $space-4 0 $space-8;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  line-height: $line-height-relaxed;
 }
 
 .primary-button,
 .secondary-button {
   width: 100%;
-  height: 76rpx;
-  border-radius: 22rpx;
-  font-size: 23rpx;
+  height: $tap-size;
+  border-radius: $radius-lg;
+  font-size: $font-size-body;
+  line-height: 1;
 }
 
 .primary-button:after,
@@ -114,14 +114,15 @@ page {
 
 .primary-button {
   border: 0;
-  background: #087d74;
+  background: $color-primary;
   color: #fff;
+  font-weight: $font-weight-semibold;
 }
 
 .secondary-button {
-  margin-top: 16rpx;
-  border: 1rpx solid #dce7e9;
-  background: #fff;
-  color: #61777c;
+  margin-top: $space-3;
+  border: 1rpx solid $color-line;
+  background: $color-surface;
+  color: $color-ink-soft;
 }
 </style>

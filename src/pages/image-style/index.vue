@@ -6,18 +6,40 @@
       <view class="step active">二甄选画风</view>
       <view class="step">三规划成画</view>
     </view>
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
+    <scroll-view
+      scroll-y
+      :show-scrollbar="false"
+      class="content"
+      :style="contentKeyboardStyle"
+    >
       <text class="step-count">步骤 2 / 3</text>
       <text class="page-title">第二步：甄选且现风格</text>
       <text class="page-desc">择取最合心意的笔触与气韵，使意境自然成章。</text>
 
+      <app-state-hint
+        v-if="isLoadingOptions"
+        class="content-state"
+        type="loading"
+        title="正在载入画风"
+      />
+      <app-state-hint
+        v-else-if="optionsError"
+        class="content-state"
+        type="error"
+        title="画风加载失败"
+        description="请检查网络后重试，已填写的画面主旨会保留"
+        action-text="重新加载"
+        @action="loadStyleOptions"
+      />
+
       <view class="prompt-card">
         <view class="prompt-head"
-          ><text>画面主旨意象</text><text>{{ prompt.length }} / 500字</text></view
+          ><text>画面主旨意象</text
+          ><text>{{ prompt.length }} / {{ promptLimit }}字</text></view
         >
         <textarea
           v-model="prompt"
-          maxlength="500"
+          :maxlength="promptLimit"
           class="prompt-input"
           placeholder="写下你想描绘的意象"
         />
@@ -27,10 +49,10 @@
           ><text @click="prompt = ''">清空</text></view
         >
       </view>
-      <view class="suggestion-head"
+      <view v-if="!isLoadingOptions && !optionsError" class="suggestion-head"
         ><text>灵感引线（轻触即添）</text><text>点击注入画面要素</text></view
       >
-      <view class="suggestions"
+      <view v-if="!isLoadingOptions && !optionsError" class="suggestions"
         ><button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
           ＋ {{ item }}
         </button></view
@@ -39,33 +61,6 @@
         ><view>● 画境点睛 · 气韵微调</view><text>意境基调　清润淡雅　墨韵沉静</text
         ><text>留白比例　迂阔（60%）　虚实均亭</text></view
       >
-
-      <!-- <view class="style-grid legacy-style-grid">
-        <view
-          v-for="style in styles"
-          :key="style.name"
-          class="style-card"
-          :class="{ selected: selectedStyle === style.name }"
-          @click="selectStyle(style.name)"
-        >
-          <view class="style-image" :class="style.class_name">
-            <text v-if="style.name === '宋式水墨'">山水</text>
-            <text v-else-if="style.name === '真实摄影'">茶与纸</text>
-            <text v-else-if="style.name === '宋瓷青釉'">青釉</text>
-            <text v-else>册页</text>
-          </view>
-          <view class="style-name">
-            {{ style.name }}
-            <app-icon
-              v-if="selectedStyle === style.name"
-              class="selected-mark"
-              name="check"
-            />
-          </view>
-          <text class="style-desc">{{ style.description }}</text>
-          <text v-if="selectedStyle === style.name" class="current">当前</text>
-        </view>
-      </view> -->
 
       <view class="detail-card">
         <view class="detail-title">风格特征细调 <text>针对当前画风</text></view>
@@ -79,17 +74,33 @@
         </view>
       </view>
     </scroll-view>
-    <view class="bottom-actions">
+    <view class="bottom-actions" :style="barKeyboardStyle">
       <button class="previous" @click="goBack">上一步</button>
-      <button class="next" @click="goNext">开始研墨成画 →</button>
+      <button
+        class="next"
+        :disabled="isSubmitting || isLoadingOptions || optionsError"
+        @click="handleSubmit"
+      >
+        开始研墨成画 →
+      </button>
     </view>
     <confirm-generation-dialog
       v-if="confirmVisible"
+      title="确认研墨成画"
+      :cost="generationCost"
+      :estimated-time="estimatedTime || '待定'"
+      note="确认后将扣除本次灵感点，并把画卷送入云端研磨，期间离开或切换页面均不影响生成。"
+      confirm-text="确认研墨成画"
       @cancel="confirmVisible = false"
       @confirm="confirmGenerate"
     />
     <generation-dialog
       v-if="progressVisible"
+      title="研墨成画"
+      type="creation"
+      :progress="taskProgress"
+      :progress-label="taskStage"
+      :note="taskNote"
       @back="uni.redirectTo({ url: '/pages/workbench/index' })"
       @library="uni.navigateTo({ url: '/pages/library/index' })"
     />
@@ -97,40 +108,113 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
-import { createImageGeneration, getImageStyles } from "@/apis/textToImage";
-import AppIcon from "@/components/AppIcon/index.vue";
+import { TASK_STATUS } from "@/apis/constants";
+import {
+  createImageGeneration,
+  getImageCanvasOptions,
+  getImageCreationOptions,
+  getImageStyles,
+  getImageTaskStatus,
+} from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
+import useKeyboardInset from "@/hooks/useKeyboardInset";
+import useTaskPolling from "@/hooks/useTaskPolling";
+import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import { appendPromptText, polishPromptText } from "@/utils/prompt";
+import { getErrorMessage } from "@/utils/request";
 
 const selectedStyle = ref("");
-const styles = ref([]);
 const prompt = ref("");
+const promptLimit = ref(500);
 const suggestions = ref([]);
+const polishSuffix = ref("");
+const randomPromptText = ref("");
+const canvasCounts = ref([]);
+const estimatedTime = ref("");
+const draft = ref(readCreationDraft(DRAFT_KEYS.image) || {});
 const confirmVisible = ref(false);
 const progressVisible = ref(false);
+const isSubmitting = ref(false);
+const isLoadingOptions = ref(true);
+const optionsError = ref(false);
+const taskId = ref("");
+const taskProgress = ref(0);
+const taskStatusData = ref(null);
+const { keyboardInset } = useKeyboardInset();
+
+const contentKeyboardStyle = computed(() => ({
+  paddingBottom:
+    keyboardInset.value > 0
+      ? `calc(var(--content-bottom-pad) + ${keyboardInset.value}px)`
+      : undefined,
+}));
+
+const barKeyboardStyle = computed(() => ({
+  bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
+}));
+
+const generationCost = computed(() => {
+  const matched = canvasCounts.value.find((item) => item.name === draft.value.count);
+
+  return matched ? matched.cost : "—";
+});
+
+const taskStage = computed(() => taskStatusData.value?.statusText || "气韵流转");
+
+const taskNote = computed(
+  () =>
+    taskStatusData.value?.tip ||
+    "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。"
+);
+
+const { start: startPolling } = useTaskPolling({
+  fetchTask: () => getImageTaskStatus(taskId.value),
+  interval: 3000,
+  maxAttempts: 60,
+  isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
+  onProgress: (data) => {
+    taskProgress.value = data.progress;
+    taskStatusData.value = data;
+  },
+  onCompleted: (data) => {
+    taskProgress.value = data.progress;
+    taskStatusData.value = data;
+  },
+  onFailed: (error) => {
+    uni.showToast({
+      title: getErrorMessage(error, "任务状态查询失败，请稍后重试"),
+      icon: "none",
+    });
+  },
+});
+
+// 在现有主旨后追加润色意象，空主旨时使用默认起笔句式
 const polishPrompt = () => {
-  prompt.value = prompt.value
-    ? `${prompt.value}，墨色清润，留白有致`
-    : "秋日薄暮，远山叠嶂，水墨氤氲";
+  prompt.value = polishPromptText(
+    prompt.value,
+    polishSuffix.value,
+    `江南烟雨中的远山与归舟，${polishSuffix.value}`
+  );
 };
+
+// 用随机意象覆盖当前主旨
 const randomPrompt = () => {
-  prompt.value = "江南烟雨中的远山与归舟，疏朗留白，清润水墨";
-};
-const appendPrompt = (value) => {
-  prompt.value = prompt.value ? `${prompt.value}，${value}` : value;
+  prompt.value = randomPromptText.value;
 };
 
 /**
- * 记录当前选中的画风。
- * @param {string} name 画风名称。
+ * 将灵感词追加到画面主旨，已有内容时用逗号衔接。
+ * @param {string} value 待追加的灵感词。
  * @returns {void}
  */
-const selectStyle = (name) => {
-  selectedStyle.value = name;
+const appendPrompt = (value) => {
+  prompt.value = appendPromptText(prompt.value, value);
 };
 
 // 返回上一页重新构思
@@ -138,150 +222,189 @@ const goBack = () => {
   uni.navigateBack();
 };
 
-// 校验并保存画风草稿，进入画幅设定页
-const goNext = async () => {
+// 校验构思内容后弹出生成确认
+const handleSubmit = () => {
+  if (isSubmitting.value || isLoadingOptions.value || optionsError.value) {
+    return;
+  }
+
   if (!selectedStyle.value) {
     uni.showToast({ title: "请先选择一种画风", icon: "none" });
     return;
   }
 
-  const draft = uni.getStorageSync("imageCreationDraft") || {};
   if (!prompt.value.trim()) {
     uni.showToast({ title: "请先填写画面主旨意象", icon: "none" });
     return;
   }
-  if (!confirmVisible.value) {
-    confirmVisible.value = true;
+
+  confirmVisible.value = true;
+};
+
+// 启动任务轮询，空任务标识时直接给出提示
+const startTaskPolling = () => {
+  if (!taskId.value) {
+    uni.showToast({ title: "任务创建失败，请重试", icon: "none" });
     return;
   }
-  confirmVisible.value = false;
+
+  taskProgress.value = 0;
+  taskStatusData.value = null;
+  startPolling();
+};
+
+/**
+ * 确认生成后创建文字生图任务。
+ * @returns {Promise<void>}
+ */
+const confirmGenerate = async () => {
+  if (isSubmitting.value) {
+    return;
+  }
+
   const requestData = {
     prompt: prompt.value.trim(),
     style: selectedStyle.value,
-    ratio: "1:1",
-    count: "鍙屽紶",
+    ratio: draft.value.ratio || "1:1",
+    count: draft.value.count || "双张",
   };
-  const response = await createImageGeneration(requestData);
-  if (response.code !== 0) {
+
+  isSubmitting.value = true;
+
+  try {
+    const task = await createImageGeneration(requestData);
+
+    confirmVisible.value = false;
+    draft.value = { ...draft.value, ...requestData };
+    saveCreationDraft(DRAFT_KEYS.image, draft.value);
+    taskId.value = task.taskId;
+    progressVisible.value = true;
+    startTaskPolling();
+  } catch (error) {
     uni.showToast({
-      title: response.message || "鍒涘缓浠诲姟澶辫触",
+      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
       icon: "none",
     });
-    return;
+  } finally {
+    isSubmitting.value = false;
   }
-  uni.setStorageSync("imageCreationDraft", requestData);
-  progressVisible.value = true;
 };
 
-const confirmGenerate = async () => {
-  await goNext();
+// 加载画风、灵感词与画幅配置，供首次进入与失败重试复用。
+const loadStyleOptions = async () => {
+  isLoadingOptions.value = true;
+  optionsError.value = false;
+
+  try {
+    const [styleOptions, creationOptions, canvasOptions] = await Promise.all([
+      getImageStyles(),
+      getImageCreationOptions(),
+      getImageCanvasOptions(),
+    ]);
+
+    const defaultStyle =
+      styleOptions.styles.find((item) => item.styleId === styleOptions.defaultStyleId) ||
+      styleOptions.styles[0];
+
+    selectedStyle.value = defaultStyle?.name || "";
+    suggestions.value = creationOptions.suggestions;
+    polishSuffix.value = creationOptions.polishSuffix;
+    randomPromptText.value = creationOptions.randomPrompt;
+    promptLimit.value = creationOptions.promptLimit || 500;
+    canvasCounts.value = canvasOptions.counts;
+    estimatedTime.value = canvasOptions.estimatedTime;
+    prompt.value = draft.value.prompt || "";
+  } catch (error) {
+    optionsError.value = true;
+  } finally {
+    isLoadingOptions.value = false;
+  }
 };
 
-onMounted(async () => {
-  const response = await getImageStyles();
-  if (response.code === 0) {
-    selectedStyle.value = response.data.default_style;
-    styles.value = response.data.lists;
-    suggestions.value = [
-      "寒林萧寺",
-      "江南烟雨",
-      "苍松怪石",
-      "孤舟蓑笠",
-      "烟岚浮动",
-      "残阳泛金",
-    ];
-    prompt.value = (uni.getStorageSync("imageCreationDraft") || {}).prompt || "";
-  }
+onMounted(() => {
+  loadStyleOptions();
 });
 
 onShow(() => {
-  const draft = uni.getStorageSync("imageCreationDraft");
+  const currentDraft = readCreationDraft(DRAFT_KEYS.image);
 
-  if (!draft?.style) {
+  if (!currentDraft?.style) {
     uni.showToast({ title: "请先完成构思意境", icon: "none" });
     uni.redirectTo({ url: "/pages/image-creation/index" });
+    return;
   }
+
+  draft.value = currentDraft;
 });
 </script>
 
-<style scoped>
-page {
-  height: 100%;
-  overflow: hidden;
-}
-
+<style scoped lang="scss">
 .style-page {
   height: 100vh;
   overflow: hidden;
-  background: #f7fafb;
-  color: #16363e;
+  background: $color-bg-page;
+  color: $color-ink;
 }
 
 .step-bar {
-  height: 72rpx;
-  margin: 12rpx 24rpx 0;
-  padding: 8rpx;
+  height: 82rpx;
+  margin: 18rpx $space-7 0;
+  padding: $space-1;
   display: flex;
   align-items: center;
-  border: 1rpx solid #dce9eb;
-  border-radius: 20rpx;
-  background: #fff;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-2xl;
+  background: $color-surface;
+  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: 13rpx 5rpx;
-  border-radius: 15rpx;
-  color: #b3bfc2;
+  padding: $space-2 $space-1;
+  border-radius: $radius-md;
+  color: $color-faint;
   text-align: center;
-  font-size: 19rpx;
+  font-size: $font-size-caption;
   white-space: nowrap;
 }
 
 .step.done {
-  color: #087e76;
+  color: $color-primary-soft;
 }
 
 .step.active {
-  color: #087e76;
-  background: #e8f8f6;
-  font-weight: 700;
+  background: $color-primary;
+  color: #fff;
+  font-weight: $font-weight-bold;
 }
 
 .step-bar .step:nth-child(3) {
   display: none;
 }
 
-.step-bar {
-  margin: 18rpx 32rpx 0;
-  height: 82rpx;
-  border-radius: 28rpx;
-  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
-}
-
-.step.active {
-  color: #fff;
-  background: #05604c;
+.content-state {
+  margin-top: $space-6;
 }
 
 .content {
-  height: calc(100vh - 270rpx);
-  padding: 34rpx 32rpx 160rpx;
+  --content-bottom-pad: 160rpx;
+  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
+  padding: 34rpx $space-7 var(--content-bottom-pad);
   box-sizing: border-box;
 }
 
-.legacy-style-grid,
 .detail-card {
   display: none;
 }
 
 .prompt-card,
 .tuning-card {
-  margin-top: 24rpx;
-  padding: 22rpx;
-  border: 1rpx solid #e0e7e4;
-  border-radius: 24rpx;
-  background: #fff;
+  margin-top: $space-5;
+  padding: $space-5;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-xl;
+  background: $color-surface;
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.05);
 }
 
@@ -289,227 +412,119 @@ page {
 .prompt-tools,
 .suggestion-head {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
 }
 
 .prompt-head text:last-child,
 .suggestion-head text:last-child,
 .tuning-card text {
-  color: #91a1a4;
-  font-size: 18rpx;
+  color: $color-muted;
+  font-size: $font-size-caption;
 }
 
 .prompt-input {
   width: 100%;
   height: 250rpx;
-  margin-top: 18rpx;
-  font-size: 24rpx;
+  margin-top: $space-3;
+  font-size: $font-size-body;
+  line-height: $line-height-normal;
+}
+
+.prompt-tools {
+  flex-wrap: wrap;
+  margin-top: $space-3;
 }
 
 .prompt-tools button,
 .suggestions button {
-  margin: 0 10rpx 0 0;
-  padding: 0 16rpx;
-  height: 52rpx;
-  border: 1rpx solid #dce7e3;
-  border-radius: 14rpx;
-  background: #fff;
-  color: #176954;
-  font-size: 19rpx;
+  @include tap-area(64rpx);
+  margin: 0 $space-2 $space-2 0;
+  padding: 0 $space-3;
+  border: 1rpx solid $color-line;
+  border-radius: $radius-sm;
+  background: $color-surface;
+  color: $color-primary-soft;
+  font-size: $font-size-caption;
+  line-height: 1;
+}
+
+.prompt-tools button:after,
+.suggestions button:after {
+  border: 0;
 }
 
 .prompt-tools text {
-  color: #a0aaab;
-  font-size: 18rpx;
+  margin-left: auto;
+  color: $color-muted;
+  font-size: $font-size-caption;
 }
+
 .suggestion-head {
-  margin-top: 26rpx;
-  color: #146c59;
-  font-size: 21rpx;
+  margin-top: $space-5;
+  color: $color-primary;
+  font-size: $font-size-aux;
 }
+
 .suggestions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 14rpx;
+  gap: $space-2;
+  margin-top: $space-3;
 }
+
 .suggestions button {
-  color: #47615f;
+  color: $color-ink-soft;
 }
+
 .tuning-card view {
-  margin-bottom: 16rpx;
-  color: #17463d;
-  font-weight: 700;
+  margin-bottom: $space-3;
+  color: $color-ink;
+  font-weight: $font-weight-bold;
 }
+
 .tuning-card text {
   display: block;
-  padding: 12rpx 0;
-  border-top: 1rpx solid #edf1ef;
+  padding: $space-3 0;
+  border-top: 1rpx solid $color-line;
 }
 
 .step-count {
   display: block;
-  color: #759096;
-  font-size: 19rpx;
+  color: $color-muted;
+  font-size: $font-size-caption;
+  @include numeric;
 }
 
 .page-title {
   display: block;
-  margin-top: 10rpx;
-  font: 700 34rpx serif;
+  margin-top: $space-1;
+  color: $color-ink;
+  font-size: $font-size-page-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
 }
 
 .page-desc {
   display: block;
-  margin-top: 8rpx;
-  color: #748a90;
-  font-size: 20rpx;
-}
-
-.style-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18rpx;
-  margin-top: 28rpx;
-}
-
-.style-card {
-  position: relative;
-  padding: 12rpx;
-  border: 1rpx solid #dce5e7;
-  border-radius: 22rpx;
-  background: #fff;
-}
-
-.style-card.selected {
-  border: 2rpx solid #099d91;
-  box-shadow: 0 0 0 3rpx rgba(9, 157, 145, 0.1);
-}
-
-.style-image {
-  height: 165rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 16rpx;
-  color: rgba(55, 70, 68, 0.55);
-  font: 700 28rpx serif;
-}
-
-.ink-style {
-  background: linear-gradient(155deg, #eeeae0, #b4c4c0);
-}
-
-.photo-style {
-  background: linear-gradient(145deg, #d6dec6, #bca98c);
-  color: rgba(85, 70, 50, 0.65);
-}
-
-.ceramic-style {
-  background: linear-gradient(145deg, #c2d6ce, #7f9e98);
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.illustration-style {
-  background: linear-gradient(145deg, #f1e5c7, #d5ba8f);
-  color: rgba(121, 90, 56, 0.65);
-}
-
-.style-name {
-  margin-top: 12rpx;
-  font-size: 23rpx;
-  font-weight: 700;
-}
-
-.selected-mark {
-  float: right;
-  width: 32rpx;
-  height: 32rpx;
-  border-radius: 50%;
-  background: #099d91;
-  color: #fff;
-  text-align: center;
-  line-height: 32rpx;
-}
-
-.style-desc {
-  display: block;
-  margin-top: 6rpx;
-  color: #72868b;
-  font-size: 17rpx;
-  line-height: 1.4;
-}
-
-.current {
-  position: absolute;
-  right: 14rpx;
-  bottom: 78rpx;
-  padding: 4rpx 8rpx;
-  border-radius: 8rpx;
-  background: #e6faf7;
-  color: #118f87;
-  font-size: 16rpx;
-}
-
-.detail-card {
-  margin-top: 22rpx;
-  padding: 20rpx;
-  border: 1rpx solid #dce7ea;
-  border-radius: 22rpx;
-  background: #fff;
-}
-
-.detail-title {
-  padding-bottom: 16rpx;
-  color: #2b555d;
-  font-size: 21rpx;
-  font-weight: 700;
-}
-
-.detail-title text {
-  float: right;
-  color: #99aaae;
-  font-size: 17rpx;
-  font-weight: 400;
-}
-
-.select-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12rpx;
-  padding: 20rpx 16rpx;
-  border-radius: 14rpx;
-  background: #f8fafb;
-  color: #4e6e74;
-  font-size: 19rpx;
-}
-
-.select-row text:last-child {
-  padding: 5rpx 12rpx;
-  border: 1rpx solid #e1e9eb;
-  border-radius: 10rpx;
-  background: #fff;
-  color: #637a80;
+  margin-top: $space-1;
+  color: $color-muted;
+  font-size: $font-size-aux;
+  line-height: $line-height-normal;
 }
 
 .bottom-actions {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  @include action-bar;
   display: flex;
-  gap: 14rpx;
-  padding: 18rpx 32rpx 28rpx;
-  border-top: 1rpx solid #e7eeee;
-  background: #fff;
+  gap: $space-3;
 }
 
 .bottom-actions button {
-  height: 70rpx;
-  border-radius: 18rpx;
-  font-size: 21rpx;
+  height: $tap-size;
+  border-radius: $radius-md;
+  font-size: $font-size-body;
+  line-height: 1;
 }
 
 .bottom-actions button:after {
@@ -517,176 +532,22 @@ page {
 }
 
 .previous {
-  width: 100rpx;
-  border: 1rpx solid #e2e9eb;
-  background: #fff;
-  color: #7a8e93;
+  width: 150rpx;
+  flex-shrink: 0;
+  border: 1rpx solid $color-line;
+  background: $color-surface;
+  color: $color-ink-soft;
 }
 
 .next {
   flex: 1;
   border: 0;
-  background: #007d73;
+  background: $color-primary;
   color: #fff;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
 }
 
-.modal-mask {
-  position: fixed;
-  z-index: 20;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  background: rgba(20, 28, 27, 0.52);
-}
-
-.confirm-sheet {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 32rpx 28rpx 28rpx;
-  border-radius: 32rpx 32rpx 0 0;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.confirm-title {
-  order: 1;
-}
-.confirm-meta {
-  order: 2;
-}
-.confirm-note {
-  order: 3;
-}
-.confirm-actions {
-  order: 4;
-}
-
-.confirm-title {
-  color: #183c35;
-  font: 700 28rpx serif;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #e7ecea;
-}
-
-.confirm-sheet > text:first-of-type {
-  display: none;
-}
-.confirm-sheet > text {
-  display: block;
-  margin: 18rpx 0 26rpx;
-  color: #758582;
-  font-size: 20rpx;
-}
-
-.confirm-note {
-  padding: 14rpx 8rpx;
-  color: #71817e;
-  font-size: 18rpx;
-  line-height: 1.5;
-}
-
-.confirm-meta {
-  margin-top: 18rpx;
-  padding: 14rpx 16rpx;
-  border: 1rpx solid #f1dfab;
-  border-radius: 18rpx;
-  background: #fffaf0;
-}
-
-.confirm-meta view {
-  display: flex;
-  align-items: center;
-  min-height: 48rpx;
-  color: #746c5b;
-  font-size: 18rpx;
-}
-
-.confirm-meta view + view {
-  border-top: 1rpx solid #f2e8cf;
-}
-
-.confirm-meta view > text:first-child {
-  width: 38rpx;
-  color: #d58b22;
-  font-size: 22rpx;
-}
-
-.confirm-meta b {
-  margin-left: auto;
-  color: #a65d17;
-  font-size: 20rpx;
-}
-.confirm-actions {
-  display: flex;
-  gap: 14rpx;
-}
-.confirm-actions button {
-  flex: 1;
-  height: 72rpx;
-  border-radius: 18rpx;
-  font-size: 20rpx;
-}
-.confirm-actions .confirm {
-  border: 0;
-  background: #05604c;
-  color: #fff;
-}
-.progress-sheet {
-  text-align: center;
-}
-
-.progress-title {
-  width: 100%;
-  text-align: left;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #e7ecea;
-  color: #183c35;
-  font: 700 30rpx serif;
-}
-
-.progress-subtitle,
-.progress-status,
-.progress-note {
-  display: block;
-  color: #73817e;
-  font-size: 18rpx;
-}
-
-.progress-sheet > text:not(.progress-subtitle):not(.progress-status):not(.progress-note) {
-  display: none;
-}
-
-.progress-subtitle {
-  margin-top: 10rpx;
-}
-
-.progress-sheet .progress-circle {
-  margin-top: 22rpx;
-}
-
-.progress-status {
-  margin-top: 18rpx;
-  color: #087761;
-  font-weight: 700;
-}
-
-.progress-note {
-  margin: 14rpx 0 24rpx;
-  line-height: 1.5;
-}
-.progress-circle {
-  width: 150rpx;
-  height: 150rpx;
-  margin: 0 auto 22rpx;
-  border: 6rpx solid #0c9b86;
-  border-radius: 50%;
-  color: #16463d;
-  font-size: 52rpx;
-  line-height: 150rpx;
-}
-.progress-circle small {
-  font-size: 22rpx;
+.bottom-actions button[disabled] {
+  opacity: 0.55;
 }
 </style>

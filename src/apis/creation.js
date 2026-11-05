@@ -1,82 +1,90 @@
-const WORKBENCH_DATA = {
-  frames: ["起势·淡雾", "承转·远山", "流光·松石", "收敛·留白"],
-  drafts: [
-    {
-      draft_id: 1,
-      title: "《松山夜笛》插图构思",
-      time: "2小时前",
-      status: "待生成",
-    },
-    {
-      draft_id: 2,
-      title: "茶室空间运镜脚本设计",
-      time: "昨日",
-      status: "已分镜",
-    },
-    {
-      draft_id: 3,
-      title: "老照片人物去污处理",
-      time: "3日前",
-      status: "已完成",
-    },
-  ],
+/**
+ * 创作台与作品库
+ */
+import { API_PATHS, PAGE_DEFAULTS } from "@/apis/constants";
+import apiRequest from "@/apis/http";
+import { mapPageInfo } from "@/apis/mappers";
+
+// 映射分镜
+const mapFrame = (item = {}) => ({
+  frameId: item.frame_id,
+  name: item.name || "",
+});
+
+// 映射草稿
+const mapDraft = (item = {}) => ({
+  draftId: item.draft_id,
+  title: item.title || "",
+  time: item.time || "",
+  status: item.status || "",
+});
+
+// 映射作品标签
+const mapTab = (item = {}) => ({
+  status: item.status,
+  name: item.name || "",
+  count: Number(item.count) || 0,
+});
+
+// 映射作品
+const mapWork = (item = {}) => ({
+  workId: item.work_id,
+  title: item.title || "",
+  status: item.status || "",
+  className: item.class_name || "",
+  imageUrl: item.image_url || "",
+});
+
+// 映射生成中提示
+const mapGenerating = (item) => {
+  if (!item) {
+    return null;
+  }
+
+  return {
+    workId: item.work_id,
+    title: item.title || "",
+    statusText: item.status_text || "",
+  };
 };
 
-const LIBRARY_TABS = [
-  { status: "all", name: "全部", count: 19 },
-  { status: "completed", name: "已完成", count: 12 },
-  { status: "creating", name: "创作中", count: 4 },
-  { status: "draft", name: "草稿", count: 3 },
-];
+/**
+ * 获取创作台数据。
+ * @returns {Promise<import("@/apis/types").WorkbenchOverview>} 创作台数据。
+ */
+export const getWorkbenchData = async () => {
+  const data = await apiRequest({ url: API_PATHS.WORKBENCH });
 
-const WORKS = [
-  {
-    work_id: 1,
-    title: "《寒江独钓图》",
-    status: "completed",
-    class_name: "river-work",
-  },
-  {
-    work_id: 2,
-    title: "《空山新雨竹影》",
-    status: "completed",
-    class_name: "bamboo-work",
-  },
-  {
-    work_id: 3,
-    title: "《茶室听雪静物》",
-    status: "creating",
-    class_name: "tea-work",
-  },
-  {
-    work_id: 4,
-    title: "《烟渚微茫图》",
-    status: "draft",
-    class_name: "mist-work",
-  },
-];
+  return {
+    filmChips: Array.isArray(data.film_chips) ? data.film_chips : [],
+    frames: Array.isArray(data.frames) ? data.frames.map(mapFrame) : [],
+    drafts: Array.isArray(data.drafts) ? data.drafts.map(mapDraft) : [],
+  };
+};
 
-/** 获取创作台数据。 @returns {Promise<Object>} 创作台响应。 */
-export function getWorkbenchData() {
-  return Promise.resolve({ code: 0, message: "success", data: WORKBENCH_DATA });
-}
-
-/** 获取作品库列表。 @param {Object} params 查询参数。 @returns {Promise<Object>} 作品库响应。 */
-export function getLibraryData(params = {}) {
-  const status = params.status || "all";
-  const lists = WORKS.filter((item) => status === "all" || item.status === status);
-  const page = params.page || 1;
-  const pageSize = params.page_size || 10;
-  const start = (page - 1) * pageSize;
-
-  return Promise.resolve({
-    code: 0,
-    message: "success",
-    data: {
-      summary: "共 18 幅典藏 · 1 幅研墨中",
-      tabs: LIBRARY_TABS,
-      page_info: { page, page_size: pageSize, total: lists.length },
-      lists: lists.slice(start, start + pageSize),
+/**
+ * 获取作品库列表。
+ * @param {Object} [params] 查询参数。
+ * @param {number} [params.page] 页码。
+ * @param {number} [params.pageSize] 每页条数。
+ * @param {string} [params.status] 作品状态。
+ * @returns {Promise<import("@/apis/types").LibraryResult>} 作品库数据。
+ */
+export const getLibraryData = async (params = {}) => {
+  const data = await apiRequest({
+    url: API_PATHS.LIBRARY,
+    params: {
+      page: params.page || PAGE_DEFAULTS.PAGE,
+      page_size: params.pageSize || PAGE_DEFAULTS.PAGE_SIZE,
+      status: params.status || "all",
     },
   });
-}
+
+  return {
+    summary: data.summary || "",
+    tabs: Array.isArray(data.tabs) ? data.tabs.map(mapTab) : [],
+    pageInfo: mapPageInfo(data.page_info),
+    works: Array.isArray(data.lists) ? data.lists.map(mapWork) : [],
+    generating: mapGenerating(data.generating),
+  };
+};
