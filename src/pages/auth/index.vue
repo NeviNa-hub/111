@@ -52,7 +52,7 @@
             v-model="formModel.username"
             class="field-input"
             placeholder="请输入用户名"
-            maxlength="30"
+            maxlength="64"
           />
         </el-form-item>
 
@@ -143,11 +143,22 @@ const formRules = computed(() => ({
       message: "请输入账号",
       trigger: "blur",
     },
+    {
+      pattern: /^[A-Za-z0-9_]{3,64}$/,
+      message: "账号需为 3–64 位英文字母、数字或下划线",
+      trigger: "blur",
+    },
   ],
   password: [
     {
       required: true,
       message: "请输入密码",
+      trigger: "blur",
+    },
+    {
+      min: 8,
+      max: 128,
+      message: "密码长度需为 8–128 个字符",
       trigger: "blur",
     },
   ],
