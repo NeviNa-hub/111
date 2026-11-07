@@ -1,14 +1,16 @@
 <template>
   <view class="development-page">
     <app-page-header :title="title" />
-    <view class="content-card">
-      <view class="icon"></view>
-      <text class="title">{{ title }}正在建设中</text>
-      <text class="description"
-        >该功能暂未开放，我们正在持续完善创作体验。</text
-      >
-      <button class="primary-button" @tap="goWorkbench">返回创作台</button>
-      <button class="secondary-button" @tap="goBack">返回上一页</button>
+    <view class="content-area">
+      <view class="content-card">
+        <view class="icon"></view>
+        <text class="title">{{ title }}正在建设中</text>
+        <text class="description"
+          >该功能暂未开放，我们正在持续完善创作体验。</text
+        >
+        <button class="primary-button" @tap="goWorkbench">返回创作台</button>
+        <button class="secondary-button" @tap="goBack">返回上一页</button>
+      </view>
     </view>
     <app-bottom-nav active="workshop" />
   </view>
@@ -49,12 +51,18 @@ const goBack = () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: calc(var(--status-bar-height, 0px) + #{$space-5}) $space-7 0;
-  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   overflow: hidden;
   background: $color-bg-page;
   color: $color-ink;
+}
+
+.content-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 0 $space-7 calc(140rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 .content-card {
