@@ -58,9 +58,7 @@
 
         <view class="label-row">
           <text class="field-label">密码</text>
-          <text v-if="!isRegister" class="link-text" @tap="showUnavailable">
-            忘记密码？
-          </text>
+          <text v-if="!isRegister" class="link-text">忘记密码？</text>
         </view>
         <el-form-item prop="password" class="auth-form-item">
           <el-input
@@ -124,6 +122,8 @@
 
 <script setup>
 import { computed, reactive, ref } from "vue";
+import { loginUser, registerUser } from "@/apis/auth";
+import { AUTH_TOKEN_STORAGE_KEY, AUTH_USER_STORAGE_KEY } from "@/utils/request";
 
 const formRef = ref(null);
 const formModel = reactive({
@@ -189,16 +189,11 @@ const goBack = () => {
   }
 };
 
-// 展示接口接入前的说明。
-const showUnavailable = () => {
-  uni.showToast({ title: "找回密码功能暂未开放", icon: "none" });
-};
-
-// 执行本地表单校验；服务端认证接口暂未接入。
+// 校验表单并调用登录或注册接口。
 const handleSubmit = async () => {
-  const isValid = await formRef.value.validate().catch(() => false);
-
-  if (!isValid) {
+  try {
+    await formRef.value.validate();
+  } catch (error) {
     return;
   }
 
@@ -206,11 +201,25 @@ const handleSubmit = async () => {
     uni.showToast({ title: "请先阅读并同意服务协议与隐私政策", icon: "none" });
     return;
   }
+  const params = { account: formModel.account, password: formModel.password };
+  const resData = isRegister.value
+    ? await registerUser({
+        username: formModel.username,
+        ...params,
+      })
+    : await loginUser({
+        ...params,
+      });
 
-  uni.showToast({
-    title: isRegister.value ? "注册接口暂未接入" : "登录接口暂未接入",
-    icon: "none",
-  });
+  if (resData.code === 200) {
+    uni.setStorageSync(AUTH_TOKEN_STORAGE_KEY, resData.data.access_token);
+    uni.setStorageSync(AUTH_USER_STORAGE_KEY, {
+      user_id: resData.data.user_id,
+      username: resData.data.username,
+      account: resData.data.account,
+    });
+    uni.reLaunch({ url: "/pages/index/index" });
+  }
 };
 </script>
 
