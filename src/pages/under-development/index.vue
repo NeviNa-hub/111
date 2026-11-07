@@ -4,7 +4,9 @@
     <view class="content-card">
       <view class="icon"></view>
       <text class="title">{{ title }}正在建设中</text>
-      <text class="description">该功能暂未开放，我们正在持续完善创作体验。</text>
+      <text class="description"
+        >该功能暂未开放，我们正在持续完善创作体验。</text
+      >
       <button class="primary-button" @tap="goWorkbench">返回创作台</button>
       <button class="secondary-button" @tap="goBack">返回上一页</button>
     </view>
@@ -47,7 +49,7 @@ const goBack = () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 60rpx $space-7;
+  padding: calc(var(--status-bar-height, 0px) + #{$space-5}) $space-7 0;
   padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   overflow: hidden;
@@ -58,6 +60,7 @@ const goBack = () => {
 .content-card {
   width: 100%;
   margin: auto;
+  transform: translateY(-$space-6);
   padding: $space-10 $space-8;
   box-sizing: border-box;
   border: 1rpx solid $color-line;
@@ -100,11 +103,16 @@ const goBack = () => {
 
 .primary-button,
 .secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: $tap-size;
+  padding: 0;
+  box-sizing: border-box;
   border-radius: $radius-lg;
   font-size: $font-size-body;
-  line-height: 1;
+  line-height: $line-height-tight;
 }
 
 .primary-button:after,
