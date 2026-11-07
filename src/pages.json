@@ -1,0 +1,84 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "妙笔生花"
+      }
+    },
+    {
+      "path": "pages/workbench/index",
+      "style": {
+        "navigationBarTitleText": "妙笔生花"
+      }
+    },
+    {
+      "path": "pages/image-creation/index",
+      "style": {
+        "navigationBarTitleText": "文字生图"
+      }
+    },
+    {
+      "path": "pages/image-style/index",
+      "style": {
+        "navigationBarTitleText": "挑选画风"
+      }
+    },
+    {
+      "path": "pages/image-canvas/index",
+      "style": {
+        "navigationBarTitleText": "设定画幅"
+      }
+    },
+    {
+      "path": "pages/image-generation/index",
+      "style": {
+        "navigationBarTitleText": "画卷生成中"
+      }
+    },
+    {
+      "path": "pages/image-optimization/index",
+      "style": {
+        "navigationBarTitleText": "图片优化"
+      }
+    },
+    {
+      "path": "pages/video-creation/index",
+      "style": {
+        "navigationBarTitleText": "规制与意境"
+      }
+    },
+    {
+      "path": "pages/video-render/index",
+      "style": {
+        "navigationBarTitleText": "画质与渲染"
+      }
+    },
+    {
+      "path": "pages/library/index",
+      "style": {
+        "navigationBarTitleText": "作品库"
+      }
+    },
+    {
+      "path": "pages/under-development/index",
+      "style": {
+        "navigationBarTitleText": "功能建设中"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationStyle": "custom",
+    "rpxCalcMaxDeviceWidth": 750,
+    "rpxCalcBaseDeviceWidth": 750,
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "妙笔生花",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "h5": {
+    "router": {
+      "mode": "hash"
+    }
+  }
+}
