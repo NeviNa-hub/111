@@ -30,7 +30,10 @@ const { start: startPolling } = useTaskPolling({
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
   onProgress: (data) => {
     task.progress = data.progress;
-    task.statusData = { statusText: "云端处理中", tip: "离开页面不影响任务进度。" };
+    task.statusData = {
+      statusText: "云端处理中",
+      tip: "离开页面不影响任务进度。",
+    };
   },
   onCompleted: (data) => {
     task.progress = data.progress;
@@ -49,7 +52,7 @@ const { start: startPolling } = useTaskPolling({
 
 const progressData = computed(() => {
   const isOptimization = task.mode === "optimization";
-  const status = task.statusData || {};
+  const isCompleted = task.progress >= 100;
 
   return {
     mode: task.mode,
@@ -59,16 +62,16 @@ const progressData = computed(() => {
     typeLabel: isOptimization ? "图片优化" : "文字生图",
     progress: task.progress,
     progressLabel: "气韵流转",
-    statusText: status.statusText || "云端处理中",
+    statusText: isCompleted ? "已完成 · 已归档作品库" : "云端处理中",
     workName: isOptimization ? "图片优化任务" : "新建画卷",
     detail: "云端智能生成",
     tags: [],
     cost: isOptimization ? 3 : 4,
     description: "任务完成后自动保存至作品库",
     estimatedTime: "预计稍候完成",
-    tip:
-      status.tip ||
-      "已进入云端处理，期间离开或切换页面不影响生成，可在作品库查看。",
+    tip: isCompleted
+      ? "任务已完成，可前往作品库查看。"
+      : "已进入云端处理，离开页面不影响任务进度。",
   };
 });
 

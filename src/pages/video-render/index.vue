@@ -216,8 +216,20 @@ import { getErrorMessage } from "@/utils/request";
 
 const draft = ref({ ratioName: "", prompt: "", imagePath: "" });
 const fpsOptions = [
-  { fpsId: 1, value: 30, name: "30 FPS · 典雅", tag: "节律省电", description: "传统水墨电影韵味，起承转合自然含蓄" },
-  { fpsId: 2, value: 60, name: "60 FPS · 丝滑 4K 超清", tag: "首推", description: "雪浪微澜，丝缕毕现，水汽流动如真如幻" },
+  {
+    fpsId: 1,
+    value: 30,
+    name: "30 FPS · 典雅",
+    tag: "节律省电",
+    description: "传统水墨电影韵味，起承转合自然含蓄",
+  },
+  {
+    fpsId: 2,
+    value: 60,
+    name: "60 FPS · 丝滑 4K 超清",
+    tag: "首推",
+    description: "雪浪微澜，丝缕毕现，水汽流动如真如幻",
+  },
 ];
 const renderConfig = reactive({
   power: 800,

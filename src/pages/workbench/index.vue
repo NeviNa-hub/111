@@ -21,7 +21,9 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">支持宣纸留白与精细排版</text>
-          <button class="footer-button" @click="startTool('文字生图')">研墨生图</button>
+          <button class="footer-button" @click="startTool('文字生图')">
+            研墨生图
+          </button>
         </view>
       </view>
 
@@ -47,7 +49,11 @@
             </view>
           </view>
           <view class="film-frames">
-            <view v-for="frame in frames" :key="frame.frameId" class="film-frame">
+            <view
+              v-for="frame in frames"
+              :key="frame.frameId"
+              class="film-frame"
+            >
               <i class="frame-thumb"></i>
               <small class="frame-label">{{ frame.name }}</small>
             </view>
@@ -56,7 +62,10 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">四镜连贯 · 独立成片</text>
-          <button class="footer-button button-blue" @click="startTool('视频创作')">
+          <button
+            class="footer-button button-blue"
+            @click="startTool('视频创作')"
+          >
             逐帧调度
           </button>
         </view>
@@ -87,7 +96,10 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">最大支持五千万像素解析</text>
-          <button class="footer-button button-purple" @click="startTool('图片优化')">
+          <button
+            class="footer-button button-purple"
+            @click="startTool('图片优化')"
+          >
             净炼重绘
           </button>
         </view>
@@ -129,7 +141,12 @@ const frames = [
   { frameId: 4, name: "收敛·留白" },
 ];
 const drafts = [
-  { draftId: 1, title: "《松山夜笛》插图构思", time: "2小时前", status: "待生成" },
+  {
+    draftId: 1,
+    title: "《松山夜笛》插图构思",
+    time: "2小时前",
+    status: "待生成",
+  },
   { draftId: 2, title: "茶室空间运镜脚本设计", time: "昨日", status: "已分镜" },
   { draftId: 3, title: "老照片人物去污处理", time: "3日前", status: "已完成" },
 ];
@@ -160,7 +177,6 @@ const startTool = (name) => {
     url: `/pages/under-development/index?title=${encodeURIComponent(name)}`,
   });
 };
-
 </script>
 
 <style scoped lang="scss">
@@ -365,7 +381,13 @@ const startTool = (name) => {
   min-width: 0;
   margin-left: 20rpx;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
 }
 
 .film-marquee-track {

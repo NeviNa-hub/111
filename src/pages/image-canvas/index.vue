@@ -62,11 +62,7 @@
     </scroll-view>
     <view class="bottom-actions">
       <button class="previous" @click="goBack">修改画风</button>
-      <button
-        class="generate"
-        :disabled="isSubmitting"
-        @click="generate"
-      >
+      <button class="generate" :disabled="isSubmitting" @click="generate">
         研墨成画（扣除 {{ selectedCost }} 点）
       </button>
     </view>
@@ -74,12 +70,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 import { createImageGeneration } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import {
   DRAFT_KEYS,
   readCreationDraft,

@@ -6,9 +6,9 @@ import request from "@/utils/request";
  * @returns {Promise<Object>} 积分余额与流水数据。
  */
 export const getPointsInfo = (params = {}) => {
-  return request({ 
-    url: "/points/myInfo", 
-    method: "GET", 
+  return request({
+    url: "/points/myInfo",
+    method: "GET",
     params: { ...params },
   });
 };

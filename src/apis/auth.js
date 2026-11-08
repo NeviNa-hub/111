@@ -6,10 +6,10 @@ import request from "@/utils/request";
  * @returns {Promise<Object>} 注册结果。
  */
 export const registerUser = (params = {}) => {
-  return request({ 
-    url: "/auth/register", 
-    method: "POST", 
-    params
+  return request({
+    url: "/auth/register",
+    method: "POST",
+    params,
   });
 };
 
@@ -19,10 +19,10 @@ export const registerUser = (params = {}) => {
  * @returns {Promise<Object>} 登录凭证和用户资料。
  */
 export const loginUser = (params = {}) => {
-  return request({ 
-    url: "/auth/login", 
-    method: "POST", 
-    params
+  return request({
+    url: "/auth/login",
+    method: "POST",
+    params,
   });
 };
 
@@ -32,9 +32,9 @@ export const loginUser = (params = {}) => {
  * @returns {Promise<null>} 登出结果。
  */
 export const logoutUser = (params = {}) => {
-  return request({ 
-    url: "/auth/logout", 
-    method: "POST", 
-    params
-  }); 
+  return request({
+    url: "/auth/logout",
+    method: "POST",
+    params,
+  });
 };

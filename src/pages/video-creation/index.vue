@@ -116,10 +116,7 @@
               <text class="image-title">{{ imageTitle }}</text>
               <text class="image-hint">{{ imageHint }}</text>
             </view>
-            <el-button
-              class="image-pick-button"
-              @click="chooseImage"
-            >
+            <el-button class="image-pick-button" @click="chooseImage">
               <el-icon><Upload /></el-icon>
               {{ selectedImage ? "更换" : "选图" }}
             </el-button>

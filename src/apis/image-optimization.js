@@ -6,10 +6,10 @@ import request from "@/utils/request";
  * @returns {Promise<Object>} 创建结果。
  */
 export const createImageOptimization = (params = {}) => {
-  return request({ 
-    url: "/image-optimization/tasks", 
-    method: "POST", 
-    params
+  return request({
+    url: "/image-optimization/tasks",
+    method: "POST",
+    params,
   });
 };
 

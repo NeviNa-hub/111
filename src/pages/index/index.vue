@@ -9,7 +9,9 @@
           <view class="greeting-left">
             <text class="greeting-title">东方意象美学</text>
             <view class="greeting-marquee">
-              <view class="marquee-track"> 以笔为引，以意生花 · 极简智能多模态创作 </view>
+              <view class="marquee-track">
+                以笔为引，以意生花 · 极简智能多模态创作
+              </view>
             </view>
           </view>
           <text class="weather">{{ weatherText }}</text>
@@ -17,7 +19,11 @@
         <!-- 推荐创作 -->
         <view class="hero-card">
           <view class="hero-art">
-            <app-image class="hero-image" :src="hero.image_url" mode="aspectFill" />
+            <app-image
+              class="hero-image"
+              :src="hero.image_url"
+              mode="aspectFill"
+            />
             <view class="hero-label">{{ hero.label }}</view>
             <view class="hero-caption">{{ hero.caption }}</view>
             <view class="hero-hint">提示词：{{ hero.prompt }}</view>
@@ -25,9 +31,13 @@
           <view class="hero-footer">
             <view class="hero-meta">
               <text class="meta-title">{{ hero.model_name }}</text>
-              <text class="meta-subtitle">已生成 {{ generatedCountText }} 次</text>
+              <text class="meta-subtitle"
+                >已生成 {{ generatedCountText }} 次</text
+              >
             </view>
-            <button class="try-button" @click="handleTryCreation">同款创作</button>
+            <button class="try-button" @click="handleTryCreation">
+              同款创作
+            </button>
           </view>
         </view>
 
@@ -116,9 +126,39 @@ const homeData = {
     generated_count: 1280,
   },
   creations: [
-    { creation_id: 1, eyebrow: "IMAGE INK", title: "文字生图", input_label: "意境：", input_value: "宋式青绿水墨...", icon: "✦", note: "字句勾勒意境", action: "去探索", url: "/pages/image-creation/index" },
-    { creation_id: 2, eyebrow: "MOTION INK", title: "生成视频", input_label: "镜头：", input_value: "微风荡起波澜...", icon: "▣", note: "融汇静止为流动", action: "去创作", url: "/pages/video-creation/index" },
-    { creation_id: 3, eyebrow: "IMAGE REFINE", title: "图片优化", input_label: "优化：", input_value: "超高清晰画质", icon: "✨", note: "一键唤醒纤毫纹理", action: "还原", url: "/pages/image-optimization/index" },
+    {
+      creation_id: 1,
+      eyebrow: "IMAGE INK",
+      title: "文字生图",
+      input_label: "意境：",
+      input_value: "宋式青绿水墨...",
+      icon: "✦",
+      note: "字句勾勒意境",
+      action: "去探索",
+      url: "/pages/image-creation/index",
+    },
+    {
+      creation_id: 2,
+      eyebrow: "MOTION INK",
+      title: "生成视频",
+      input_label: "镜头：",
+      input_value: "微风荡起波澜...",
+      icon: "▣",
+      note: "融汇静止为流动",
+      action: "去创作",
+      url: "/pages/video-creation/index",
+    },
+    {
+      creation_id: 3,
+      eyebrow: "IMAGE REFINE",
+      title: "图片优化",
+      input_label: "优化：",
+      input_value: "超高清晰画质",
+      icon: "✨",
+      note: "一键唤醒纤毫纹理",
+      action: "还原",
+      url: "/pages/image-optimization/index",
+    },
   ],
 };
 const currentCreation = ref(0);
@@ -130,7 +170,7 @@ const weatherText = computed(() => homeData.weather_text);
 const quote = computed(() => homeData.quote);
 const hero = computed(() => homeData.hero);
 const generatedCountText = computed(() =>
-  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
 );
 
 // 开始同款创作
@@ -177,7 +217,9 @@ const getCardPosition = (index) => {
     return "active";
   }
 
-  return index === (currentCreation.value + 1) % creationCount.value ? "right" : "left";
+  return index === (currentCreation.value + 1) % creationCount.value
+    ? "right"
+    : "left";
 };
 
 /**
@@ -205,7 +247,7 @@ const handleTouchEnd = (event) => {
 
   if (distance > 50) {
     selectCreation(
-      (currentCreation.value - 1 + creationCount.value) % creationCount.value
+      (currentCreation.value - 1 + creationCount.value) % creationCount.value,
     );
   }
 
@@ -213,7 +255,6 @@ const handleTouchEnd = (event) => {
     selectCreation((currentCreation.value + 1) % creationCount.value);
   }
 };
-
 </script>
 
 <style scoped lang="scss">

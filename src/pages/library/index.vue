@@ -53,7 +53,9 @@
           title="暂无画卷"
           description="完成一次生图任务后，作品会自动归档到这里"
         />
-        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
+        <view v-else-if="isLoadingMore" class="load-more"
+          >正在载入更多作品…</view
+        >
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />

@@ -6,10 +6,10 @@ import request from "@/utils/request";
  * @returns {Promise<Object>} 创建结果。
  */
 export const createVideoGeneration = (params = {}) => {
-  return request({ 
-    url: "/video/tasks", 
-    method: "POST", 
-    params
+  return request({
+    url: "/video/tasks",
+    method: "POST",
+    params,
   });
 };
 

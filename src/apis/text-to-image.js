@@ -6,14 +6,12 @@ import request from "@/utils/request";
  * @returns {Promise<Object>} 创建结果。
  */
 export const createImageGeneration = (params = {}) => {
-  return request({ 
-    url: "/text-to-image/tasks", 
-    method: "POST", 
-    params
+  return request({
+    url: "/text-to-image/tasks",
+    method: "POST",
+    params,
   });
 };
-
-
 
 /**
  * 查询文字生图任务状态。
@@ -21,9 +19,9 @@ export const createImageGeneration = (params = {}) => {
  * @returns {Promise<Object>} 任务状态。
  */
 export const getImageTaskStatus = (params = {}) => {
-  return request({ 
+  return request({
     url: `/text-to-image/tasks/${encodeURIComponent(params.taskId || "")}`,
-    method: "GET", 
+    method: "GET",
     params: { ...params },
   });
 };
