@@ -6,7 +6,7 @@
       <text class="points-icon">✦</text>
       <text class="points-label">灵感点</text>
       <text class="points-value">{{ pointsText }}</text>
-      <text class="points-detail">明细</text>
+      <text v-if="points !== null" class="points-detail">明细</text>
     </view>
   </view>
 </template>

@@ -269,7 +269,12 @@ const confirmGenerate = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createImageGeneration(requestData);
+    const task = await createImageGeneration({
+      prompt: requestData.prompt,
+      style: requestData.style,
+      ratio: requestData.ratio,
+      count: requestData.count,
+    });
 
     confirmVisible.value = false;
     draft.value = { ...draft.value, ...requestData };

@@ -3,23 +3,7 @@
   <view class="video-render-page">
     <app-page-header title="画质与渲染" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <app-state-hint
-        v-if="isLoadingOptions"
-        class="render-state"
-        type="loading"
-        title="正在载入渲染配置"
-      />
-      <app-state-hint
-        v-else-if="optionsError"
-        class="render-state"
-        type="error"
-        title="渲染配置加载失败"
-        description="请检查网络后重试，已完成的规制不会丢失"
-        action-text="重新加载"
-        @action="loadRenderOptions"
-      />
       <el-form
-        v-if="!isLoadingOptions && !optionsError"
         ref="formRef"
         :model="formData"
         :rules="formRules"
@@ -156,7 +140,7 @@
       <el-button
         class="render-button"
         :loading="isSubmitting"
-        :disabled="isSubmitting || isLoadingOptions || optionsError"
+        :disabled="isSubmitting"
         @click="handleRender"
       >
         <el-icon v-if="!isSubmitting"><VideoPlay /></el-icon>
@@ -200,7 +184,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 // #ifdef H5
@@ -218,7 +202,6 @@ import {
 import { TASK_STATUS } from "@/apis/constants";
 import {
   createVideoGeneration,
-  getVideoRenderOptions,
   getVideoTaskStatus,
 } from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.png";
@@ -232,23 +215,22 @@ import { DRAFT_KEYS, readCreationDraft } from "@/utils/creation-draft";
 import { getErrorMessage } from "@/utils/request";
 
 const draft = ref({ ratioName: "", prompt: "", imagePath: "" });
-const fpsOptions = ref([]);
+const fpsOptions = [
+  { fpsId: 1, value: 30, name: "30 FPS · 典雅", tag: "节律省电", description: "传统水墨电影韵味，起承转合自然含蓄" },
+  { fpsId: 2, value: 60, name: "60 FPS · 丝滑 4K 超清", tag: "首推", description: "雪浪微澜，丝缕毕现，水汽流动如真如幻" },
+];
 const renderConfig = reactive({
-  power: 0,
-  cost: 0,
-  estimatedTime: "",
-  previewTitle: "",
-  cameraMove: "",
+  power: 800,
+  cost: 8,
+  estimatedTime: "约 18 秒",
+  previewTitle: "《江雪孤舟 · 动态长卷》",
+  cameraMove: "平缓推镜",
 });
 const confirmVisible = ref(false);
 const progressVisible = ref(false);
 const isSubmitting = ref(false);
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
 const formRef = ref(null);
-const formData = reactive({
-  fps: 0,
-});
+const formData = reactive({ fps: 60 });
 const taskId = ref("");
 const taskProgress = ref(0);
 const taskStatusData = ref(null);
@@ -358,15 +340,15 @@ const confirmRender = async () => {
     const task = await createVideoGeneration({
       mode: draft.value.mode,
       ratio: draft.value.ratio,
-      ratioName: draft.value.ratioName,
+      ratio_name: draft.value.ratioName,
       prompt: draft.value.prompt,
-      imagePath: draft.value.imagePath,
+      image_path: draft.value.imagePath,
       fps: formData.fps,
     });
 
     confirmVisible.value = false;
     progressVisible.value = true;
-    taskId.value = task.taskId;
+    taskId.value = task.task_id;
     taskProgress.value = 0;
     taskStatusData.value = null;
     startPolling();
@@ -389,32 +371,6 @@ const goWorkbench = () => {
 const goLibrary = () => {
   uni.navigateTo({ url: "/pages/library/index" });
 };
-
-// 加载帧率与资源结算配置，失败时保留重试入口
-const loadRenderOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const data = await getVideoRenderOptions();
-
-    fpsOptions.value = data.fpsOptions;
-    formData.fps = data.defaultFps;
-    renderConfig.power = data.power;
-    renderConfig.cost = data.cost;
-    renderConfig.estimatedTime = data.estimatedTime;
-    renderConfig.previewTitle = data.previewTitle;
-    renderConfig.cameraMove = data.cameraMove;
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadRenderOptions();
-});
 
 onShow(() => {
   const stored = readCreationDraft(DRAFT_KEYS.video);

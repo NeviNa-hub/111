@@ -2,21 +2,6 @@
   <view class="page">
     <app-page-header title="图片优化" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <app-state-hint
-        v-if="isLoadingOptions"
-        class="content-state"
-        type="loading"
-        title="正在载入优化配置"
-      />
-      <app-state-hint
-        v-else-if="optionsError"
-        class="content-state"
-        type="error"
-        title="优化配置加载失败"
-        description="请检查网络后重试，已选的图片会保留"
-        action-text="重新加载"
-        @action="loadOptimizationOptions"
-      />
       <view class="file">
         <text v-if="selectedImage"> {{ selectedImage.name }}</text>
         <text v-else>请先导入需要优化的图片</text>
@@ -49,10 +34,8 @@
       <view class="hint" @click="chooseImage"
         >　点击重新从系统相册导入或拍摄</view
       >
-      <view v-if="!isLoadingOptions && !optionsError" class="heading">
-        优化方向 <small>单选</small>
-      </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="directions">
+      <view class="heading"> 优化方向 <small>单选</small> </view>
+      <view class="directions">
         <view
           v-for="item in directions"
           :key="item.directionId"
@@ -65,10 +48,10 @@
           <small>{{ item.description }}</small>
         </view>
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="heading">
+      <view class="heading">
         重绘强度 <small class="accent">均衡重构（推荐）</small>
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="intensity">
+      <view class="intensity">
         <text
           v-for="item in intensities"
           :key="item"
@@ -78,7 +61,7 @@
           {{ item }}
         </text>
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="switch-row">
+      <view class="switch-row">
         <view>
           <strong>◉　保留原画面部细节</strong>
           <small>避免AI拟合过度导致的五官微变</small>
@@ -96,13 +79,7 @@
         <text>账户结余以实际扣减为准</text>
       </view>
       <button
-        :disabled="
-          !selectedImage ||
-          isSubmitting ||
-          isUploading ||
-          isLoadingOptions ||
-          optionsError
-        "
+        :disabled="!selectedImage || isSubmitting || isUploading"
         @click="startOptimization"
       >
         {{
@@ -122,14 +99,28 @@ import { uploadImage } from "@/apis/upload";
 import AppIcon from "@/components/AppIcon/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import { chooseSingleImage } from "@/utils/image-picker";
 import { getErrorMessage } from "@/utils/request";
 
 const directions = [
-  { directionId: 1, iconName: "grid", title: "无损超清", description: "4K超分重塑" },
-  { directionId: 2, iconName: "spark", title: "旧画去噪", description: "质感抚平" },
-  { directionId: 3, iconName: "spark", title: "意境重绘", description: "笔触唤醒" },
+  {
+    directionId: 1,
+    iconName: "grid",
+    title: "无损超清",
+    description: "4K超分重塑",
+  },
+  {
+    directionId: 2,
+    iconName: "spark",
+    title: "旧画去噪",
+    description: "质感抚平",
+  },
+  {
+    directionId: 3,
+    iconName: "spark",
+    title: "意境重绘",
+    description: "笔触唤醒",
+  },
 ];
 const intensities = ["微调修润", "均衡重构", "深度淬炼"];
 const direction = ref("无损超清");
@@ -173,9 +164,7 @@ const chooseImage = async () => {
 
 // 校验图片后开始优化任务
 const startOptimization = async () => {
-  if (
-    isSubmitting.value ||
-    isUploading.value) {
+  if (isSubmitting.value || isUploading.value) {
     return;
   }
 
@@ -188,15 +177,15 @@ const startOptimization = async () => {
 
   try {
     const task = await createImageOptimization({
-      imagePath: selectedImage.value.url || selectedImage.value.path,
+      image_path: selectedImage.value.url || selectedImage.value.path,
       direction: direction.value,
       intensity: intensity.value,
-      keepDetail: keepDetail.value,
+      keep_detail: keepDetail.value,
     });
 
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
-        task.taskId
+        task.task_id,
       )}`,
     });
   } catch (error) {

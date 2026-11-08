@@ -8,17 +8,7 @@
       class="content"
       :style="contentKeyboardStyle"
     >
-      <app-state-hint
-        v-if="optionsError"
-        class="options-state"
-        type="error"
-        title="规制配置加载失败"
-        description="请检查网络后重试，已填写的内容不会丢失"
-        action-text="重新加载"
-        @action="loadOptions"
-      />
       <el-form
-        v-else
         ref="formRef"
         :model="formData"
         :rules="formRules"
@@ -74,12 +64,17 @@
                 <view class="ratio-info">
                   <view class="ratio-name">
                     <text>{{ ratio.name }}</text>
-                    <text v-if="ratio.recommended" class="recommend"> 默认推荐 </text>
+                    <text v-if="ratio.recommended" class="recommend">
+                      默认推荐
+                    </text>
                   </view>
                   <text class="ratio-desc">{{ ratio.description }}</text>
                 </view>
               </view>
-              <el-icon v-if="formData.ratio === ratio.value" class="ratio-check">
+              <el-icon
+                v-if="formData.ratio === ratio.value"
+                class="ratio-check"
+              >
                 <Check />
               </el-icon>
             </el-radio>
@@ -188,7 +183,7 @@
       <el-button
         class="next-button"
         :loading="isSubmitting"
-        :disabled="isSubmitting || isUploading || isLoadingOptions || optionsError"
+        :disabled="isSubmitting || isUploading"
         @click="goNext"
       >
         下一步：规格画质
@@ -241,9 +236,25 @@ const flowSteps = [
   { index: "02", title: "画质与渲染" },
 ];
 const ratios = [
-  { ratioId: 1, value: "16:9", name: "16:9 横屏", description: "视野宽广 · 磅礴画卷", recommended: true },
-  { ratioId: 2, value: "9:16", name: "9:16 竖屏", description: "长幅沉浸 · 适宜移轴" },
-  { ratioId: 3, value: "1:1", name: "1:1 镜心", description: "方正静穆 · 斗方小品" },
+  {
+    ratioId: 1,
+    value: "16:9",
+    name: "16:9 横屏",
+    description: "视野宽广 · 磅礴画卷",
+    recommended: true,
+  },
+  {
+    ratioId: 2,
+    value: "9:16",
+    name: "9:16 竖屏",
+    description: "长幅沉浸 · 适宜移轴",
+  },
+  {
+    ratioId: 3,
+    value: "1:1",
+    name: "1:1 镜心",
+    description: "方正静穆 · 斗方小品",
+  },
 ];
 const modes = [
   { modeId: "text", name: "文字生视频" },
@@ -278,7 +289,7 @@ const imageTitle = computed(() => selectedImage.value?.name || "传入一张图�
 const imageHint = computed(() =>
   selectedImage.value
     ? "点击更换图卷，将以图卷起点延展运镜"
-    : "从相册选择或拍摄，作为动卷起点"
+    : "从相册选择或拍摄，作为动卷起点",
 );
 
 /**
@@ -341,12 +352,12 @@ const clearPrompt = () => {
 
 // 在现有意境后追加润色句式，空意境时以寒江雪意起笔
 const polishPrompt = () => {
-  const suffix = polishSuffix.value || "墨色清润，气韵徐徐流转";
+  const suffix = polishSuffix || "墨色清润，气韵徐徐流转";
 
   formData.prompt = polishPromptText(
     formData.prompt.trim(),
     suffix,
-    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`
+    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`,
   );
 };
 
@@ -393,7 +404,9 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
+  const selectedRatioItem = ratios.find(
+    (ratio) => ratio.value === formData.ratio,
+  );
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {

@@ -8,7 +8,7 @@
       @scrolltolower="loadMore"
     >
       <view class="summary-row">
-        <text class="summary">{{ summary }}</text>
+        <text class="summary">共 {{ pageInfo.total }} 幅典藏</text>
       </view>
       <view class="tabs">
         <text
@@ -17,7 +17,7 @@
           :class="{ active: activeStatus === tab.status }"
           @click="handleTabChange(tab.status)"
         >
-          {{ tab.name }}　{{ tab.count }}
+          {{ tab.name }}
         </text>
       </view>
       <app-state-hint
@@ -36,18 +36,10 @@
         @action="loadLibraryData(true)"
       />
       <view v-else class="library-body">
-        <view v-if="showGenerating && generating" class="generating">
-          <view class="generating-label">造物<br />中</view>
-          <view class="generating-body">
-            <text>{{ generating.title }}</text>
-            <text class="status">{{ generating.statusText }}</text>
-          </view>
-          <text class="close" @click="showGenerating = false">×</text>
-        </view>
         <view class="section-title">历史画卷 <text>长按可批量导出</text></view>
         <view class="work-grid">
           <view v-for="work in works" :key="work.workId" class="work-card">
-            <view class="art" :class="work.className">
+            <view class="art">
               <text>逸才意境</text>
             </view>
             <text class="more">•••</text>
@@ -80,15 +72,17 @@ import { getErrorMessage } from "@/utils/request";
 const PAGE_SIZE = 10;
 
 const activeStatus = ref("all");
-const summary = ref("");
 const works = ref([]);
-const tabs = ref([]);
-const generating = ref(null);
+const tabs = [
+  { status: "all", name: "全部" },
+  { status: "completed", name: "已完成" },
+  { status: "creating", name: "创作中" },
+  { status: "draft", name: "草稿" },
+];
 const pageInfo = ref({ page: 1, pageSize: PAGE_SIZE, total: 0 });
 const isLoading = ref(true);
 const isLoadingMore = ref(false);
 const loadError = ref(false);
-const showGenerating = ref(true);
 
 let requestToken = 0;
 
@@ -113,7 +107,7 @@ const loadLibraryData = async (reset = false) => {
   try {
     const data = await getLibraryData({
       page,
-      pageSize: PAGE_SIZE,
+      page_size: PAGE_SIZE,
       status: activeStatus.value,
     });
 
@@ -121,15 +115,13 @@ const loadLibraryData = async (reset = false) => {
       return;
     }
 
-    summary.value = data.summary;
-    tabs.value = data.tabs;
-    pageInfo.value = data.pageInfo;
-    generating.value = data.generating;
-    works.value = reset ? data.works : works.value.concat(data.works);
-
-    if (reset) {
-      showGenerating.value = Boolean(data.generating);
-    }
+    pageInfo.value = {
+      page: Number(data.page_info?.page) || page,
+      pageSize: Number(data.page_info?.page_size) || PAGE_SIZE,
+      total: Number(data.page_info?.total) || 0,
+    };
+    const pageWorks = Array.isArray(data.lists) ? data.lists : [];
+    works.value = reset ? pageWorks : works.value.concat(pageWorks);
   } catch (error) {
     if (token !== requestToken) {
       return;

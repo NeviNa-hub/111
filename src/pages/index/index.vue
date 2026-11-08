@@ -3,22 +3,7 @@
     <app-page-header title="妙笔生花" />
 
     <scroll-view scroll-y :show-scrollbar="false" class="main-scroll">
-      <app-state-hint
-        v-if="isLoading"
-        class="home-state"
-        type="loading"
-        title="正在载入首页"
-      />
-      <app-state-hint
-        v-else-if="loadError"
-        class="home-state"
-        type="error"
-        title="首页数据加载失败"
-        description="请检查网络后重试"
-        action-text="重新加载"
-        @action="loadHomeData"
-      />
-      <view v-else>
+      <view>
         <!-- 欢迎语 -->
         <view class="greeting-row">
           <view class="greeting-left">
@@ -113,53 +98,41 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
-import { getHomeOverview } from "@/apis/home";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
 
-const homeData = ref(null);
-const isLoading = ref(true);
-const loadError = ref(false);
+const homeData = {
+  weather_text: "今日谷雨",
+  quote: "造法自然 · 意致千里",
+  hero: {
+    label: "今日推荐 · 烟岚登翠",
+    caption: "青绿水墨江南",
+    prompt: "水墨淋漓，宋式青绿设色，微风拂动湖面 ...",
+    image_url: "/static/home/home-1.png",
+    model_name: "国产大模型",
+    generated_count: 1280,
+  },
+  creations: [
+    { creation_id: 1, eyebrow: "IMAGE INK", title: "文字生图", input_label: "意境：", input_value: "宋式青绿水墨...", icon: "✦", note: "字句勾勒意境", action: "去探索", url: "/pages/image-creation/index" },
+    { creation_id: 2, eyebrow: "MOTION INK", title: "生成视频", input_label: "镜头：", input_value: "微风荡起波澜...", icon: "▣", note: "融汇静止为流动", action: "去创作", url: "/pages/video-creation/index" },
+    { creation_id: 3, eyebrow: "IMAGE REFINE", title: "图片优化", input_label: "优化：", input_value: "超高清晰画质", icon: "✨", note: "一键唤醒纤毫纹理", action: "还原", url: "/pages/image-optimization/index" },
+  ],
+};
 const currentCreation = ref(0);
 const touchStartX = ref(0);
 
-const creations = computed(() => homeData.value?.creations || []);
+const creations = computed(() => homeData.creations);
 const creationCount = computed(() => creations.value.length);
-const weatherText = computed(() => homeData.value?.weather_text || "");
-const quote = computed(() => homeData.value?.quote || "");
-const hero = computed(
-  () =>
-    homeData.value?.hero || {
-      label: "",
-      caption: "",
-      prompt: "",
-      image_url: "",
-      model_name: "",
-      generated_count: 0,
-    }
-);
+const weatherText = computed(() => homeData.weather_text);
+const quote = computed(() => homeData.quote);
+const hero = computed(() => homeData.hero);
 const generatedCountText = computed(() =>
   String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 );
-
-// 加载首页推荐与灵感工坊数据，供首次进入与失败重试复用
-const loadHomeData = async () => {
-  isLoading.value = true;
-  loadError.value = false;
-
-  try {
-    homeData.value = await getHomeOverview();
-  } catch (error) {
-    loadError.value = true;
-    homeData.value = null;
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 // 开始同款创作
 const handleTryCreation = () => {
@@ -242,9 +215,6 @@ const handleTouchEnd = (event) => {
   }
 };
 
-onMounted(() => {
-  loadHomeData();
-});
 </script>
 
 <style scoped lang="scss">

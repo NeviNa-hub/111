@@ -2,21 +2,6 @@
   <view class="workbench-page">
     <app-page-header title="创作台" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <app-state-hint
-        v-if="isLoading"
-        class="content-state"
-        type="loading"
-        title="正在载入创作台"
-      />
-      <app-state-hint
-        v-else-if="loadError"
-        class="content-state"
-        type="error"
-        title="创作台数据加载失败"
-        description="请检查网络后重试，已创作的草稿不会丢失"
-        action-text="重新加载"
-        @action="loadWorkbenchData"
-      />
       <!-- 01 文字生图 -->
       <view class="tool-card tool-teal">
         <view class="card-heading">
@@ -119,7 +104,7 @@
           <text class="draft-status">{{ draft.status }}</text>
         </view>
         <app-state-hint
-          v-if="!isLoading && !loadError && !drafts.length"
+          v-if="!drafts.length"
           type="empty"
           title="暂无草稿"
           description="完成一次创作后，草稿会自动归档到这里"
@@ -131,19 +116,25 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
-import { getWorkbenchData } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
 
-const frames = ref([]);
-const drafts = ref([]);
-const filmChips = ref([]);
-const isLoading = ref(true);
-const loadError = ref(false);
+const frames = [
+  { frameId: 1, name: "起势·淡雾" },
+  { frameId: 2, name: "承转·远山" },
+  { frameId: 3, name: "流光·松石" },
+  { frameId: 4, name: "收敛·留白" },
+];
+const drafts = [
+  { draftId: 1, title: "《松山夜笛》插图构思", time: "2小时前", status: "待生成" },
+  { draftId: 2, title: "茶室空间运镜脚本设计", time: "昨日", status: "已分镜" },
+  { draftId: 3, title: "老照片人物去污处理", time: "3日前", status: "已完成" },
+];
+const filmChips = ["四开画幅", "轨迹平滑", "60FPS 帧率"];
 
 /**
  * 根据工具名称进入对应创作流程或公共待开发页。
@@ -171,30 +162,6 @@ const startTool = (name) => {
   });
 };
 
-// 加载创作台的视频分镜与草稿数据。
-const loadWorkbenchData = async () => {
-  isLoading.value = true;
-  loadError.value = false;
-
-  try {
-    const data = await getWorkbenchData();
-
-    filmChips.value = data.filmChips;
-    frames.value = data.frames;
-    drafts.value = data.drafts;
-  } catch (error) {
-    loadError.value = true;
-    filmChips.value = [];
-    frames.value = [];
-    drafts.value = [];
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(() => {
-  loadWorkbenchData();
-});
 </script>
 
 <style scoped lang="scss">

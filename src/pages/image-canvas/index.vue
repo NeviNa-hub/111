@@ -10,22 +10,7 @@
       <text class="step-count">步骤 3 / 3</text>
       <text class="page-title">第三步：设定画幅并落墨</text>
       <text class="page-desc">厘定比例与画幅张数，即将落笔成卷</text>
-      <app-state-hint
-        v-if="isLoadingOptions"
-        class="content-state"
-        type="loading"
-        title="正在载入画幅配置"
-      />
-      <app-state-hint
-        v-else-if="optionsError"
-        class="content-state"
-        type="error"
-        title="画幅配置加载失败"
-        description="请检查网络后重试，已完成的构思与画风不会丢失"
-        action-text="重新加载"
-        @action="loadCanvasOptions"
-      />
-      <view v-if="!isLoadingOptions && !optionsError">
+      <view>
         <view class="summary-card">
           <view class="summary-title">
             创作意念回溯 <text @click="editPrompt">修改内容</text>
@@ -79,7 +64,7 @@
       <button class="previous" @click="goBack">修改画风</button>
       <button
         class="generate"
-        :disabled="isSubmitting || isLoadingOptions || optionsError"
+        :disabled="isSubmitting"
         @click="generate"
       >
         研墨成画（扣除 {{ selectedCost }} 点）
@@ -166,7 +151,12 @@ const generate = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createImageGeneration(requestData);
+    const task = await createImageGeneration({
+      prompt: requestData.prompt,
+      style: requestData.style,
+      ratio: requestData.ratio,
+      count: requestData.count,
+    });
 
     saveCreationDraft(DRAFT_KEYS.image, requestData);
     uni.navigateTo({
