@@ -204,7 +204,7 @@ import {
   createVideoGeneration,
   getVideoTaskStatus,
 } from "@/apis/video-creation";
-import previewFallback from "@/assets/theme/theme-videos-1.png";
+import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";

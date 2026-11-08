@@ -12,9 +12,112 @@
     <title></title>
     <!--preload-links-->
     <!--app-context-->
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #f6f7f3;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
+          "Noto Sans CJK SC", sans-serif;
+      }
+
+      #boot-shell {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f6f7f3;
+      }
+
+      .boot-spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(5, 96, 76, 0.16);
+        border-top-color: #05604c;
+        border-radius: 50%;
+        animation: boot-spin 0.9s linear infinite;
+      }
+
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .boot-nav {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        height: 51px;
+        border-top: 1px solid #e3e9e5;
+        background: #fff;
+      }
+
+      .boot-nav span {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7b8d86;
+        font-size: 13px;
+        line-height: 1;
+      }
+
+      .boot-nav .is-active {
+        color: #05604c;
+        font-weight: 600;
+      }
+
+      @media (min-width: 768px) {
+        .boot-nav {
+          right: auto;
+          left: 50%;
+          width: 750px;
+          transform: translateX(-50%);
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="app"><!--app-html--></div>
+    <div id="boot-shell">
+      <div class="boot-spinner"></div>
+      <nav class="boot-nav">
+        <span class="is-active">文稿库</span>
+        <span>创作台</span>
+        <span>作品库</span>
+        <span>工作坊</span>
+        <span>我的</span>
+      </nav>
+    </div>
+    <script>
+      // 应用挂载出首个页面后移除静态加载壳，避免遮挡页面内容
+      (function () {
+        var shell = document.getElementById('boot-shell')
+        var app = document.getElementById('app')
+
+        if (!shell || !app || !window.MutationObserver) {
+          return
+        }
+
+        var observer = new MutationObserver(function () {
+          if (app.children.length) {
+            shell.parentNode.removeChild(shell)
+            observer.disconnect()
+          }
+        })
+
+        observer.observe(app, { childList: true })
+      })()
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

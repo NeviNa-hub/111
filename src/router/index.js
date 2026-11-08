@@ -4,6 +4,25 @@
 import { PAGE_PATHS } from "@/apis/constants";
 import { getToken } from "@/utils/auth";
 
+const LAST_PAGE_STORAGE_KEY = "magic_app_last_page";
+
+/**
+ * 读取最近访问的页面地址。
+ * @returns {string} 最近访问的页面地址；没有记录时为空字符串。
+ */
+export const getLastPage = () => uni.getStorageSync(LAST_PAGE_STORAGE_KEY) || "";
+
+/**
+ * 记录最近访问的页面地址。
+ * @param {string} url 页面地址。
+ * @returns {void}
+ */
+export const rememberPage = (url) => {
+  if (url) {
+    uni.setStorageSync(LAST_PAGE_STORAGE_KEY, url);
+  }
+};
+
 /**
  * 统一页面路径，兼容带前导斜杠与查询串的跳转地址。
  * @param {string} url 页面地址。
@@ -35,6 +54,10 @@ const guardPage = (args) => {
     uni.reLaunch({ url: PAGE_PATHS.HOME });
 
     return false;
+  }
+
+  if (hasToken) {
+    rememberPage(args.url);
   }
 
   return true;

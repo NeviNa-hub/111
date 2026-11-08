@@ -13,7 +13,7 @@
         <view class="card-art">
           <app-image
             class="art-image"
-            src="/static/theme/theme-images.png"
+            src="/static/theme/theme-images.jpg"
             mode="aspectFill"
           />
           <text class="art-chip chip-left">留白神韵</text>
@@ -82,12 +82,12 @@
         <view class="compare-art">
           <app-image
             class="art-image compare-before"
-            src="/static/theme/theme-optimization-before.png"
+            src="/static/theme/theme-optimization-before.jpg"
             mode="aspectFill"
           />
           <app-image
             class="art-image compare-after"
-            src="/static/theme/theme-optimization-after.png"
+            src="/static/theme/theme-optimization-after.jpg"
             mode="aspectFill"
           />
           <text class="compare-handle">↔</text>
@@ -461,22 +461,22 @@ const startTool = (name) => {
 
 .film-frame:nth-child(1) .frame-thumb {
   height: 88rpx;
-  background-image: url("../../assets/theme/theme-videos-1.png");
+  background-image: url("../../assets/theme/theme-videos-1.jpg");
 }
 
 .film-frame:nth-child(2) .frame-thumb {
   height: 110rpx;
-  background-image: url("../../assets/theme/theme-videos-2.png");
+  background-image: url("../../assets/theme/theme-videos-2.jpg");
 }
 
 .film-frame:nth-child(3) .frame-thumb {
   height: 132rpx;
-  background-image: url("../../assets/theme/theme-videos-3.png");
+  background-image: url("../../assets/theme/theme-videos-3.jpg");
 }
 
 .film-frame:nth-child(4) .frame-thumb {
   height: 156rpx;
-  background-image: url("../../assets/theme/theme-videos-4.png");
+  background-image: url("../../assets/theme/theme-videos-4.jpg");
 }
 
 .frame-label {

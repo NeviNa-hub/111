@@ -1,5 +1,35 @@
 <script lang="ts">
-export default {};
+import { PAGE_PATHS } from "@/apis/constants";
+import { getLastPage, rememberPage } from "@/router";
+import { getToken } from "@/utils/auth";
+
+export default {
+  onLaunch() {
+    // #ifdef H5
+    // H5 刷新后入口地址不带页面 hash 或停留在登录页时，恢复上次访问的页面。
+    if (!getToken()) {
+      return;
+    }
+
+    const hashPath = window.location.hash.replace(/^#\//, "");
+
+    if (!hashPath || hashPath.startsWith("pages/auth/index")) {
+      uni.reLaunch({ url: getLastPage() || PAGE_PATHS.HOME });
+    }
+    // #endif
+  },
+  onShow() {
+    // 记录当前页面，作为刷新后恢复页面的依据。
+    const pages = getCurrentPages();
+    const currentRoute = pages[pages.length - 1]?.route as string | undefined;
+
+    if (!getToken() || !currentRoute || `/${currentRoute}` === PAGE_PATHS.AUTH) {
+      return;
+    }
+
+    rememberPage(`/${currentRoute}`);
+  },
+};
 </script>
 
 <style lang="scss">

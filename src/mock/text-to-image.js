@@ -127,6 +127,6 @@ export const buildImageTaskStatus = (record) => {
       : "已投入云端渲染池，离开页面不影响任务进度",
     status_text: isCompleted ? "已完成 · 已归档作品库" : "第二阶段 · 丹青晕染",
     progress_label: "气韵流转",
-    result_urls: isCompleted ? ["/static/home/home-1.png"] : [],
+    result_urls: isCompleted ? ["/static/home/home-1.jpg"] : [],
   };
 };

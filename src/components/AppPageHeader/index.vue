@@ -4,9 +4,9 @@
     <view class="header-title">{{ title }}</view>
     <view class="header-points">
       <text class="points-icon">✦</text>
-      <text class="points-label">灵感点</text>
+      <text class="points-label">积分</text>
       <text class="points-value">{{ pointsText }}</text>
-      <text v-if="points !== null" class="points-detail">明细</text>
+      <text v-if="pointsBalance !== null" class="points-detail">明细</text>
     </view>
   </view>
 </template>
@@ -14,17 +14,18 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 
+import { getPointsInfo } from "@/apis/points";
+
 /**
  * @property {string} title 页头标题。
- * @property {number|null} points 灵感点余额；无接口数据时传 null，展示占位符。
  */
-const props = defineProps({
+defineProps({
   title: { type: String, required: true },
-  points: { type: Number, default: null },
 });
 
+const pointsBalance = ref(null);
 const canGoBack = ref(false);
-const pointsText = computed(() => (props.points === null ? "—" : props.points));
+const pointsText = computed(() => (pointsBalance.value === null ? "—" : pointsBalance.value));
 
 // 根据当前页面栈决定是否显示返回箭头。
 const updateBackState = () => {
@@ -36,8 +37,20 @@ const handleBack = () => {
   uni.navigateBack();
 };
 
+// 读取当前积分余额，与「我的」页共用同一接口。
+const loadPointsBalance = async () => {
+  try {
+    const data = await getPointsInfo({ page: 1, page_size: 1 });
+
+    pointsBalance.value = data.points_balance;
+  } catch (error) {
+    // 请求层已统一提示错误，这里保留占位符。
+  }
+};
+
 onMounted(() => {
   updateBackState();
+  loadPointsBalance();
 });
 </script>
 

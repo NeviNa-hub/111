@@ -121,7 +121,7 @@ const homeData = {
     label: "今日推荐 · 烟岚登翠",
     caption: "青绿水墨江南",
     prompt: "水墨淋漓，宋式青绿设色，微风拂动湖面 ...",
-    image_url: "/static/home/home-1.png",
+    image_url: "/static/home/home-1.jpg",
     model_name: "国产大模型",
     generated_count: 1280,
   },
