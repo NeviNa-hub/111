@@ -33,7 +33,9 @@
           <view class="summary-row">构想意境　{{ options.prompt }}</view>
           <view class="summary-row">甄选画风　{{ options.style }}</view>
         </view>
-        <view class="section-title">画幅比例 <text>影响构图与空间意象</text></view>
+        <view class="section-title">
+          画幅比例 <text>影响构图与空间意象</text>
+        </view>
         <view class="ratio-grid">
           <view
             v-for="ratio in options.ratios"
@@ -45,7 +47,9 @@
             <view class="ratio-icon"></view>
             <text class="ratio-name">{{ ratio.name }}</text>
             <text class="ratio-desc">{{ ratio.description }}</text>
-            <text v-if="selectedRatio === ratio.value" class="chosen">已选</text>
+            <text v-if="selectedRatio === ratio.value" class="chosen">
+              已选
+            </text>
           </view>
         </view>
         <view class="section-title count-title">
@@ -88,27 +92,44 @@
 import { computed, onMounted, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
-import { getAccountOverview } from "@/apis/account";
-import { createImageGeneration, getImageCanvasOptions } from "@/apis/text-to-image";
+import { createImageGeneration } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
-import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import {
+  DRAFT_KEYS,
+  readCreationDraft,
+  saveCreationDraft,
+} from "@/utils/creation-draft";
 import { getErrorMessage } from "@/utils/request";
 
-const options = ref({ prompt: "", style: "", ratios: [], counts: [] });
-const selectedRatio = ref("");
-const selectedCount = ref("");
-const pointsBalance = ref(null);
+const options = ref({
+  prompt: "",
+  style: "",
+  ratios: [
+    { name: "1:1 方形", description: "适合朋友圈 / 头像", value: "1:1" },
+    { name: "16:9 横卷", description: "电脑宽幅长卷", value: "16:9" },
+    { name: "9:16 立轴", description: "移动壁纸画轴", value: "9:16" },
+    { name: "4:3 经典", description: "雅致画册典藏", value: "4:3" },
+  ],
+  counts: [
+    { name: "单张", value: 1, cost: 2 },
+    { name: "双张", value: 2, cost: 4 },
+    { name: "四张", value: 4, cost: 8 },
+  ],
+});
+const selectedRatio = ref("1:1");
+const selectedCount = ref("双张");
+const pointsBalance = ref(800);
 const isSubmitting = ref(false);
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
 
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value
+  pointsBalance.value === null ? "—" : pointsBalance.value,
 );
 
 const selectedCost = computed(() => {
-  const matched = options.value.counts.find((item) => item.name === selectedCount.value);
+  const matched = options.value.counts.find(
+    (item) => item.name === selectedCount.value,
+  );
 
   return matched ? matched.cost : "—";
 });
@@ -125,7 +146,7 @@ const editPrompt = () => {
 
 // 校验画幅选择并创建生图任务，成功后保存草稿并跳转生成页
 const generate = async () => {
-  if (isSubmitting.value || isLoadingOptions.value || optionsError.value) {
+  if (isSubmitting.value) {
     return;
   }
 
@@ -150,7 +171,7 @@ const generate = async () => {
     saveCreationDraft(DRAFT_KEYS.image, requestData);
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
-        task.taskId
+        task.task_id,
       )}`,
     });
   } catch (error) {
@@ -162,46 +183,6 @@ const generate = async () => {
     isSubmitting.value = false;
   }
 };
-
-// 加载灵感点余额；失败时以占位符展示
-const loadPoints = async () => {
-  try {
-    const data = await getAccountOverview();
-
-    pointsBalance.value = data.pointsBalance;
-  } catch (error) {
-    pointsBalance.value = null;
-  }
-};
-
-// 加载画幅配置，供首次进入与失败重试复用。
-const loadCanvasOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const data = await getImageCanvasOptions();
-    const draft = readCreationDraft(DRAFT_KEYS.image) || {};
-
-    options.value = {
-      prompt: draft.prompt || "",
-      style: draft.style || "",
-      ratios: data.ratios,
-      counts: data.counts,
-    };
-    selectedRatio.value = data.defaultRatio;
-    selectedCount.value = data.defaultCount;
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadCanvasOptions();
-  loadPoints();
-});
 
 onShow(() => {
   const draft = readCreationDraft(DRAFT_KEYS.image);

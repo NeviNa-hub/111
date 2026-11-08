@@ -7,22 +7,7 @@
       <view class="step inactive"><i>2</i><text>甄选画风</text></view>
     </view>
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <app-state-hint
-        v-if="isLoadingOptions"
-        class="content-state"
-        type="loading"
-        title="正在载入生图配置"
-      />
-      <app-state-hint
-        v-else-if="optionsError"
-        class="content-state"
-        type="error"
-        title="生图配置加载失败"
-        description="请检查网络后重试，失败不会影响已保存的草稿"
-        action-text="重新加载"
-        @action="loadCreationOptions"
-      />
-      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
+      <view class="config-card">
         <view class="config-title"><em>壹 ·</em> 风格定品</view>
         <view class="option-grid">
           <view
@@ -37,7 +22,7 @@
           </view>
         </view>
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
+      <view class="config-card">
         <view class="config-title"><em>贰 ·</em> 画幅比例</view>
         <view class="option-grid four">
           <view
@@ -50,7 +35,7 @@
           >
         </view>
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="config-card">
+      <view class="config-card">
         <view class="config-title"><em>叁 ·</em> 生成规则</view>
         <view class="option-grid three">
           <view
@@ -65,42 +50,51 @@
       </view>
     </scroll-view>
     <view class="next-card">
-      <button :disabled="isLoadingOptions || optionsError" @click="goNext">
-        下一步：构想意象
-      </button>
+      <button @click="goNext">下一步：构想意象</button>
     </view>
   </view>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
-import { getImageCanvasOptions, getImageStyles } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
 import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
-const styleOptions = ref([]);
-const selectedStyleId = ref(null);
-const ratios = ref([]);
-const counts = ref([]);
-const selectedRatio = ref("");
-const selectedCount = ref("");
+const styleOptions = [
+  {
+    styleId: 1,
+    name: "宋式水墨",
+    description: "写意淡墨，温润留白，淡雅韵味。",
+  },
+  { styleId: 2, name: "真实摄影", description: "微质感，柔和光影，细腻真实。" },
+  { styleId: 3, name: "宋瓷青釉", description: "手工釉色肌理，低饱和大地色。" },
+  { styleId: 4, name: "温润插画", description: "轻笔与木刻手绘感，质朴温暖。" },
+];
+const ratios = [
+  { name: "1:1 方形", description: "适合朋友圈 / 头像", value: "1:1" },
+  { name: "16:9 横卷", description: "电脑宽幅长卷", value: "16:9" },
+  { name: "9:16 立轴", description: "移动壁纸画轴", value: "9:16" },
+  { name: "4:3 经典", description: "雅致画册典藏", value: "4:3" },
+];
+const counts = [
+  { name: "单张", value: 1, cost: 2 },
+  { name: "双张", value: 2, cost: 4 },
+  { name: "四张", value: 4, cost: 8 },
+];
+const selectedStyleId = ref(1);
+const selectedRatio = ref("1:1");
+const selectedCount = ref("双张");
 
 const selectedStyleName = computed(
   () =>
-    styleOptions.value.find((style) => style.styleId === selectedStyleId.value)?.name ||
-    ""
+    styleOptions.value.find((style) => style.styleId === selectedStyleId.value)
+      ?.name || "",
 );
 
 // 校验并保存构思草稿，进入画风挑选页
 const goNext = () => {
-  if (isLoadingOptions.value || optionsError.value) {
-    return;
-  }
-
   if (!selectedStyleName.value) {
     uni.showToast({ title: "请先选择画风", icon: "none" });
     return;
@@ -114,34 +108,6 @@ const goNext = () => {
   });
   uni.navigateTo({ url: "/pages/image-style/index" });
 };
-
-// 加载画风、画幅与生成张数配置，供首次进入与失败重试复用。
-const loadCreationOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const [styleOptionsData, canvasOptionsData] = await Promise.all([
-      getImageStyles(),
-      getImageCanvasOptions(),
-    ]);
-
-    styleOptions.value = styleOptionsData.styles;
-    selectedStyleId.value = styleOptionsData.defaultStyleId;
-    ratios.value = canvasOptionsData.ratios;
-    counts.value = canvasOptionsData.counts;
-    selectedRatio.value = canvasOptionsData.defaultRatio;
-    selectedCount.value = canvasOptionsData.defaultCount;
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadCreationOptions();
-});
 </script>
 
 <style scoped lang="scss">
@@ -320,7 +286,11 @@ onMounted(() => {
   height: $tap-size;
   border: 0;
   border-radius: $radius-xl;
-  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
+  background: linear-gradient(
+    135deg,
+    $color-primary-soft 0%,
+    $color-primary-dark 100%
+  );
   color: #fff;
   font-size: $font-size-body;
   font-weight: $font-weight-bold;

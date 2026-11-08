@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [uni()],
   server: {
     proxy: {
-      // 本地 Mock 服务代理：VITE_USE_MOCK=false + VITE_API_BASE_URL=/api 时使用
+      // 开发期走同源代理访问服务器后端（Nginx :80 → FastAPI 127.0.0.1:8001），避免跨域预检
+      // 不重写路径：后端接口本身带 /api 前缀
       "/api": {
-        target: "http://127.0.0.1:3001",
+        target: "http://172.22.121.135",
         changeOrigin: true,
-        rewrite: (path: string) => path.replace(/^\/api/, ""),
       },
     },
   },

@@ -14,8 +14,6 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 
-import { getAccountOverview } from "@/apis/account";
-
 /**
  * @property {string} title 页头标题。
  * @property {number|null} points 灵感点余额；无接口数据时传 null，展示占位符。
@@ -26,24 +24,7 @@ const props = defineProps({
 });
 
 const canGoBack = ref(false);
-const remotePoints = ref(null);
-
-const pointsText = computed(() => {
-  const value = props.points === null ? remotePoints.value : props.points;
-
-  return value === null ? "—" : value;
-});
-
-// 读取灵感点余额；页头不打扰用户，失败时保留占位
-const loadPoints = async () => {
-  try {
-    const data = await getAccountOverview();
-
-    remotePoints.value = data.pointsBalance;
-  } catch (error) {
-    remotePoints.value = null;
-  }
-};
+const pointsText = computed(() => (props.points === null ? "—" : props.points));
 
 // 根据当前页面栈决定是否显示返回箭头。
 const updateBackState = () => {
@@ -57,7 +38,6 @@ const handleBack = () => {
 
 onMounted(() => {
   updateBackState();
-  loadPoints();
 });
 </script>
 

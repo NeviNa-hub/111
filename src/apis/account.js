@@ -1,18 +1,14 @@
-/**
- * 账户信息
- */
-import { API_PATHS } from "@/apis/constants";
-import apiRequest from "@/apis/http";
+import request from "@/utils/request";
 
 /**
  * 获取账户概览。
- * @returns {Promise<import("@/apis/types").AccountOverview>} 账户数据。
+ * @param {Object} params 查询参数。
+ * @returns {Promise<Object>} 账户数据。
  */
-export const getAccountOverview = async () => {
-  const data = await apiRequest({ url: API_PATHS.ACCOUNT_OVERVIEW });
-  const points = data?.points_balance;
-
-  return {
-    pointsBalance: typeof points === "number" ? points : null,
-  };
+export const getAccountOverview = (params) => {
+  return request({
+    url: "/account/overview",
+    method: "GET",
+    params: { ...params },
+  });
 };

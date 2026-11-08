@@ -21,22 +21,34 @@
         <text v-if="selectedImage"> {{ selectedImage.name }}</text>
         <text v-else>请先导入需要优化的图片</text>
         <button :disabled="isUploading" @click="chooseImage">
-          {{ isUploading ? "导入中…" : selectedImage ? "更换图片" : "导入图片" }}
+          {{
+            isUploading ? "导入中…" : selectedImage ? "更换图片" : "导入图片"
+          }}
         </button>
       </view>
-      <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
+      <view
+        class="preview"
+        :class="{ empty: !selectedImage }"
+        @click="chooseImage"
+      >
         <app-image
           v-if="selectedImage"
           class="preview-media"
           :src="selectedImage.url || selectedImage.path"
           mode="aspectFit"
         />
-        <text v-else class="empty-tip"> ＋<small>从相册选择或拍摄图片</small> </text>
+        <text v-else class="empty-tip">
+          ＋<small>从相册选择或拍摄图片</small>
+        </text>
         <text v-if="selectedImage" class="cover"> 已选封面</text>
-        <text v-if="selectedImage" class="ready"> 原图解析就绪 · 4K重绘待命</text>
+        <text v-if="selectedImage" class="ready">
+          原图解析就绪 · 4K重绘待命</text
+        >
         <text v-if="selectedImage" class="zoom">⌕</text>
       </view>
-      <view class="hint" @click="chooseImage">　点击重新从系统相册导入或拍摄</view>
+      <view class="hint" @click="chooseImage"
+        >　点击重新从系统相册导入或拍摄</view
+      >
       <view v-if="!isLoadingOptions && !optionsError" class="heading">
         优化方向 <small>单选</small>
       </view>
@@ -93,7 +105,9 @@
         "
         @click="startOptimization"
       >
-        {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
+        {{
+          isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）`
+        }}
       </button>
       <text>云端蒸馏级处理 · 支持高清直存至作品库</text>
     </view>
@@ -101,12 +115,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
-import {
-  createImageOptimization,
-  getImageOptimizationOptions,
-} from "@/apis/image-optimization";
+import { createImageOptimization } from "@/apis/image-optimization";
 import { uploadImage } from "@/apis/upload";
 import AppIcon from "@/components/AppIcon/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
@@ -115,19 +126,21 @@ import AppStateHint from "@/components/AppStateHint/index.vue";
 import { chooseSingleImage } from "@/utils/image-picker";
 import { getErrorMessage } from "@/utils/request";
 
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
-const directions = ref([]);
-const intensities = ref([]);
-const direction = ref("");
-const intensity = ref("");
+const directions = [
+  { directionId: 1, iconName: "grid", title: "无损超清", description: "4K超分重塑" },
+  { directionId: 2, iconName: "spark", title: "旧画去噪", description: "质感抚平" },
+  { directionId: 3, iconName: "spark", title: "意境重绘", description: "笔触唤醒" },
+];
+const intensities = ["微调修润", "均衡重构", "深度淬炼"];
+const direction = ref("无损超清");
+const intensity = ref("均衡重构");
 const keepDetail = ref(true);
 const selectedImage = ref(null);
-const cost = ref(0);
+const cost = 3;
 const isSubmitting = ref(false);
 const isUploading = ref(false);
 
-const costText = computed(() => (cost.value > 0 ? cost.value : "—"));
+const costText = computed(() => cost);
 
 // 从系统相册或相机选择图片并上传，失败时保留已有图片
 const chooseImage = async () => {
@@ -162,10 +175,7 @@ const chooseImage = async () => {
 const startOptimization = async () => {
   if (
     isSubmitting.value ||
-    isUploading.value ||
-    isLoadingOptions.value ||
-    optionsError.value
-  ) {
+    isUploading.value) {
     return;
   }
 
@@ -198,30 +208,6 @@ const startOptimization = async () => {
     isSubmitting.value = false;
   }
 };
-
-// 加载优化方向与强度配置，供首次进入与失败重试复用。
-const loadOptimizationOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const options = await getImageOptimizationOptions();
-
-    directions.value = options.directions;
-    intensities.value = options.intensities;
-    direction.value = options.defaultDirection;
-    intensity.value = options.defaultIntensity;
-    cost.value = options.cost;
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadOptimizationOptions();
-});
 </script>
 
 <style scoped lang="scss">

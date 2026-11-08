@@ -30,18 +30,16 @@
         class="form-card"
         :model="formModel"
         :rules="formRules"
+        :validate-on-rule-change="false"
         status-icon
       >
-        <view class="field-label">
-          ♙ {{ isRegister ? "账号" : "手机号/邮箱" }}
-        </view>
+        <view class="field-label"> 账号 </view>
         <el-form-item prop="account" class="auth-form-item">
           <el-input
             v-model="formModel.account"
             class="field-input"
-            :placeholder="
-              isRegister ? '请输入账号/邮箱' : '请输入账号/邮箱/手机号'
-            "
+            :placeholder="isRegister ? '请输入账号' : '请输入登录账号'"
+            maxlength="64"
             autocomplete="username"
           />
         </el-form-item>
@@ -65,6 +63,7 @@
             v-model="formModel.password"
             class="field-input"
             :placeholder="isRegister ? '请设置登录密码' : '请输入登录密码'"
+            maxlength="128"
             :type="isPasswordVisible ? 'text' : 'password'"
             autocomplete="current-password"
           >
@@ -89,6 +88,7 @@
             v-model="formModel.confirmPassword"
             class="field-input"
             placeholder="请再次输入密码"
+            maxlength="128"
             :type="isConfirmVisible ? 'text' : 'password'"
             autocomplete="new-password"
           />
@@ -103,7 +103,11 @@
             <text class="link-text">《行卷隐私保护政策》</text>
           </text>
         </view>
-        <button class="submit-button" @tap="handleSubmit">
+        <button
+          class="submit-button"
+          :disabled="isSubmitting"
+          @tap="handleSubmit"
+        >
           {{ isRegister ? "创建丹青画境" : "开启丹青画境" }} <text>→</text>
         </button>
       </el-form>
@@ -121,9 +125,11 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
+
+import { PAGE_PATHS } from "@/apis/constants";
 import { loginUser, registerUser } from "@/apis/auth";
-import { AUTH_TOKEN_STORAGE_KEY, AUTH_USER_STORAGE_KEY } from "@/utils/request";
+import { initializeSession } from "@/stores";
 
 const formRef = ref(null);
 const formModel = reactive({
@@ -133,9 +139,10 @@ const formModel = reactive({
   confirmPassword: "",
 });
 const isRegister = ref(false);
-const hasAgreed = ref(true);
+const hasAgreed = ref(false);
 const isPasswordVisible = ref(false);
 const isConfirmVisible = ref(false);
+const isSubmitting = ref(false);
 const formRules = computed(() => ({
   account: [
     {
@@ -166,6 +173,7 @@ const formRules = computed(() => ({
     ? [
         {
           required: true,
+          whitespace: true,
           message: "请输入用户名",
           trigger: "blur",
         },
@@ -187,10 +195,21 @@ const formRules = computed(() => ({
     : [],
 }));
 
-// 切换登录与注册表单。
+// 切换登录与注册表单；切换后清空输入，避免把另一侧的填写内容带过来。
 const toggleMode = () => {
   isRegister.value = !isRegister.value;
-  formRef.value?.clearValidate();
+  Object.assign(formModel, {
+    account: "",
+    password: "",
+    username: "",
+    confirmPassword: "",
+  });
+  isPasswordVisible.value = false;
+  isConfirmVisible.value = false;
+  // 等新模式的表单项渲染完成后再清理校验提示，避免切换后直接显示报错
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
 };
 
 // 返回上一页；从应用入口打开时留在登录页。
@@ -200,8 +219,12 @@ const goBack = () => {
   }
 };
 
-// 校验表单并调用登录或注册接口。
+// 校验表单并提交登录或注册，成功后初始化会话并进入首页。
 const handleSubmit = async () => {
+  if (isSubmitting.value) {
+    return;
+  }
+
   try {
     await formRef.value.validate();
   } catch (error) {
@@ -212,24 +235,30 @@ const handleSubmit = async () => {
     uni.showToast({ title: "请先阅读并同意服务协议与隐私政策", icon: "none" });
     return;
   }
-  const params = { account: formModel.account, password: formModel.password };
-  const resData = isRegister.value
-    ? await registerUser({
-        username: formModel.username,
-        ...params,
-      })
-    : await loginUser({
-        ...params,
-      });
 
-  if (resData.code === 200) {
-    uni.setStorageSync(AUTH_TOKEN_STORAGE_KEY, resData.data.access_token);
-    uni.setStorageSync(AUTH_USER_STORAGE_KEY, {
-      user_id: resData.data.user_id,
-      username: resData.data.username,
-      account: resData.data.account,
-    });
-    uni.reLaunch({ url: "/pages/index/index" });
+  isSubmitting.value = true;
+
+  try {
+    const params = { account: formModel.account, password: formModel.password };
+
+    // 注册接口只返回用户资料、不签发令牌，注册成功后切回登录态再获取会话。
+    if (isRegister.value) {
+      await registerUser({ username: formModel.username, ...params });
+      isRegister.value = false;
+      formRef.value?.clearValidate();
+      uni.showToast({ title: "注册成功，请登录", icon: "none" });
+      return;
+    }
+
+    const data = await loginUser(params);
+
+    initializeSession(data);
+    uni.showToast({ title: "登录成功", icon: "none" });
+    uni.reLaunch({ url: PAGE_PATHS.HOME });
+  } catch (error) {
+    // 请求层已统一提示错误。
+  } finally {
+    isSubmitting.value = false;
   }
 };
 </script>
@@ -408,33 +437,33 @@ const handleSubmit = async () => {
 
 .auth-form-item {
   margin-bottom: $space-4;
-}
 
-.auth-form-item :deep(.el-form-item__content) {
-  line-height: normal;
-}
+  :deep(.el-form-item__content) {
+    line-height: normal;
+  }
 
-.auth-form-item :deep(.el-input__wrapper) {
-  min-height: 80rpx;
-  padding: 0 $space-5;
-  border-radius: $radius-lg;
-  background: #eff3ff;
-  box-shadow: none;
-}
+  :deep(.el-input__wrapper) {
+    min-height: 80rpx;
+    padding: 0 $space-5;
+    border-radius: $radius-lg;
+    background: #eff3ff;
+    box-shadow: none;
+  }
 
-.auth-form-item :deep(.el-input__inner) {
-  color: #233d52;
-  font-size: $font-size-body;
-}
+  :deep(.el-input__inner) {
+    color: #233d52;
+    font-size: $font-size-body;
 
-.auth-form-item :deep(.el-input__inner::placeholder) {
-  color: #aab9c6;
-}
+    &::placeholder {
+      color: #aab9c6;
+    }
+  }
 
-.auth-form-item :deep(.el-form-item__error) {
-  position: static;
-  padding-top: $space-1;
-  font-size: $font-size-caption;
+  :deep(.el-form-item__error) {
+    position: static;
+    padding-top: $space-1;
+    font-size: $font-size-caption;
+  }
 }
 
 .field-label {
@@ -450,10 +479,10 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: $space-3;
-}
 
-.label-row .field-label {
-  margin-bottom: 0;
+  .field-label {
+    margin-bottom: 0;
+  }
 }
 
 .link-text {
@@ -487,11 +516,11 @@ const handleSubmit = async () => {
   border-radius: 8rpx;
   color: #fff;
   font-size: 26rpx;
-}
 
-.checkbox.is-checked {
-  border-color: $color-primary;
-  background: $color-primary;
+  &.is-checked {
+    border-color: $color-primary;
+    background: $color-primary;
+  }
 }
 
 .agreement-text {
@@ -516,10 +545,14 @@ const handleSubmit = async () => {
   font-size: $font-size-body-lg;
   font-weight: $font-weight-bold;
   line-height: 1;
-}
 
-.submit-button:after {
-  border: 0;
+  &::after {
+    border: 0;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
 }
 
 .switch-row {

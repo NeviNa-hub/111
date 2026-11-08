@@ -22,11 +22,12 @@ const NAV_ITEMS = [
     label: "工作坊",
     url: "/pages/under-development/index?title=工作坊",
   },
+  { key: "profile", label: "我的", url: "/pages/profile/index" },
 ];
 
 /**
  * 当前激活的导航项。
- * @property {"drafts" | "creation" | "works" | "workshop"} active 当前导航标识。
+ * @property {"drafts" | "creation" | "works" | "workshop" | "profile"} active 当前导航标识。
  */
 const props = defineProps({ active: { type: String, required: true } });
 

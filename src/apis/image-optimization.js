@@ -1,71 +1,27 @@
-/**
- * 图片优化
- */
-import { API_PATHS } from "@/apis/constants";
-import apiRequest from "@/apis/http";
-import { mapTaskStatus } from "@/apis/mappers";
-
-// 映射优化方向
-const mapDirection = (item = {}) => ({
-  directionId: item.direction_id,
-  iconName: item.icon_name || "",
-  title: item.title || "",
-  description: item.description || "",
-});
-
-/**
- * 获取图片优化配置。
- * @returns {Promise<import("@/apis/types").ImageOptimizationOptions>} 优化配置。
- */
-export const getImageOptimizationOptions = async () => {
-  const data = await apiRequest({ url: API_PATHS.IMAGE_OPTIMIZATION_OPTIONS });
-
-  return {
-    directions: Array.isArray(data.directions) ? data.directions.map(mapDirection) : [],
-    intensities: Array.isArray(data.intensities) ? data.intensities : [],
-    defaultDirection: data.default_direction || "",
-    defaultIntensity: data.default_intensity || "",
-    cost: Number(data.cost) || 0,
-    estimatedTime: data.estimated_time || "",
-  };
-};
+import request from "@/utils/request";
 
 /**
  * 创建图片优化任务。
- * @param {Object} params 优化参数。
- * @param {string} params.imagePath 原图地址。
- * @param {string} params.direction 优化方向。
- * @param {string} params.intensity 重绘强度。
- * @param {boolean} params.keepDetail 是否保留面部细节。
- * @returns {Promise<import("@/apis/types").TaskState>} 创建结果。
+ * @param {Object} params 图片优化参数。
+ * @returns {Promise<Object>} 创建结果。
  */
-export const createImageOptimization = async (params) => {
-  const data = await apiRequest({
-    url: API_PATHS.IMAGE_OPTIMIZATION_TASKS,
-    method: "POST",
-    params: {
-      image_path: params.imagePath,
-      direction: params.direction,
-      intensity: params.intensity,
-      keep_detail: params.keepDetail,
-    },
+export const createImageOptimization = (params = {}) => {
+  return request({ 
+    url: "/image-optimization/tasks", 
+    method: "POST", 
+    params
   });
-
-  return {
-    taskId: data.task_id,
-    status: data.status,
-  };
 };
 
 /**
  * 查询图片优化任务状态。
- * @param {string} taskId 任务标识。
- * @returns {Promise<import("@/apis/types").ImageTaskStatus>} 任务状态。
+ * @param {Object} params 查询参数，包含 taskId。
+ * @returns {Promise<Object>} 任务状态。
  */
-export const getImageOptimizationTaskStatus = async (taskId) => {
-  const data = await apiRequest({
-    url: `${API_PATHS.IMAGE_OPTIMIZATION_TASKS}/${encodeURIComponent(taskId)}`,
+export const getImageOptimizationTaskStatus = (params = {}) => {
+  return request({
+    url: `/image-optimization/tasks/${encodeURIComponent(params.taskId || "")}`,
+    method: "GET",
+    params: { ...params },
   });
-
-  return mapTaskStatus(data);
 };

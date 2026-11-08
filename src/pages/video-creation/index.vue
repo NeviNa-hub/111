@@ -209,7 +209,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 
 // #ifdef H5
 import {
@@ -227,7 +227,6 @@ import {
 // #endif
 
 import { uploadImage } from "@/apis/upload";
-import { getVideoCreationOptions } from "@/apis/video-creation";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
@@ -241,17 +240,22 @@ const flowSteps = [
   { index: "01", title: "规制与意境" },
   { index: "02", title: "画质与渲染" },
 ];
-const ratios = ref([]);
-const modes = ref([]);
-const suggestions = ref([]);
-const power = ref(0);
-const promptLimit = ref(300);
-const polishSuffix = ref("");
+const ratios = [
+  { ratioId: 1, value: "16:9", name: "16:9 横屏", description: "视野宽广 · 磅礴画卷", recommended: true },
+  { ratioId: 2, value: "9:16", name: "9:16 竖屏", description: "长幅沉浸 · 适宜移轴" },
+  { ratioId: 3, value: "1:1", name: "1:1 镜心", description: "方正静穆 · 斗方小品" },
+];
+const modes = [
+  { modeId: "text", name: "文字生视频" },
+  { modeId: "image", name: "图卷生动境" },
+];
+const suggestions = ["清溪泛舟", "浮岚暖翠", "寒江雪霁", "竹影摇曳"];
+const power = 800;
+const promptLimit = 300;
+const polishSuffix = "水波微澜，晨雾轻笼，气韵徐徐流转";
 const selectedImage = ref(null);
 const isSubmitting = ref(false);
 const isUploading = ref(false);
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
@@ -379,7 +383,7 @@ const chooseImage = async () => {
 
 // 校验规制与意境后保存草稿，进入画质与渲染页
 const goNext = async () => {
-  if (isSubmitting.value || isUploading.value || optionsError.value) {
+  if (isSubmitting.value || isUploading.value) {
     return;
   }
 
@@ -389,7 +393,7 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.value.find((ratio) => ratio.value === formData.ratio);
+  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {
@@ -408,32 +412,9 @@ const goNext = async () => {
 };
 
 // 加载规制与意境配置，供首次进入与失败重试复用。
-const loadOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const data = await getVideoCreationOptions();
-
-    ratios.value = data.ratios;
-    modes.value = data.modes;
-    suggestions.value = data.suggestions;
-    power.value = data.power;
-    promptLimit.value = data.promptLimit;
-    polishSuffix.value = data.polishSuffix;
-    formData.ratio = data.defaultRatio;
-    formData.mode = data.defaultMode;
-    formData.prompt = data.defaultPrompt;
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadOptions();
-});
+formData.ratio = "16:9";
+formData.mode = "text";
+formData.prompt = "孤舟蓑笠，江雪霏霏，水波微澜，远山在晨雾中徐徐隐退";
 </script>
 
 <style scoped lang="scss">

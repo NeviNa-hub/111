@@ -1,29 +1,45 @@
-import { AUTH_TOKEN_STORAGE_KEY } from "@/utils/request";
+/**
+ * 页面跳转守卫：uni-app 由 pages.json 管理路由，这里只注册导航拦截器。
+ */
+import { PAGE_PATHS } from "@/apis/constants";
+import { getToken } from "@/utils/auth";
 
-const AUTH_PAGE = "/pages/auth/index";
-const HOME_PAGE = "/pages/index/index";
+/**
+ * 统一页面路径，兼容带前导斜杠与查询串的跳转地址。
+ * @param {string} url 页面地址。
+ * @returns {string} 以斜杠开头的页面路径。
+ */
+const normalizePagePath = (url) => {
+  const path = url.replace(/^\//, "").split("?")[0];
 
-// 注册 UniApp 页面跳转守卫，受保护页面要求存在服务端访问令牌。
-export const setupRouteGuard = () => {
-  const guardPage = (args) => {
-    const isAuthenticated = Boolean(uni.getStorageSync(AUTH_TOKEN_STORAGE_KEY));
-    const path = args.url.replace(/^\//, "").split("?")[0];
-    const isAuthPage = path === AUTH_PAGE.slice(1);
-
-    if (!isAuthenticated && !isAuthPage) {
-      uni.reLaunch({ url: AUTH_PAGE });
-      return false;
-    }
-
-    if (isAuthenticated && isAuthPage) {
-      uni.reLaunch({ url: HOME_PAGE });
-      return false;
-    }
-
-    return true;
-  };
-
-  ["navigateTo", "redirectTo", "reLaunch", "switchTab"].forEach((method) => {
-    uni.addInterceptor(method, { invoke: guardPage });
-  });
+  return `/${path}`;
 };
+
+/**
+ * 拦截页面跳转：未登录进入登录页，已登录不再停留在登录页。
+ * @param {Object} args 页面跳转参数。
+ * @param {string} args.url 目标页面地址。
+ * @returns {boolean} 是否放行本次跳转。
+ */
+const guardPage = (args) => {
+  const path = normalizePagePath(args.url);
+  const hasToken = Boolean(getToken());
+
+  if (!hasToken && path !== PAGE_PATHS.AUTH) {
+    uni.reLaunch({ url: PAGE_PATHS.AUTH });
+
+    return false;
+  }
+
+  if (hasToken && path === PAGE_PATHS.AUTH) {
+    uni.reLaunch({ url: PAGE_PATHS.HOME });
+
+    return false;
+  }
+
+  return true;
+};
+
+["navigateTo", "redirectTo", "reLaunch", "switchTab"].forEach((method) => {
+  uni.addInterceptor(method, { invoke: guardPage });
+});

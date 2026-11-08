@@ -2,19 +2,19 @@
  * 统一请求层。
  *
  * 职责：拼接地址、超时、取消、相同 GET 请求合并、统一解包 `{ code, message, data }`。
- * 业务层只拿到 `data`；非 0 code 与网络异常统一抛出 ApiError，由页面决定提示方式。
+ * 业务层只拿到 `data`；非 0 code 与网络异常统一抛出 ApiError，请求层统一提示错误，
+ * 会话失效时清理凭据并返回登录页。
  */
 import { API_BASE_URL, REQUEST_TIMEOUT } from "@/apis/config";
-import { ERROR_CODES } from "@/apis/constants";
+import { ERROR_CODES, PAGE_PATHS } from "@/apis/constants";
+import { getToken } from "@/utils/auth";
+import { clearSession } from "@/stores";
 
 const pendingRequests = new Map();
 
-export const AUTH_TOKEN_STORAGE_KEY = "magic_app_auth_token";
-export const AUTH_USER_STORAGE_KEY = "magic_app_user";
-
 // 为所有真实请求统一附加 JSON 与会话请求头。
 const buildHeaders = (header = {}) => {
-  const token = uni.getStorageSync(AUTH_TOKEN_STORAGE_KEY);
+  const token = getToken();
 
   return {
     "Content-Type": "application/json",
@@ -23,14 +23,36 @@ const buildHeaders = (header = {}) => {
   };
 };
 
-// 请求异常统一通过全局提示展示，取消请求不提示。
-const showRequestError = (error) => {
-  if (error.code !== ERROR_CODES.REQUEST_ABORTED) {
-    uni.showToast({
-      title: error.message || "请求失败，请稍后重试",
-      icon: "none",
-    });
+// 会话失效时清理凭据并返回登录页；未登录请求不触发跳转。
+const redirectToAuth = () => {
+  if (!getToken()) {
+    return false;
   }
+
+  clearSession();
+  uni.reLaunch({ url: PAGE_PATHS.AUTH });
+
+  return true;
+};
+
+// 登录态缺失、无效或已过期时统一按会话失效处理。
+const isUnauthorizedCode = (code) =>
+  code === ERROR_CODES.UNAUTHORIZED || code === ERROR_CODES.SESSION_EXPIRED;
+
+// 请求异常统一通过全局提示展示，取消请求和会话失效不提示。
+const showRequestError = (error) => {
+  if (error.code === ERROR_CODES.REQUEST_ABORTED) {
+    return;
+  }
+
+  if (isUnauthorizedCode(error.code) && redirectToAuth()) {
+    return;
+  }
+
+  uni.showToast({
+    title: error.message || "请求失败，请稍后重试",
+    icon: "none",
+  });
 };
 
 // 拼接基地址；绝对地址保持不变，避免重复前缀
@@ -159,13 +181,12 @@ const sendRequest = (config) =>
     const requestTask = uni.request({
       url: buildUrl(config.url),
       method: config.method,
-      data: config.params,
+      data: Object.keys(config.params).length ? config.params : undefined,
       header: buildHeaders(config.header),
       timeout: config.timeout,
       success: (response) => {
         const body = response.data;
-        const isHttpSuccess =
-          response.statusCode >= 200 && response.statusCode < 300;
+        const isHttpSuccess = response.statusCode >= 200 && response.statusCode < 300;
 
         if (!isHttpSuccess) {
           finish(
@@ -173,60 +194,44 @@ const sendRequest = (config) =>
             new ApiError(
               body?.code || resolveHttpErrorCode(response.statusCode),
               body?.message || `请求失败（${response.statusCode}）`,
-              body,
-            ),
+              body
+            )
           );
           return;
         }
 
         if (!body || typeof body !== "object" || !("code" in body)) {
-          finish(
-            reject,
-            new ApiError(ERROR_CODES.SERVER_ERROR, "响应格式不正确", body),
-          );
+          finish(reject, new ApiError(ERROR_CODES.SERVER_ERROR, "响应格式不正确", body));
           return;
         }
 
-        if (body.code !== ERROR_CODES.SUCCESS) {
-          finish(
-            reject,
-            new ApiError(body.code, body.message || "请求失败", body.data),
-          );
+        // 本地 Mock 使用 0，真实后端使用 200 表示成功。
+        if (body.code !== ERROR_CODES.SUCCESS && body.code !== ERROR_CODES.SUCCESS_REAL) {
+          finish(reject, new ApiError(body.code, body.message || "请求失败", body.data));
           return;
         }
 
-        finish(resolve, body);
+        finish(resolve, body.data);
       },
       fail: (error) => {
         const errMsg = String(error?.errMsg || "");
 
         if (config.signal?.aborted) {
-          finish(
-            reject,
-            new ApiError(ERROR_CODES.REQUEST_ABORTED, "请求已取消"),
-          );
+          finish(reject, new ApiError(ERROR_CODES.REQUEST_ABORTED, "请求已取消"));
           return;
         }
 
         if (errMsg.includes("timeout")) {
           finish(
             reject,
-            new ApiError(
-              ERROR_CODES.NETWORK_ERROR,
-              "请求超时，请稍后重试",
-              error,
-            ),
+            new ApiError(ERROR_CODES.NETWORK_ERROR, "请求超时，请稍后重试", error)
           );
           return;
         }
 
         finish(
           reject,
-          new ApiError(
-            ERROR_CODES.NETWORK_ERROR,
-            "网络连接不可用，请稍后重试",
-            error,
-          ),
+          new ApiError(ERROR_CODES.NETWORK_ERROR, "网络连接不可用，请稍后重试", error)
         );
       },
     });

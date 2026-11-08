@@ -16,27 +16,11 @@
       <text class="page-title">第二步：甄选且现风格</text>
       <text class="page-desc">择取最合心意的笔触与气韵，使意境自然成章。</text>
 
-      <app-state-hint
-        v-if="isLoadingOptions"
-        class="content-state"
-        type="loading"
-        title="正在载入画风"
-      />
-      <app-state-hint
-        v-else-if="optionsError"
-        class="content-state"
-        type="error"
-        title="画风加载失败"
-        description="请检查网络后重试，已填写的画面主旨会保留"
-        action-text="重新加载"
-        @action="loadStyleOptions"
-      />
-
       <view class="prompt-card">
-        <view class="prompt-head"
-          ><text>画面主旨意象</text
-          ><text>{{ prompt.length }} / {{ promptLimit }}字</text></view
-        >
+        <view class="prompt-head">
+          <text>画面主旨意象</text>
+          <text>{{ prompt.length }} / {{ promptLimit }}字</text>
+        </view>
         <textarea
           v-model="prompt"
           :maxlength="promptLimit"
@@ -49,18 +33,23 @@
           ><text @click="prompt = ''">清空</text></view
         >
       </view>
-      <view v-if="!isLoadingOptions && !optionsError" class="suggestion-head"
-        ><text>灵感引线（轻触即添）</text><text>点击注入画面要素</text></view
-      >
-      <view v-if="!isLoadingOptions && !optionsError" class="suggestions"
-        ><button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
+      <view class="suggestion-head">
+        <text>灵感引线（轻触即添）</text><text>点击注入画面要素</text>
+      </view>
+      <view class="suggestions">
+        <button
+          v-for="item in suggestions"
+          :key="item"
+          @click="appendPrompt(item)"
+        >
           ＋ {{ item }}
-        </button></view
-      >
-      <view class="tuning-card"
-        ><view>● 画境点睛 · 气韵微调</view><text>意境基调　清润淡雅　墨韵沉静</text
-        ><text>留白比例　迂阔（60%）　虚实均亭</text></view
-      >
+        </button>
+      </view>
+      <view class="tuning-card">
+        <view>● 画境点睛 · 气韵微调</view>
+        <text>意境基调　清润淡雅　墨韵沉静</text>
+        <text>留白比例　迂阔（60%）　虚实均亭</text>
+      </view>
 
       <view class="detail-card">
         <view class="detail-title">风格特征细调 <text>针对当前画风</text></view>
@@ -76,11 +65,7 @@
     </scroll-view>
     <view class="bottom-actions" :style="barKeyboardStyle">
       <button class="previous" @click="goBack">上一步</button>
-      <button
-        class="next"
-        :disabled="isSubmitting || isLoadingOptions || optionsError"
-        @click="handleSubmit"
-      >
+      <button class="next" :disabled="isSubmitting" @click="handleSubmit">
         开始研墨成画 →
       </button>
     </view>
@@ -108,15 +93,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 import { TASK_STATUS } from "@/apis/constants";
 import {
   createImageGeneration,
-  getImageCanvasOptions,
-  getImageCreationOptions,
-  getImageStyles,
   getImageTaskStatus,
 } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -125,24 +107,37 @@ import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
 import useTaskPolling from "@/hooks/useTaskPolling";
-import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import {
+  DRAFT_KEYS,
+  readCreationDraft,
+  saveCreationDraft,
+} from "@/utils/creation-draft";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
 import { getErrorMessage } from "@/utils/request";
 
 const selectedStyle = ref("");
 const prompt = ref("");
-const promptLimit = ref(500);
-const suggestions = ref([]);
-const polishSuffix = ref("");
-const randomPromptText = ref("");
-const canvasCounts = ref([]);
-const estimatedTime = ref("");
+const promptLimit = 500;
+const suggestions = [
+  "江南烟雨",
+  "宋代山水",
+  "青绿设色",
+  "晨曦微光",
+  "枯墨留白",
+];
+const polishSuffix = "画面空灵雅致，留白自然，笔触细腻";
+const randomPromptText =
+  "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
+const canvasCounts = [
+  { name: "单张", value: 1, cost: 2 },
+  { name: "双张", value: 2, cost: 4 },
+  { name: "四张", value: 4, cost: 8 },
+];
+const estimatedTime = "约 6~8 秒";
 const draft = ref(readCreationDraft(DRAFT_KEYS.image) || {});
 const confirmVisible = ref(false);
 const progressVisible = ref(false);
 const isSubmitting = ref(false);
-const isLoadingOptions = ref(true);
-const optionsError = ref(false);
 const taskId = ref("");
 const taskProgress = ref(0);
 const taskStatusData = ref(null);
@@ -160,21 +155,23 @@ const barKeyboardStyle = computed(() => ({
 }));
 
 const generationCost = computed(() => {
-  const matched = canvasCounts.value.find((item) => item.name === draft.value.count);
+  const matched = canvasCounts.find((item) => item.name === draft.value.count);
 
   return matched ? matched.cost : "—";
 });
 
-const taskStage = computed(() => taskStatusData.value?.statusText || "气韵流转");
+const taskStage = computed(
+  () => taskStatusData.value?.statusText || "气韵流转",
+);
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.tip ||
-    "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。"
+    "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。",
 );
 
 const { start: startPolling } = useTaskPolling({
-  fetchTask: () => getImageTaskStatus(taskId.value),
+  fetchTask: () => getImageTaskStatus({ taskId: taskId.value }),
   interval: 3000,
   maxAttempts: 60,
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
@@ -198,14 +195,14 @@ const { start: startPolling } = useTaskPolling({
 const polishPrompt = () => {
   prompt.value = polishPromptText(
     prompt.value,
-    polishSuffix.value,
-    `江南烟雨中的远山与归舟，${polishSuffix.value}`
+    polishSuffix,
+    `江南烟雨中的远山与归舟，${polishSuffix}`,
   );
 };
 
 // 用随机意象覆盖当前主旨
 const randomPrompt = () => {
-  prompt.value = randomPromptText.value;
+  prompt.value = randomPromptText;
 };
 
 /**
@@ -224,7 +221,7 @@ const goBack = () => {
 
 // 校验构思内容后弹出生成确认
 const handleSubmit = () => {
-  if (isSubmitting.value || isLoadingOptions.value || optionsError.value) {
+  if (isSubmitting.value) {
     return;
   }
 
@@ -277,7 +274,7 @@ const confirmGenerate = async () => {
     confirmVisible.value = false;
     draft.value = { ...draft.value, ...requestData };
     saveCreationDraft(DRAFT_KEYS.image, draft.value);
-    taskId.value = task.taskId;
+    taskId.value = task.task_id;
     progressVisible.value = true;
     startTaskPolling();
   } catch (error) {
@@ -289,41 +286,6 @@ const confirmGenerate = async () => {
     isSubmitting.value = false;
   }
 };
-
-// 加载画风、灵感词与画幅配置，供首次进入与失败重试复用。
-const loadStyleOptions = async () => {
-  isLoadingOptions.value = true;
-  optionsError.value = false;
-
-  try {
-    const [styleOptions, creationOptions, canvasOptions] = await Promise.all([
-      getImageStyles(),
-      getImageCreationOptions(),
-      getImageCanvasOptions(),
-    ]);
-
-    const defaultStyle =
-      styleOptions.styles.find((item) => item.styleId === styleOptions.defaultStyleId) ||
-      styleOptions.styles[0];
-
-    selectedStyle.value = defaultStyle?.name || "";
-    suggestions.value = creationOptions.suggestions;
-    polishSuffix.value = creationOptions.polishSuffix;
-    randomPromptText.value = creationOptions.randomPrompt;
-    promptLimit.value = creationOptions.promptLimit || 500;
-    canvasCounts.value = canvasOptions.counts;
-    estimatedTime.value = canvasOptions.estimatedTime;
-    prompt.value = draft.value.prompt || "";
-  } catch (error) {
-    optionsError.value = true;
-  } finally {
-    isLoadingOptions.value = false;
-  }
-};
-
-onMounted(() => {
-  loadStyleOptions();
-});
 
 onShow(() => {
   const currentDraft = readCreationDraft(DRAFT_KEYS.image);

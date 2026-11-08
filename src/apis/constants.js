@@ -4,7 +4,11 @@
  */
 
 export const API_PATHS = {
+  AUTH_REGISTER: "/auth/register",
+  AUTH_LOGIN: "/auth/login",
+  AUTH_LOGOUT: "/auth/logout",
   ACCOUNT_OVERVIEW: "/account/overview",
+  POINTS_MY_INFO: "/points/myInfo",
   HOME_OVERVIEW: "/home/overview",
   WORKBENCH: "/workbench",
   LIBRARY: "/library",
@@ -20,10 +24,19 @@ export const API_PATHS = {
   UPLOADS: "/uploads/images",
 };
 
+export const PAGE_PATHS = {
+  AUTH: "/pages/auth/index",
+  HOME: "/pages/index/index",
+};
+
 export const ERROR_CODES = {
   SUCCESS: 0,
+  /** 真实后端成功码。 */
+  SUCCESS_REAL: 200,
   INVALID_PARAMS: 42201,
   UNAUTHORIZED: 40101,
+  /** 登录态缺失、无效或已过期。 */
+  SESSION_EXPIRED: 40102,
   NOT_FOUND: 40401,
   TASK_NOT_FOUND: 40402,
   INSUFFICIENT_POINTS: 40901,

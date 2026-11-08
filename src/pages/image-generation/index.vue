@@ -23,8 +23,8 @@ const task = reactive({
 const { start: startPolling } = useTaskPolling({
   fetchTask: () =>
     task.mode === "optimization"
-      ? getImageOptimizationTaskStatus(task.taskId)
-      : getImageTaskStatus(task.taskId),
+      ? getImageOptimizationTaskStatus({ taskId: task.taskId })
+      : getImageTaskStatus({ taskId: task.taskId }),
   interval: 3000,
   maxAttempts: 60,
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
@@ -51,7 +51,8 @@ const progressData = computed(() => {
   return {
     mode: task.mode,
     title: isOptimization ? "图片优化" : "画卷生成中",
-    progressTitle: status.progressTitle || (isOptimization ? "淬炼重绘" : "研墨成画"),
+    progressTitle:
+      status.progressTitle || (isOptimization ? "淬炼重绘" : "研墨成画"),
     stageLabel: status.stageLabel || "正在连接云端",
     typeLabel: status.typeLabel || "",
     progress: task.progress,
@@ -63,7 +64,9 @@ const progressData = computed(() => {
     cost: typeof status.cost === "number" ? status.cost : null,
     description: status.description || "正在获取任务信息",
     estimatedTime: status.estimatedTime || "",
-    tip: status.tip || "已进入云端处理，期间离开或切换页面不影响生成，可在作品库查看。",
+    tip:
+      status.tip ||
+      "已进入云端处理，期间离开或切换页面不影响生成，可在作品库查看。",
   };
 });
 

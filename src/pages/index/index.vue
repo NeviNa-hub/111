@@ -32,14 +32,14 @@
         <!-- 推荐创作 -->
         <view class="hero-card">
           <view class="hero-art">
-            <app-image class="hero-image" :src="hero.imageUrl" mode="aspectFill" />
+            <app-image class="hero-image" :src="hero.image_url" mode="aspectFill" />
             <view class="hero-label">{{ hero.label }}</view>
             <view class="hero-caption">{{ hero.caption }}</view>
             <view class="hero-hint">提示词：{{ hero.prompt }}</view>
           </view>
           <view class="hero-footer">
             <view class="hero-meta">
-              <text class="meta-title">{{ hero.modelName }}</text>
+              <text class="meta-title">{{ hero.model_name }}</text>
               <text class="meta-subtitle">已生成 {{ generatedCountText }} 次</text>
             </view>
             <button class="try-button" @click="handleTryCreation">同款创作</button>
@@ -64,7 +64,7 @@
           <view class="carousel-container">
             <view
               v-for="(creation, index) in creations"
-              :key="creation.creationId"
+              :key="creation.creation_id"
               class="creation-card"
               :class="[getCardPosition(index), `creation-card-${index + 1}`]"
               @click="openCreation(creation.url)"
@@ -73,8 +73,8 @@
                 <text class="card-label">{{ creation.eyebrow }}</text>
                 <text class="creation-title">{{ creation.title }}</text>
                 <view class="mock-input">
-                  <text class="input-prefix">{{ creation.inputLabel }}</text>
-                  <text class="input-value">{{ creation.inputValue }}</text>
+                  <text class="input-prefix">{{ creation.input_label }}</text>
+                  <text class="input-value">{{ creation.input_value }}</text>
                   <text class="input-icon">{{ creation.icon }}</text>
                 </view>
               </view>
@@ -129,7 +129,7 @@ const touchStartX = ref(0);
 
 const creations = computed(() => homeData.value?.creations || []);
 const creationCount = computed(() => creations.value.length);
-const weatherText = computed(() => homeData.value?.weatherText || "");
+const weatherText = computed(() => homeData.value?.weather_text || "");
 const quote = computed(() => homeData.value?.quote || "");
 const hero = computed(
   () =>
@@ -137,13 +137,13 @@ const hero = computed(
       label: "",
       caption: "",
       prompt: "",
-      imageUrl: "",
-      modelName: "",
-      generatedCount: 0,
+      image_url: "",
+      model_name: "",
+      generated_count: 0,
     }
 );
 const generatedCountText = computed(() =>
-  String(hero.value.generatedCount).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 );
 
 // 加载首页推荐与灵感工坊数据，供首次进入与失败重试复用
@@ -265,6 +265,15 @@ onMounted(() => {
 
 .home-state {
   margin-top: $space-6;
+
+  &.is-loading {
+    min-height: calc(
+      100vh - 210rpx - var(--status-bar-height, 0px) - #{$space-2} - #{$space-4}
+    );
+    margin-top: 0;
+    border: 0;
+    background: transparent;
+  }
 }
 
 .greeting-row {

@@ -47,7 +47,11 @@
 
         <view class="preview-card">
           <view class="preview-thumb">
-            <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
+            <app-image
+              class="preview-image"
+              :src="previewSource"
+              mode="aspectFill"
+            />
             <text class="preview-badge">影片</text>
           </view>
           <view class="preview-info">
@@ -141,7 +145,11 @@
     </scroll-view>
 
     <view class="bottom-bar">
-      <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
+      <el-button
+        class="previous-button"
+        :disabled="isSubmitting"
+        @click="goPreviousStep"
+      >
         <el-icon><ArrowLeft /></el-icon>
         上一步
       </el-button>
@@ -247,16 +255,18 @@ const taskStatusData = ref(null);
 
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
 
-const taskStage = computed(() => taskStatusData.value?.stageLabel || "云端逐帧重绘");
+const taskStage = computed(
+  () => taskStatusData.value?.stageLabel || "云端逐帧重绘",
+);
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.note ||
-    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。"
+    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
 );
 
 const { start: startPolling } = useTaskPolling({
-  fetchTask: () => getVideoTaskStatus(taskId.value),
+  fetchTask: () => getVideoTaskStatus({ taskId: taskId.value }),
   interval: 3000,
   maxAttempts: 60,
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,

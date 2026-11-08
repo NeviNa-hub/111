@@ -10,12 +10,13 @@ export const USE_MOCK = String(ENV.VITE_USE_MOCK ?? "true") !== "false";
 /**
  * 真实请求基地址。
  *
- * 本地 Mock 服务可设为 `http://127.0.0.1:3001`；
- * 使用 Vite `/api` 代理时可设为 `/api`；接入真实后端时配置对应网关地址。
+ * 默认使用 Vite 同源代理 `/api`，开发期由代理转发到本地后端，避免跨域预检；
+ * 需要直连其他网关时用 `VITE_API_BASE_URL` 覆盖完整地址。
  */
-export const API_BASE_URL = String(
-  ENV.VITE_API_BASE_URL ?? "http://127.0.0.1:8001/api",
-).replace(/\/+$/, "");
+export const API_BASE_URL = String(ENV.VITE_API_BASE_URL ?? "/api").replace(
+  /\/+$/,
+  "",
+);
 
 /** 单次请求超时时间，单位毫秒。 */
 export const REQUEST_TIMEOUT = 15000;

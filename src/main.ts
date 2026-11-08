@@ -1,5 +1,5 @@
 import { createSSRApp } from "vue";
-import { setupRouteGuard } from "@/router";
+import "@/router";
 
 // #ifdef H5
 import ElementPlus from "element-plus";
@@ -11,8 +11,6 @@ import App from "./App.vue";
 
 export function createApp() {
   const app = createSSRApp(App);
-
-  setupRouteGuard();
 
   // #ifdef H5
   app.use(ElementPlus, { locale: zhCn });
