@@ -279,9 +279,9 @@ const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 const formData = reactive({
-  ratio: "",
+  ratio: "16:9",
   mode: "text",
-  prompt: "",
+  prompt: "孤舟蓑笠，江雪霏霏，水波微澜，远山在晨雾中徐徐隐退",
   imagePath: "",
 });
 
@@ -425,9 +425,6 @@ const goNext = async () => {
 };
 
 // 加载规制与意境配置，供首次进入与失败重试复用。
-formData.ratio = "16:9";
-formData.mode = "text";
-formData.prompt = "孤舟蓑笠，江雪霏霏，水波微澜，远山在晨雾中徐徐隐退";
 </script>
 
 <style scoped lang="scss">

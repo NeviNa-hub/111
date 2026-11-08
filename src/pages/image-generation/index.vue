@@ -30,11 +30,17 @@ const { start: startPolling } = useTaskPolling({
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
   onProgress: (data) => {
     task.progress = data.progress;
-    task.statusData = data;
+    task.statusData = {
+      statusText: task.mode === "optimization" ? "高清图像重绘中" : "研墨成画中",
+      tip: "已进入云端处理，离开页面不影响任务进度。",
+    };
   },
   onCompleted: (data) => {
     task.progress = data.progress;
-    task.statusData = data;
+    task.statusData = {
+      statusText: "已完成 · 已归档作品库",
+      tip: "任务已完成，可前往作品库查看。",
+    };
   },
   onFailed: (error) => {
     uni.showToast({
@@ -51,19 +57,18 @@ const progressData = computed(() => {
   return {
     mode: task.mode,
     title: isOptimization ? "图片优化" : "画卷生成中",
-    progressTitle:
-      status.progressTitle || (isOptimization ? "淬炼重绘" : "研墨成画"),
-    stageLabel: status.stageLabel || "正在连接云端",
-    typeLabel: status.typeLabel || "",
+    progressTitle: isOptimization ? "淬炼重绘" : "研墨成画",
+    stageLabel: task.progress >= 100 ? "任务已完成" : "云端处理中",
+    typeLabel: isOptimization ? "图片优化" : "文字生图",
     progress: task.progress,
-    progressLabel: status.progressLabel || "气韵流转",
-    statusText: status.statusText || "等待云端响应",
-    workName: status.workName || "任务校验中",
-    detail: status.detail || "",
-    tags: status.tags || [],
-    cost: typeof status.cost === "number" ? status.cost : null,
-    description: status.description || "正在获取任务信息",
-    estimatedTime: status.estimatedTime || "",
+    progressLabel: "气韵流转",
+    statusText: status.statusText || "正在提交任务",
+    workName: isOptimization ? "图片优化任务" : "新建画卷",
+    detail: "云端智能生成",
+    tags: [],
+    cost: isOptimization ? 3 : 4,
+    description: "任务完成后自动保存至作品库",
+    estimatedTime: "预计稍候完成",
     tip:
       status.tip ||
       "已进入云端处理，期间离开或切换页面不影响生成，可在作品库查看。",

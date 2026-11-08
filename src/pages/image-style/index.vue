@@ -102,7 +102,6 @@ import {
   getImageTaskStatus,
 } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
