@@ -59,7 +59,7 @@ const progressData = computed(() => {
     typeLabel: isOptimization ? "图片优化" : "文字生图",
     progress: task.progress,
     progressLabel: "气韵流转",
-    statusText: status.statusText || "正在提交任务",
+    statusText: status.statusText || "云端处理中",
     workName: isOptimization ? "图片优化任务" : "新建画卷",
     detail: "云端智能生成",
     tags: [],

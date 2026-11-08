@@ -8,7 +8,7 @@
       @scrolltolower="loadMore"
     >
       <view class="summary-row">
-        <text class="summary">共 {{ pageInfo.total }} 幅典藏</text>
+        <text class="summary">{{ librarySummary }}</text>
       </view>
       <view class="tabs">
         <text
@@ -17,7 +17,7 @@
           :class="{ active: activeStatus === tab.status }"
           @click="handleTabChange(tab.status)"
         >
-          {{ tab.name }}
+          {{ tab.name }}　{{ tabCount(tab.status) }}
         </text>
       </view>
       <app-state-hint
@@ -79,6 +79,7 @@ const tabs = [
   { status: "creating", name: "创作中" },
   { status: "draft", name: "草稿" },
 ];
+const librarySummary = computed(() => `共 ${pageInfo.value.total} 幅典藏`);
 const pageInfo = ref({ page: 1, pageSize: PAGE_SIZE, total: 0 });
 const isLoading = ref(true);
 const isLoadingMore = ref(false);
@@ -87,6 +88,14 @@ const loadError = ref(false);
 let requestToken = 0;
 
 const hasMore = computed(() => works.value.length < pageInfo.value.total);
+
+const tabCount = (status) => {
+  if (status === activeStatus.value) {
+    return pageInfo.value.total;
+  }
+
+  return "";
+};
 
 /**
  * 加载作品库数据，并丢弃过期响应避免切换筛选时旧数据覆盖新状态。
@@ -120,7 +129,12 @@ const loadLibraryData = async (reset = false) => {
       pageSize: Number(data.page_info?.page_size) || PAGE_SIZE,
       total: Number(data.page_info?.total) || 0,
     };
-    const pageWorks = Array.isArray(data.lists) ? data.lists : [];
+    const pageWorks = Array.isArray(data.lists)
+      ? data.lists.map((item) => ({
+          workId: item.work_id,
+          title: item.title || "",
+        }))
+      : [];
     works.value = reset ? pageWorks : works.value.concat(pageWorks);
   } catch (error) {
     if (token !== requestToken) {

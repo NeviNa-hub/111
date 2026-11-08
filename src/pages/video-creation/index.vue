@@ -118,10 +118,9 @@
             </view>
             <el-button
               class="image-pick-button"
-              :loading="isUploading"
               @click="chooseImage"
             >
-              <el-icon v-if="!isUploading"><Upload /></el-icon>
+              <el-icon><Upload /></el-icon>
               {{ selectedImage ? "更换" : "选图" }}
             </el-button>
           </view>
@@ -183,7 +182,7 @@
       <el-button
         class="next-button"
         :loading="isSubmitting"
-        :disabled="isSubmitting || isUploading"
+        :disabled="isSubmitting"
         @click="goNext"
       >
         下一步：规格画质
@@ -221,7 +220,6 @@ import {
 } from "@element-plus/icons-vue";
 // #endif
 
-import { uploadImage } from "@/apis/upload";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
@@ -266,7 +264,6 @@ const promptLimit = 300;
 const polishSuffix = "水波微澜，晨雾轻笼，气韵徐徐流转";
 const selectedImage = ref(null);
 const isSubmitting = ref(false);
-const isUploading = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
@@ -363,15 +360,8 @@ const polishPrompt = () => {
 
 // 从系统相册或相机选择图卷并上传，失败时保留已有图卷
 const chooseImage = async () => {
-  if (isUploading.value) {
-    return;
-  }
-
   try {
     const image = await chooseSingleImage();
-
-    isUploading.value = true;
-
     selectedImage.value = { ...image, url: image.path };
     formData.imagePath = image.path;
     formRef.value?.clearValidate("imagePath");
@@ -382,14 +372,12 @@ const chooseImage = async () => {
         icon: "none",
       });
     }
-  } finally {
-    isUploading.value = false;
   }
 };
 
 // 校验规制与意境后保存草稿，进入画质与渲染页
 const goNext = async () => {
-  if (isSubmitting.value || isUploading.value) {
+  if (isSubmitting.value) {
     return;
   }
 

@@ -121,7 +121,6 @@ import { ref } from "vue";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 
 const frames = [
   { frameId: 1, name: "起势·淡雾" },

@@ -5,10 +5,8 @@
       <view class="file">
         <text v-if="selectedImage"> {{ selectedImage.name }}</text>
         <text v-else>请先导入需要优化的图片</text>
-        <button :disabled="isUploading" @click="chooseImage">
-          {{
-            isUploading ? "导入中…" : selectedImage ? "更换图片" : "导入图片"
-          }}
+        <button @click="chooseImage">
+          {{ selectedImage ? "更换图片" : "导入图片" }}
         </button>
       </view>
       <view
@@ -79,7 +77,7 @@
         <text>账户结余以实际扣减为准</text>
       </view>
       <button
-        :disabled="!selectedImage || isSubmitting || isUploading"
+        :disabled="!selectedImage || isSubmitting"
         @click="startOptimization"
       >
         {{
@@ -95,7 +93,6 @@
 import { computed, ref } from "vue";
 
 import { createImageOptimization } from "@/apis/image-optimization";
-import { uploadImage } from "@/apis/upload";
 import AppIcon from "@/components/AppIcon/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -129,21 +126,13 @@ const keepDetail = ref(true);
 const selectedImage = ref(null);
 const cost = 3;
 const isSubmitting = ref(false);
-const isUploading = ref(false);
 
 const costText = computed(() => cost);
 
 // 从系统相册或相机选择图片并上传，失败时保留已有图片
 const chooseImage = async () => {
-  if (isUploading.value) {
-    return;
-  }
-
   try {
     const image = await chooseSingleImage();
-
-    isUploading.value = true;
-
     selectedImage.value = { ...image, url: image.path };
   } catch (error) {
     if (!String(error?.errMsg || "").includes("cancel")) {
@@ -152,14 +141,12 @@ const chooseImage = async () => {
         icon: "none",
       });
     }
-  } finally {
-    isUploading.value = false;
   }
 };
 
 // 校验图片后开始优化任务
 const startOptimization = async () => {
-  if (isSubmitting.value || isUploading.value) {
+  if (isSubmitting.value) {
     return;
   }
 

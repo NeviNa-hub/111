@@ -159,14 +159,10 @@ const generationCost = computed(() => {
   return matched ? matched.cost : "—";
 });
 
-const taskStage = computed(
-  () => taskStatusData.value?.statusText || "气韵流转",
-);
+const taskStage = computed(() => "气韵流转");
 
 const taskNote = computed(
-  () =>
-    taskStatusData.value?.tip ||
-    "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。",
+  () => "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。",
 );
 
 const { start: startPolling } = useTaskPolling({

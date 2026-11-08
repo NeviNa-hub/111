@@ -103,7 +103,6 @@ import { computed, ref } from "vue";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 
 const homeData = {
   weather_text: "今日谷雨",
