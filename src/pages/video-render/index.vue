@@ -254,11 +254,17 @@ const { start: startPolling } = useTaskPolling({
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
   onProgress: (data) => {
     taskProgress.value = data.progress;
-    taskStatusData.value = data;
+    taskStatusData.value = {
+      stageLabel: "云端逐帧渲染中",
+      note: "已进入云端渲染，离开页面不影响任务进度。",
+    };
   },
   onCompleted: (data) => {
     taskProgress.value = data.progress;
-    taskStatusData.value = data;
+    taskStatusData.value = {
+      stageLabel: "动卷已完成",
+      note: "任务已完成并归档，可前往作品库查看。",
+    };
   },
   onFailed: (error) => {
     uni.showToast({

@@ -30,10 +30,7 @@ const { start: startPolling } = useTaskPolling({
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
   onProgress: (data) => {
     task.progress = data.progress;
-    task.statusData = {
-      statusText: task.mode === "optimization" ? "高清图像重绘中" : "研墨成画中",
-      tip: "已进入云端处理，离开页面不影响任务进度。",
-    };
+    task.statusData = { statusText: "云端处理中", tip: "离开页面不影响任务进度。" };
   },
   onCompleted: (data) => {
     task.progress = data.progress;

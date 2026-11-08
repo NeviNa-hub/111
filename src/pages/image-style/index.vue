@@ -176,11 +176,17 @@ const { start: startPolling } = useTaskPolling({
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
   onProgress: (data) => {
     taskProgress.value = data.progress;
-    taskStatusData.value = data;
+    taskStatusData.value = {
+      statusText: "云端研墨中",
+      tip: "已进入云端研磨，离开页面不影响任务进度。",
+    };
   },
   onCompleted: (data) => {
     taskProgress.value = data.progress;
-    taskStatusData.value = data;
+    taskStatusData.value = {
+      statusText: "已完成 · 已归档作品库",
+      tip: "任务已完成，可前往作品库查看。",
+    };
   },
   onFailed: (error) => {
     uni.showToast({

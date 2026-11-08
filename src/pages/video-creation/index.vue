@@ -372,13 +372,8 @@ const chooseImage = async () => {
 
     isUploading.value = true;
 
-    const uploaded = await uploadImage({
-      filePath: image.path,
-      name: image.name,
-    });
-
-    selectedImage.value = { ...image, url: uploaded.url };
-    formData.imagePath = uploaded.url;
+    selectedImage.value = { ...image, url: image.path };
+    formData.imagePath = image.path;
     formRef.value?.clearValidate("imagePath");
   } catch (error) {
     if (!String(error?.errMsg || "").includes("cancel")) {
