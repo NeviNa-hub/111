@@ -66,7 +66,7 @@
     <view class="bottom-actions" :style="barKeyboardStyle">
       <button class="previous" @click="goBack">上一步</button>
       <button class="next" :disabled="isSubmitting" @click="handleSubmit">
-        开始研墨成画 →
+        {{ isSubmitting ? "任务创建中…" : "开始研墨成画 →" }}
       </button>
     </view>
     <confirm-generation-dialog
@@ -76,6 +76,7 @@
       :estimated-time="estimatedTime || '待定'"
       note="确认后将扣除本次灵感点，并把画卷送入云端研磨，期间离开或切换页面均不影响生成。"
       confirm-text="确认研墨成画"
+      :loading="isSubmitting"
       @cancel="confirmVisible = false"
       @confirm="confirmGenerate"
     />
@@ -83,9 +84,11 @@
       v-if="progressVisible"
       title="研墨成画"
       type="creation"
+      :status="taskStatus"
       :progress="taskProgress"
       :progress-label="taskStage"
       :note="taskNote"
+      :result-url="taskResultUrl"
       @back="uni.redirectTo({ url: '/pages/workbench/index' })"
       @library="uni.navigateTo({ url: '/pages/library/index' })"
     />
@@ -112,7 +115,7 @@ import {
   saveCreationDraft,
 } from "@/utils/creation-draft";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
-import { getErrorMessage } from "@/utils/request";
+import { getErrorMessage, isApiError } from "@/utils/request";
 
 const selectedStyle = ref("");
 const prompt = ref("");
@@ -127,19 +130,29 @@ const suggestions = [
 const polishSuffix = "画面空灵雅致，留白自然，笔触细腻";
 const randomPromptText =
   "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
-const canvasCounts = [
-  { name: "单张", value: 1, cost: 2 },
-  { name: "双张", value: 2, cost: 4 },
-  { name: "四张", value: 4, cost: 8 },
-];
 const estimatedTime = "约 6~8 秒";
+const generationCost = 2;
+const TASK_STAGE_TEXT = {
+  [TASK_STATUS.PENDING]: "排队等待",
+  [TASK_STATUS.PROCESSING]: "气韵流转",
+  [TASK_STATUS.COMPLETED]: "生成完成",
+  [TASK_STATUS.FAILED]: "生成失败",
+};
+const TASK_NOTE_TEXT = {
+  [TASK_STATUS.PENDING]:
+    "任务已创建，正在排队等待云端处理，离开页面不影响生成。",
+  [TASK_STATUS.PROCESSING]: "云端研墨中，离开页面或切换画风不影响生成。",
+  [TASK_STATUS.COMPLETED]: "画卷已完成，可轻触画卷放大查看或前往作品库。",
+};
 const draft = ref(readCreationDraft(DRAFT_KEYS.image) || {});
 const confirmVisible = ref(false);
 const progressVisible = ref(false);
 const isSubmitting = ref(false);
 const taskId = ref("");
 const taskProgress = ref(0);
-const taskStatusData = ref(null);
+const taskStatus = ref(TASK_STATUS.PENDING);
+const taskMessage = ref("");
+const taskResultUrl = ref("");
 const { keyboardInset } = useKeyboardInset();
 
 const contentKeyboardStyle = computed(() => ({
@@ -153,42 +166,50 @@ const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 
-const generationCost = computed(() => {
-  const matched = canvasCounts.find((item) => item.name === draft.value.count);
-
-  return matched ? matched.cost : "—";
-});
-
-const taskStage = computed(() => "气韵流转");
-
-const taskNote = computed(
-  () => "已进入云端研磨，期间离开或切换页面不影响生成，可在作品库查看。",
+const taskStage = computed(
+  () => TASK_STAGE_TEXT[taskStatus.value] || "任务已创建",
 );
+
+const taskNote = computed(() => {
+  if (taskStatus.value === TASK_STATUS.FAILED) {
+    return taskMessage.value || "生成失败，请返回重新尝试。";
+  }
+
+  return (
+    TASK_NOTE_TEXT[taskStatus.value] || TASK_NOTE_TEXT[TASK_STATUS.PENDING]
+  );
+});
 
 const { start: startPolling } = useTaskPolling({
   fetchTask: () => getImageTaskStatus({ taskId: taskId.value }),
   interval: 3000,
   maxAttempts: 60,
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
+  isFailed: (data) => data.status === TASK_STATUS.FAILED,
   onProgress: (data) => {
-    taskProgress.value = data.progress;
-    taskStatusData.value = {
-      statusText: "云端研墨中",
-      tip: "已进入云端研磨，离开页面不影响任务进度。",
-    };
+    taskStatus.value = data.status || TASK_STATUS.PROCESSING;
+    taskProgress.value = Number(data.progress) || 0;
+
+    if (data.result_urls?.[0]) {
+      taskResultUrl.value = data.result_urls[0];
+    }
   },
   onCompleted: (data) => {
-    taskProgress.value = data.progress;
-    taskStatusData.value = {
-      statusText: "已完成 · 已归档作品库",
-      tip: "任务已完成，可前往作品库查看。",
-    };
+    taskStatus.value = TASK_STATUS.COMPLETED;
+    taskProgress.value = 100;
+    taskResultUrl.value = data.result_urls?.[0] || "";
   },
   onFailed: (error) => {
-    uni.showToast({
-      title: getErrorMessage(error, "任务状态查询失败，请稍后重试"),
-      icon: "none",
-    });
+    const isRequestError = isApiError(error);
+
+    taskStatus.value = TASK_STATUS.FAILED;
+    taskMessage.value = isRequestError
+      ? "任务状态查询失败，请稍后在作品库确认结果。"
+      : getErrorMessage(error, "生成失败，请稍后重试。");
+
+    if (!isRequestError) {
+      uni.showToast({ title: taskMessage.value, icon: "none" });
+    }
   },
 });
 
@@ -239,15 +260,12 @@ const handleSubmit = () => {
   confirmVisible.value = true;
 };
 
-// 启动任务轮询，空任务标识时直接给出提示
+// 启动任务轮询并重置当前任务状态
 const startTaskPolling = () => {
-  if (!taskId.value) {
-    uni.showToast({ title: "任务创建失败，请重试", icon: "none" });
-    return;
-  }
-
   taskProgress.value = 0;
-  taskStatusData.value = null;
+  taskStatus.value = TASK_STATUS.PENDING;
+  taskMessage.value = "";
+  taskResultUrl.value = "";
   startPolling();
 };
 
@@ -264,7 +282,6 @@ const confirmGenerate = async () => {
     prompt: prompt.value.trim(),
     style: selectedStyle.value,
     ratio: draft.value.ratio || "1:1",
-    count: draft.value.count || "双张",
   };
 
   isSubmitting.value = true;
@@ -274,8 +291,12 @@ const confirmGenerate = async () => {
       prompt: requestData.prompt,
       style: requestData.style,
       ratio: requestData.ratio,
-      count: requestData.count,
     });
+
+    if (!task?.task_id) {
+      uni.showToast({ title: "任务创建失败，请重试", icon: "none" });
+      return;
+    }
 
     confirmVisible.value = false;
     draft.value = { ...draft.value, ...requestData };
@@ -283,11 +304,14 @@ const confirmGenerate = async () => {
     taskId.value = task.task_id;
     progressVisible.value = true;
     startTaskPolling();
+    taskStatus.value = task.status || TASK_STATUS.PENDING;
   } catch (error) {
-    uni.showToast({
-      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
-      icon: "none",
-    });
+    if (!isApiError(error)) {
+      uni.showToast({
+        title: getErrorMessage(error, "创建任务失败，请稍后重试"),
+        icon: "none",
+      });
+    }
   } finally {
     isSubmitting.value = false;
   }
@@ -303,6 +327,8 @@ onShow(() => {
   }
 
   draft.value = currentDraft;
+  selectedStyle.value = currentDraft.style;
+  prompt.value = currentDraft.prompt || "";
 });
 </script>
 

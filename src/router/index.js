@@ -10,7 +10,8 @@ const LAST_PAGE_STORAGE_KEY = "magic_app_last_page";
  * 读取最近访问的页面地址。
  * @returns {string} 最近访问的页面地址；没有记录时为空字符串。
  */
-export const getLastPage = () => uni.getStorageSync(LAST_PAGE_STORAGE_KEY) || "";
+export const getLastPage = () =>
+  uni.getStorageSync(LAST_PAGE_STORAGE_KEY) || "";
 
 /**
  * 记录最近访问的页面地址。
@@ -21,6 +22,11 @@ export const rememberPage = (url) => {
   if (url) {
     uni.setStorageSync(LAST_PAGE_STORAGE_KEY, url);
   }
+};
+
+// 清理最近页面记录，退出登录或切换账号时调用，避免恢复到上一个账号的页面。
+export const clearLastPage = () => {
+  uni.removeStorageSync(LAST_PAGE_STORAGE_KEY);
 };
 
 /**

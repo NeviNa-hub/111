@@ -32,44 +32,18 @@
       <view class="hint" @click="chooseImage"
         >　点击重新从系统相册导入或拍摄</view
       >
-      <view class="heading"> 优化方向 <small>单选</small> </view>
-      <view class="directions">
-        <view
-          v-for="item in directions"
-          :key="item.directionId"
-          class="direction"
-          :class="{ selected: direction === item.title }"
-          @click="direction = item.title"
-        >
-          <app-icon :name="item.iconName" />
-          <strong>{{ item.title }}</strong>
-          <small>{{ item.description }}</small>
-        </view>
-      </view>
       <view class="heading">
-        重绘强度 <small class="accent">均衡重构（推荐）</small>
+        优化提示词 <small>{{ prompt.length }} / {{ promptLimit }} 字</small>
       </view>
-      <view class="intensity">
-        <text
-          v-for="item in intensities"
-          :key="item"
-          :class="{ selected: intensity === item }"
-          @click="intensity = item"
-        >
-          {{ item }}
-        </text>
-      </view>
-      <view class="switch-row">
-        <view>
-          <strong>◉　保留原画面部细节</strong>
-          <small>避免AI拟合过度导致的五官微变</small>
-        </view>
-        <switch
-          :checked="keepDetail"
-          color="#05604c"
-          @change="keepDetail = $event.detail.value"
+      <view class="prompt-card">
+        <textarea
+          v-model="prompt"
+          :maxlength="promptLimit"
+          class="prompt-input"
+          placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
         />
       </view>
+      <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
     </scroll-view>
     <view class="actions">
       <view class="cost">
@@ -93,38 +67,15 @@
 import { computed, ref } from "vue";
 
 import { createImageOptimization } from "@/apis/image-optimization";
-import AppIcon from "@/components/AppIcon/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import { chooseSingleImage } from "@/utils/image-picker";
-import { getErrorMessage } from "@/utils/request";
+import { getErrorMessage, isApiError } from "@/utils/request";
 
-const directions = [
-  {
-    directionId: 1,
-    iconName: "grid",
-    title: "无损超清",
-    description: "4K超分重塑",
-  },
-  {
-    directionId: 2,
-    iconName: "spark",
-    title: "旧画去噪",
-    description: "质感抚平",
-  },
-  {
-    directionId: 3,
-    iconName: "spark",
-    title: "意境重绘",
-    description: "笔触唤醒",
-  },
-];
-const intensities = ["微调修润", "均衡重构", "深度淬炼"];
-const direction = ref("无损超清");
-const intensity = ref("均衡重构");
-const keepDetail = ref(true);
-const selectedImage = ref(null);
 const cost = 3;
+const promptLimit = 200;
+const prompt = ref("");
+const selectedImage = ref(null);
 const isSubmitting = ref(false);
 
 const costText = computed(() => cost);
@@ -155,15 +106,23 @@ const startOptimization = async () => {
     return;
   }
 
+  if (!prompt.value.trim()) {
+    uni.showToast({ title: "请填写优化提示词", icon: "none" });
+    return;
+  }
+
   isSubmitting.value = true;
 
   try {
     const task = await createImageOptimization({
       image_path: selectedImage.value.url || selectedImage.value.path,
-      direction: direction.value,
-      intensity: intensity.value,
-      keep_detail: keepDetail.value,
+      prompt: prompt.value.trim(),
     });
+
+    if (!task?.task_id) {
+      uni.showToast({ title: "任务创建失败，请重试", icon: "none" });
+      return;
+    }
 
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
@@ -171,10 +130,12 @@ const startOptimization = async () => {
       )}`,
     });
   } catch (error) {
-    uni.showToast({
-      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
-      icon: "none",
-    });
+    if (!isApiError(error)) {
+      uni.showToast({
+        title: getErrorMessage(error, "创建任务失败，请稍后重试"),
+        icon: "none",
+      });
+    }
   } finally {
     isSubmitting.value = false;
   }
@@ -329,101 +290,26 @@ const startOptimization = async () => {
   font-weight: $font-weight-regular;
 }
 
-.heading .accent {
-  color: $color-primary;
-}
-
-.directions {
-  display: flex;
-  gap: $space-3;
+.prompt-card {
   margin-top: $space-3;
-}
-
-.direction {
-  flex: 1;
-  min-width: 0;
-  padding: $space-4 $space-1;
-  border: 1rpx solid $color-line;
-  border-radius: $radius-md;
-  background: $color-surface;
-  text-align: center;
-}
-
-.direction.selected {
-  border-color: $color-primary;
-  background: $color-primary;
-  color: #fff;
-}
-
-.direction text,
-.direction strong,
-.direction small {
-  display: block;
-}
-
-.direction strong {
-  margin-top: $space-2;
-  font-size: $font-size-caption;
-}
-
-.direction small {
-  margin-top: $space-1;
-  color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-tight;
-}
-
-.direction.selected small {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.intensity {
-  display: flex;
-  margin-top: $space-3;
-  padding: $space-1;
-  border-radius: $radius-sm;
-  background: $color-primary-light;
-}
-
-.intensity text {
-  @include tap-area(64rpx);
-  flex: 1;
-  padding: $space-2 0;
-  color: $color-ink-soft;
-  text-align: center;
-  font-size: $font-size-caption;
-}
-
-.intensity .selected {
-  border-radius: $radius-xs;
-  background: $color-surface;
-  color: $color-primary;
-  font-weight: $font-weight-bold;
-}
-
-.switch-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-4;
-  margin-top: $space-5;
-  padding: $space-5;
+  padding: $space-4;
   border: 1rpx solid $color-line;
   border-radius: $radius-md;
   background: $color-surface;
 }
 
-.switch-row strong,
-.switch-row small {
-  display: block;
-}
-
-.switch-row strong {
+.prompt-input {
+  width: 100%;
+  height: 200rpx;
+  color: $color-ink;
   font-size: $font-size-aux;
+  line-height: $line-height-normal;
+  box-sizing: border-box;
 }
 
-.switch-row small {
-  margin-top: $space-1;
+.fixed-tip {
+  display: block;
+  margin-top: $space-3;
   color: $color-muted;
   font-size: $font-size-badge;
 }

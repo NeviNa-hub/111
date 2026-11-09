@@ -35,7 +35,7 @@ const resolveTaskStatus = (taskId, buildStatus, expectedType) => {
   const record = readMockTask(taskId);
 
   if (!record || record.type !== expectedType) {
-    return fail(ERROR_CODES.TASK_NOT_FOUND, "任务不存在或已过期");
+    return fail(ERROR_CODES.NOT_FOUND, "任务不存在或已过期");
   }
 
   return ok(buildStatus(record));
@@ -95,7 +95,7 @@ const exactRoutes = {
     createTaskResponse("image", params, ["prompt", "style"]),
   [`GET ${API_PATHS.IMAGE_OPTIMIZATION_OPTIONS}`]: () => ok(IMAGE_OPTIMIZATION_OPTIONS),
   [`POST ${API_PATHS.IMAGE_OPTIMIZATION_TASKS}`]: (params) =>
-    createTaskResponse("optimization", params, ["image_path"]),
+    createTaskResponse("optimization", params, ["image_path", "prompt"]),
   [`GET ${API_PATHS.VIDEO_CREATION_OPTIONS}`]: () => ok(VIDEO_CREATION_OPTIONS),
   [`GET ${API_PATHS.VIDEO_RENDER_OPTIONS}`]: () => ok(VIDEO_RENDER_OPTIONS),
   [`POST ${API_PATHS.VIDEO_TASKS}`]: (params) => {

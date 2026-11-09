@@ -25,7 +25,9 @@ defineProps({
 
 const pointsBalance = ref(null);
 const canGoBack = ref(false);
-const pointsText = computed(() => (pointsBalance.value === null ? "—" : pointsBalance.value));
+const pointsText = computed(() =>
+  pointsBalance.value === null ? "—" : pointsBalance.value,
+);
 
 // 根据当前页面栈决定是否显示返回箭头。
 const updateBackState = () => {
@@ -43,7 +45,7 @@ const loadPointsBalance = async () => {
     const data = await getPointsInfo({ page: 1, page_size: 1 });
 
     pointsBalance.value = data.points_balance;
-  } catch (error) {
+  } catch {
     // 请求层已统一提示错误，这里保留占位符。
   }
 };

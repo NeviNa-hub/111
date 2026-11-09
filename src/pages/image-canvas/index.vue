@@ -9,7 +9,7 @@
     <scroll-view scroll-y :show-scrollbar="false" class="content">
       <text class="step-count">步骤 3 / 3</text>
       <text class="page-title">第三步：设定画幅并落墨</text>
-      <text class="page-desc">厘定比例与画幅张数，即将落笔成卷</text>
+      <text class="page-desc">厘定画幅比例，即将落笔成卷</text>
       <view>
         <view class="summary-card">
           <view class="summary-title">
@@ -35,21 +35,6 @@
             <text v-if="selectedRatio === ratio.value" class="chosen">
               已选
             </text>
-          </view>
-        </view>
-        <view class="section-title count-title">
-          生成张数 <text>多图可甄选微调意趣</text>
-        </view>
-        <view class="count-list">
-          <view
-            v-for="count in options.counts"
-            :key="count.name"
-            class="count-card"
-            :class="{ selected: selectedCount === count.name }"
-            @click="selectedCount = count.name"
-          >
-            <text>{{ count.name }}</text>
-            <small>消耗 {{ count.cost }} 灵感点</small>
           </view>
         </view>
         <view class="cost-card">
@@ -91,14 +76,8 @@ const options = ref({
     { name: "9:16 立轴", description: "移动壁纸画轴", value: "9:16" },
     { name: "4:3 经典", description: "雅致画册典藏", value: "4:3" },
   ],
-  counts: [
-    { name: "单张", value: 1, cost: 2 },
-    { name: "双张", value: 2, cost: 4 },
-    { name: "四张", value: 4, cost: 8 },
-  ],
 });
 const selectedRatio = ref("1:1");
-const selectedCount = ref("双张");
 const pointsBalance = ref(800);
 const isSubmitting = ref(false);
 
@@ -106,13 +85,7 @@ const pointsText = computed(() =>
   pointsBalance.value === null ? "—" : pointsBalance.value,
 );
 
-const selectedCost = computed(() => {
-  const matched = options.value.counts.find(
-    (item) => item.name === selectedCount.value,
-  );
-
-  return matched ? matched.cost : "—";
-});
+const selectedCost = 2;
 
 // 返回上一页修改画风
 const goBack = () => {
@@ -130,8 +103,8 @@ const generate = async () => {
     return;
   }
 
-  if (!selectedRatio.value || !selectedCount.value) {
-    uni.showToast({ title: "请选择画幅比例和生成张数", icon: "none" });
+  if (!selectedRatio.value) {
+    uni.showToast({ title: "请选择画幅比例", icon: "none" });
     return;
   }
 
@@ -140,7 +113,6 @@ const generate = async () => {
     prompt: draft.prompt,
     style: draft.style,
     ratio: selectedRatio.value,
-    count: selectedCount.value,
   };
 
   isSubmitting.value = true;
@@ -150,7 +122,6 @@ const generate = async () => {
       prompt: requestData.prompt,
       style: requestData.style,
       ratio: requestData.ratio,
-      count: requestData.count,
     });
 
     saveCreationDraft(DRAFT_KEYS.image, requestData);
@@ -357,43 +328,6 @@ onShow(() => {
   background: $color-primary;
   color: #fff;
   font-size: $font-size-badge;
-}
-
-.count-list {
-  display: flex;
-  gap: $space-2;
-  margin-top: $space-3;
-}
-
-.count-card {
-  flex: 1;
-  padding: $space-4 $space-1;
-  border: 1rpx solid $color-line;
-  border-radius: $radius-lg;
-  background: $color-surface;
-  text-align: center;
-}
-
-.count-card.selected {
-  border: 2rpx solid $color-primary;
-}
-
-.count-card text,
-.count-card small {
-  display: block;
-}
-
-.count-card text {
-  color: $color-ink;
-  font-size: $font-size-body;
-  font-weight: $font-weight-semibold;
-}
-
-.count-card small {
-  margin-top: $space-1;
-  color: $color-muted;
-  font-size: $font-size-badge;
-  @include numeric;
 }
 
 .cost-card {

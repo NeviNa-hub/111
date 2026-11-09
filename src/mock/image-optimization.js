@@ -49,7 +49,7 @@ export const buildOptimizationTaskStatus = (record) => {
     type_label: "无损超清",
     work_name: "图片优化任务",
     detail: "云端蒸馏 · 高清重绘",
-    tags: [payload.direction || "无损超清", "4K重绘", "高清写意"],
+    tags: ["4K重绘", "高清写意"],
     cost: IMAGE_OPTIMIZATION_OPTIONS.cost,
     estimated_time: IMAGE_OPTIMIZATION_OPTIONS.estimated_time,
     description: "云端蒸馏级处理，完成后自动保存至作品库",

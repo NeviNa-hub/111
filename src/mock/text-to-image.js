@@ -88,13 +88,6 @@ const buildWorkName = (prompt = "") => {
   return `《${prompt.length > 12 ? `${prompt.slice(0, 12)}…` : prompt}》`;
 };
 
-// 根据张数名称计算消耗的灵感点
-const resolveCost = (countName = "") => {
-  const matched = IMAGE_CANVAS_OPTIONS.counts.find((item) => item.name === countName);
-
-  return matched?.cost || IMAGE_CANVAS_OPTIONS.counts[1].cost;
-};
-
 /**
  * 生成文字生图任务状态数据。
  * @param {Object} record 模拟任务记录。
@@ -103,11 +96,9 @@ const resolveCost = (countName = "") => {
 export const buildImageTaskStatus = (record) => {
   const payload = record.payload || {};
   const isCompleted = record.status === TASK_STATUS.COMPLETED;
-  const tags = [payload.style || "宋式水墨", payload.ratio || "1:1"].filter(Boolean);
-
-  if (payload.count) {
-    tags.push(payload.count);
-  }
+  const tags = [payload.style || "宋式水墨", payload.ratio || "1:1"].filter(
+    Boolean,
+  );
 
   return {
     task_id: record.taskId,
@@ -119,7 +110,7 @@ export const buildImageTaskStatus = (record) => {
     work_name: buildWorkName(payload.prompt),
     detail: `${payload.style || "宋式水墨"} · ${payload.ratio || "1:1"}`,
     tags,
-    cost: resolveCost(payload.count),
+    cost: 2,
     estimated_time: IMAGE_CANVAS_OPTIONS.estimated_time,
     description: "研墨调色，点染山石梧桐与溪桥花茂",
     tip: isCompleted

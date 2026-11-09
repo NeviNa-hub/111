@@ -2,7 +2,7 @@
  * 统一请求层。
  *
  * 职责：拼接地址、超时、取消、相同 GET 请求合并、统一解包 `{ code, message, data }`。
- * 业务层只拿到 `data`；非 0 code 与网络异常统一抛出 ApiError，请求层统一提示错误，
+ * 业务层只拿到 `data`；非 200 code 与网络异常统一抛出 ApiError，请求层统一提示错误，
  * 会话失效时清理凭据并返回登录页。
  */
 import { API_BASE_URL, REQUEST_TIMEOUT } from "@/apis/config";
@@ -36,8 +36,7 @@ const redirectToAuth = () => {
 };
 
 // 登录态缺失、无效或已过期时统一按会话失效处理。
-const isUnauthorizedCode = (code) =>
-  code === ERROR_CODES.UNAUTHORIZED || code === ERROR_CODES.SESSION_EXPIRED;
+const isUnauthorizedCode = (code) => code === ERROR_CODES.UNAUTHORIZED;
 
 // 请求异常统一通过全局提示展示，取消请求和会话失效不提示。
 const showRequestError = (error) => {
@@ -120,22 +119,9 @@ const normalizeParams = (params = {}) =>
 const buildRequestKey = (method, url, params) =>
   `${method}:${buildUrl(url)}:${JSON.stringify(params)}`;
 
-// 根据 HTTP 状态码补全业务错误码
-const resolveHttpErrorCode = (statusCode) => {
-  if (statusCode === 401) {
-    return ERROR_CODES.UNAUTHORIZED;
-  }
-
-  if (statusCode === 404) {
-    return ERROR_CODES.NOT_FOUND;
-  }
-
-  if (statusCode === 422) {
-    return ERROR_CODES.INVALID_PARAMS;
-  }
-
-  return ERROR_CODES.SERVER_ERROR;
-};
+// 后端 code 与 HTTP 状态码一致；响应缺少 code 时直接用状态码兜底
+const resolveHttpErrorCode = (statusCode) =>
+  statusCode || ERROR_CODES.SERVER_ERROR;
 
 /**
  * 发送一次底层请求并解包响应。
@@ -146,7 +132,8 @@ const resolveHttpErrorCode = (statusCode) => {
  * @param {Object} [config.header] 请求头。
  * @param {number} config.timeout 超时时间。
  * @param {AbortSignal} [config.signal] 取消信号。
- * @returns {Promise<*>} 解包后的 data。
+ * @param {boolean} [config.includeMessage] 是否同时返回响应顶层 message。
+ * @returns {Promise<*>} 解包后的 data；需要 message 时返回 `{ data, message }`。
  */
 const sendRequest = (config) =>
   new Promise((resolve, reject) => {
@@ -186,7 +173,8 @@ const sendRequest = (config) =>
       timeout: config.timeout,
       success: (response) => {
         const body = response.data;
-        const isHttpSuccess = response.statusCode >= 200 && response.statusCode < 300;
+        const isHttpSuccess =
+          response.statusCode >= 200 && response.statusCode < 300;
 
         if (!isHttpSuccess) {
           finish(
@@ -194,44 +182,65 @@ const sendRequest = (config) =>
             new ApiError(
               body?.code || resolveHttpErrorCode(response.statusCode),
               body?.message || `请求失败（${response.statusCode}）`,
-              body
-            )
+              body,
+            ),
           );
           return;
         }
 
         if (!body || typeof body !== "object" || !("code" in body)) {
-          finish(reject, new ApiError(ERROR_CODES.SERVER_ERROR, "响应格式不正确", body));
+          finish(
+            reject,
+            new ApiError(ERROR_CODES.SERVER_ERROR, "响应格式不正确", body),
+          );
           return;
         }
 
-        // 本地 Mock 使用 0，真实后端使用 200 表示成功。
-        if (body.code !== ERROR_CODES.SUCCESS && body.code !== ERROR_CODES.SUCCESS_REAL) {
-          finish(reject, new ApiError(body.code, body.message || "请求失败", body.data));
+        if (body.code !== ERROR_CODES.SUCCESS) {
+          finish(
+            reject,
+            new ApiError(body.code, body.message || "请求失败", body.data),
+          );
           return;
         }
 
-        finish(resolve, body.data);
+        finish(
+          resolve,
+          config.includeMessage
+            ? { data: body.data, message: body.message || "" }
+            : body.data,
+        );
       },
       fail: (error) => {
         const errMsg = String(error?.errMsg || "");
 
         if (config.signal?.aborted) {
-          finish(reject, new ApiError(ERROR_CODES.REQUEST_ABORTED, "请求已取消"));
+          finish(
+            reject,
+            new ApiError(ERROR_CODES.REQUEST_ABORTED, "请求已取消"),
+          );
           return;
         }
 
         if (errMsg.includes("timeout")) {
           finish(
             reject,
-            new ApiError(ERROR_CODES.NETWORK_ERROR, "请求超时，请稍后重试", error)
+            new ApiError(
+              ERROR_CODES.NETWORK_ERROR,
+              "请求超时，请稍后重试",
+              error,
+            ),
           );
           return;
         }
 
         finish(
           reject,
-          new ApiError(ERROR_CODES.NETWORK_ERROR, "网络连接不可用，请稍后重试", error)
+          new ApiError(
+            ERROR_CODES.NETWORK_ERROR,
+            "网络连接不可用，请稍后重试",
+            error,
+          ),
         );
       },
     });
@@ -248,7 +257,8 @@ const sendRequest = (config) =>
  * @param {Object} [config.header] 自定义请求头。
  * @param {number} [config.timeout] 覆盖默认超时时间。
  * @param {AbortSignal} [config.signal] 取消信号。
- * @returns {Promise<*>} 接口 data。
+ * @param {boolean} [config.includeMessage] 是否返回响应顶层 message，供任务失败原因等场景使用。
+ * @returns {Promise<*>} 接口 data；开启 includeMessage 时返回 `{ data, message }`。
  */
 export default function request(config) {
   const method = (config.method || "GET").toUpperCase();

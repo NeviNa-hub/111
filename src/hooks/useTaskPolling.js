@@ -16,6 +16,7 @@ const DEFAULT_RETRY_LIMIT = 1;
  * @param {number} defaultOptions.maxAttempts 最大轮询次数。
  * @param {number} defaultOptions.retryLimit 单次轮询失败后的重试次数。
  * @param {Function} defaultOptions.isCompleted 判断任务是否完成。
+ * @param {Function} defaultOptions.isFailed 判断任务是否失败。
  * @param {Function} defaultOptions.onProgress 每次拉取成功后的回调。
  * @param {Function} defaultOptions.onCompleted 任务完成时的回调。
  * @param {Function} defaultOptions.onFailed 任务失败、超时或重试耗尽时的回调。
@@ -68,6 +69,7 @@ export default function useTaskPolling(defaultOptions = {}) {
     const {
       fetchTask,
       isCompleted,
+      isFailed,
       maxAttempts,
       retryLimit,
       onProgress,
@@ -94,9 +96,15 @@ export default function useTaskPolling(defaultOptions = {}) {
         return;
       }
 
+      if (isFailed?.(data)) {
+        stop();
+        onFailed?.(new Error(data.message || "任务生成失败，请稍后重试"));
+        return;
+      }
+
       if (attempts >= maxAttempts) {
         stop();
-        onFailed?.(new Error("任务轮询超时"));
+        onFailed?.(new Error("任务仍在处理，请稍后在作品库查看"));
       }
     } catch (error) {
       if (token !== pollingToken) {
@@ -138,6 +146,7 @@ export default function useTaskPolling(defaultOptions = {}) {
         ? config.retryLimit
         : DEFAULT_RETRY_LIMIT,
       isCompleted: config.isCompleted,
+      isFailed: config.isFailed,
       onProgress: config.onProgress,
       onCompleted: config.onCompleted,
       onFailed: config.onFailed,

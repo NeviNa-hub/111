@@ -7,9 +7,11 @@
     <generation-dialog
       v-if="data.mode === 'optimization'"
       type="optimization"
+      :status="data.status"
       :progress="data.progress"
       :progress-label="data.stageLabel"
       :note="data.tip"
+      :result-url="data.resultUrl"
       @back="goWorkbench"
       @library="goLibrary"
     />
@@ -29,6 +31,15 @@
           ><view :style="{ width: `${data.progress}%` }"></view
         ></view>
       </view>
+      <view v-if="data.resultUrl" class="result-card">
+        <image
+          class="result-image"
+          :src="data.resultUrl"
+          mode="aspectFit"
+          @tap="previewResult"
+        />
+        <text class="result-hint">轻触图片放大查看</text>
+      </view>
       <view class="task-card">
         <view class="task-title">
           <text class="task-mark">印</text>
@@ -37,7 +48,9 @@
         </view>
         <view class="task-tags">
           <text v-for="tag in data.tags" :key="tag">{{ tag }}</text>
-          <text class="task-cost">{{ data.cost === null ? "—" : data.cost }} 灵感点</text>
+          <text class="task-cost"
+            >{{ data.cost === null ? "—" : data.cost }} 灵感点</text
+          >
         </view>
         <view class="task-footer"
           >{{ data.description }}<text>{{ data.estimatedTime }}</text></view
@@ -46,7 +59,9 @@
       <view class="cloud-tip">{{ data.tip }}</view>
     </scroll-view>
     <view class="generation-actions">
-      <button class="primary-action" @tap="goLibrary">前往作品库查看进度</button>
+      <button class="primary-action" @tap="goLibrary">
+        前往作品库查看进度
+      </button>
       <button class="secondary-action" @tap="goWorkbench">返回工作台</button>
     </view>
   </view>
@@ -56,10 +71,19 @@
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 
-defineProps({
+const props = defineProps({
   /** 任务进度页面展示数据。 */
   data: { type: Object, required: true },
 });
+
+// 预览生成结果大图
+const previewResult = () => {
+  if (!props.data.resultUrl) {
+    return;
+  }
+
+  uni.previewImage({ urls: [props.data.resultUrl] });
+};
 
 // 前往作品库。
 const goLibrary = () => {
@@ -206,6 +230,26 @@ const goWorkbench = () => {
   height: 100%;
   border-radius: inherit;
   background: $color-primary;
+}
+
+.result-card {
+  margin-top: $space-5;
+  padding: $space-4;
+  border-radius: $radius-xl;
+  background: $color-surface;
+  text-align: center;
+}
+
+.result-image {
+  width: 100%;
+  height: 420rpx;
+}
+
+.result-hint {
+  display: block;
+  margin-top: $space-2;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .task-card {

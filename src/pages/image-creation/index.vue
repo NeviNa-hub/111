@@ -35,19 +35,6 @@
           >
         </view>
       </view>
-      <view class="config-card">
-        <view class="config-title"><em>叁 ·</em> 生成规则</view>
-        <view class="option-grid three">
-          <view
-            v-for="count in counts"
-            :key="count.countId"
-            class="option-card compact"
-            :class="{ selected: selectedCount === count.name }"
-            @click="selectedCount = count.name"
-            >{{ count.name }}</view
-          >
-        </view>
-      </view>
     </scroll-view>
     <view class="next-card">
       <button @click="goNext">下一步：构想意象</button>
@@ -78,18 +65,12 @@ const ratios = [
   { name: "9:16 立轴", description: "移动壁纸画轴", value: "9:16" },
   { name: "4:3 经典", description: "雅致画册典藏", value: "4:3" },
 ];
-const counts = [
-  { name: "单张", value: 1, cost: 2 },
-  { name: "双张", value: 2, cost: 4 },
-  { name: "四张", value: 4, cost: 8 },
-];
 const selectedStyleId = ref(1);
 const selectedRatio = ref("1:1");
-const selectedCount = ref("双张");
 
 const selectedStyleName = computed(
   () =>
-    styleOptions.value.find((style) => style.styleId === selectedStyleId.value)
+    styleOptions.find((style) => style.styleId === selectedStyleId.value)
       ?.name || "",
 );
 
@@ -104,7 +85,6 @@ const goNext = () => {
     style: selectedStyleName.value,
     styleId: selectedStyleId.value,
     ratio: selectedRatio.value,
-    count: selectedCount.value,
   });
   uni.navigateTo({ url: "/pages/image-style/index" });
 };
@@ -209,10 +189,6 @@ const goNext = () => {
 
 .option-grid.four {
   grid-template-columns: repeat(4, 1fr);
-}
-
-.option-grid.three {
-  grid-template-columns: repeat(3, 1fr);
 }
 
 .option-card {

@@ -2,8 +2,21 @@
   <view class="dialog-mask">
     <view class="dialog-sheet progress-sheet">
       <view class="dialog-title">{{ dialogTitle }}</view>
-      <view class="progress-circle">{{ progress }}<small>%</small></view>
-      <text class="progress-label">{{ progressLabel }}</text>
+      <template v-if="status === 'completed' && resultUrl">
+        <view class="result-preview">
+          <image
+            class="result-image"
+            :src="resultUrl"
+            mode="aspectFit"
+            @tap="previewResult"
+          />
+        </view>
+        <text class="result-hint">轻触图片放大查看</text>
+      </template>
+      <template v-else>
+        <view class="progress-circle">{{ progress }}<small>%</small></view>
+        <text class="progress-label">{{ progressLabel }}</text>
+      </template>
       <text class="progress-note">{{ note }}</text>
       <!-- #ifdef H5 -->
       <view class="dialog-actions">
@@ -20,7 +33,9 @@
       <!-- #ifndef H5 -->
       <view class="dialog-actions">
         <button class="back-button" @click="$emit('back')">返回工作台</button>
-        <button class="confirm-button" @click="$emit('library')">前往作品库查看</button>
+        <button class="confirm-button" @click="$emit('library')">
+          前往作品库查看
+        </button>
       </view>
       <!-- #endif -->
     </view>
@@ -40,6 +55,8 @@ import { Collection, House } from "@element-plus/icons-vue";
  * @param progress 当前生成进度。
  * @param progressLabel 进度说明。
  * @param note 弹窗提示。
+ * @param status 任务状态，完成时切换为结果展示。
+ * @param resultUrl 生成结果地址，任务完成时展示。
  */
 const props = defineProps({
   title: { type: String, default: "" },
@@ -50,13 +67,25 @@ const props = defineProps({
     type: String,
     default: "已进入云端渲染，期间离开或切换页面不影响生成，可在作品库查看。",
   },
+  status: { type: String, default: "" },
+  resultUrl: { type: String, default: "" },
 });
 
 defineEmits(["back", "library"]);
 
 const dialogTitle = computed(
-  () => props.title || (props.type === "optimization" ? "淬炼重绘" : "研墨成画")
+  () =>
+    props.title || (props.type === "optimization" ? "淬炼重绘" : "研墨成画"),
 );
+
+// 预览生成结果大图
+const previewResult = () => {
+  if (!props.resultUrl) {
+    return;
+  }
+
+  uni.previewImage({ urls: [props.resultUrl] });
+};
 </script>
 
 <style scoped lang="scss">
@@ -127,6 +156,25 @@ const dialogTitle = computed(
   color: $color-muted;
   font-size: $font-size-caption;
   line-height: $line-height-normal;
+}
+
+.result-preview {
+  height: 480rpx;
+  margin: $space-5 0 $space-2;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  background: $color-surface-muted;
+}
+
+.result-image {
+  width: 100%;
+  height: 100%;
+}
+
+.result-hint {
+  display: block;
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .dialog-actions {

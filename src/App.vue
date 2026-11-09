@@ -6,14 +6,20 @@ import { getToken } from "@/utils/auth";
 export default {
   onLaunch() {
     // #ifdef H5
-    // H5 刷新后入口地址不带页面 hash 或停留在登录页时，恢复上次访问的页面。
+    const hashPath = window.location.hash.replace(/^#\//, "");
+    const isAuthPage = !hashPath || hashPath.startsWith("pages/auth/index");
+
+    // 未登录时直达地址或刷新落在内部页面一律回登录页；地址为空时由 pages.json 首项进入登录页。
     if (!getToken()) {
+      if (!isAuthPage) {
+        uni.reLaunch({ url: PAGE_PATHS.AUTH });
+      }
+
       return;
     }
 
-    const hashPath = window.location.hash.replace(/^#\//, "");
-
-    if (!hashPath || hashPath.startsWith("pages/auth/index")) {
+    // H5 刷新后入口地址不带页面 hash 或停留在登录页时，恢复上次访问的页面。
+    if (!hashPath || isAuthPage) {
       uni.reLaunch({ url: getLastPage() || PAGE_PATHS.HOME });
     }
     // #endif
@@ -23,7 +29,11 @@ export default {
     const pages = getCurrentPages();
     const currentRoute = pages[pages.length - 1]?.route as string | undefined;
 
-    if (!getToken() || !currentRoute || `/${currentRoute}` === PAGE_PATHS.AUTH) {
+    if (
+      !getToken() ||
+      !currentRoute ||
+      `/${currentRoute}` === PAGE_PATHS.AUTH
+    ) {
       return;
     }
 

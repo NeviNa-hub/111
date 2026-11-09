@@ -15,13 +15,16 @@ export const createImageGeneration = (params = {}) => {
 
 /**
  * 查询文字生图任务状态。
- * @param {Object} params 查询参数，包含 taskId。
- * @returns {Promise<Object>} 任务状态。
+ * @param {Object} params 查询参数。
+ * @param {string} params.taskId 创建接口返回的任务标识。
+ * @returns {Promise<Object>} 任务状态，`message` 为任务失败原因。
  */
-export const getImageTaskStatus = (params = {}) => {
-  return request({
+export const getImageTaskStatus = async (params = {}) => {
+  const { data, message } = await request({
     url: `/text-to-image/tasks/${encodeURIComponent(params.taskId || "")}`,
     method: "GET",
-    params: { ...params },
+    includeMessage: true,
   });
+
+  return { ...data, message };
 };

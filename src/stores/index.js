@@ -3,12 +3,14 @@
  */
 import { reactive } from "vue";
 
+import { clearLastPage } from "@/router";
 import { getToken, removeToken, setToken } from "@/utils/auth";
 
 const SESSION_USER_STORAGE_KEY = "magic_app_session_user";
 
 // 读取展示所需的用户身份字段。
-const readStoredUser = () => uni.getStorageSync(SESSION_USER_STORAGE_KEY) || null;
+const readStoredUser = () =>
+  uni.getStorageSync(SESSION_USER_STORAGE_KEY) || null;
 
 // 登录凭据由认证工具持久化，用户资料只保存展示所需的身份字段。
 export const sessionState = reactive({
@@ -34,11 +36,12 @@ export const initializeSession = (data) => {
   uni.setStorageSync(SESSION_USER_STORAGE_KEY, sessionState.user);
 };
 
-// 清理登录凭据与用户资料。
+// 清理登录凭据与用户资料，同时清除最近页面记录，避免下个账号恢复到旧页面。
 export const clearSession = () => {
   removeToken();
   sessionState.user = null;
   uni.removeStorageSync(SESSION_USER_STORAGE_KEY);
+  clearLastPage();
 };
 
 // 判断本地是否存在登录凭据。
