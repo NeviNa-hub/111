@@ -19,12 +19,9 @@ export const createImageOptimization = (params = {}) => {
  * @param {string} params.taskId 创建接口返回的任务标识。
  * @returns {Promise<Object>} 任务状态，`message` 为任务失败原因。
  */
-export const getImageOptimizationTaskStatus = async (params = {}) => {
-  const { data, message } = await request({
+export const getImageOptimizationTaskStatus = (params = {}) =>
+  request({
     url: `/image-optimization/tasks/${encodeURIComponent(params.taskId || "")}`,
     method: "GET",
     includeMessage: true,
   });
-
-  return { ...data, message };
-};

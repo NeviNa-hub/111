@@ -132,8 +132,8 @@ const resolveHttpErrorCode = (statusCode) =>
  * @param {Object} [config.header] 请求头。
  * @param {number} config.timeout 超时时间。
  * @param {AbortSignal} [config.signal] 取消信号。
- * @param {boolean} [config.includeMessage] 是否同时返回响应顶层 message。
- * @returns {Promise<*>} 解包后的 data；需要 message 时返回 `{ data, message }`。
+ * @param {boolean} [config.includeMessage] 是否在 data 上合并响应顶层 message。
+ * @returns {Promise<*>} 解包后的 data；需要 message 时返回合并了顶层 message 的 data 对象。
  */
 const sendRequest = (config) =>
   new Promise((resolve, reject) => {
@@ -207,7 +207,7 @@ const sendRequest = (config) =>
         finish(
           resolve,
           config.includeMessage
-            ? { data: body.data, message: body.message || "" }
+            ? { ...body.data, message: body.message || "" }
             : body.data,
         );
       },
@@ -257,8 +257,8 @@ const sendRequest = (config) =>
  * @param {Object} [config.header] 自定义请求头。
  * @param {number} [config.timeout] 覆盖默认超时时间。
  * @param {AbortSignal} [config.signal] 取消信号。
- * @param {boolean} [config.includeMessage] 是否返回响应顶层 message，供任务失败原因等场景使用。
- * @returns {Promise<*>} 接口 data；开启 includeMessage 时返回 `{ data, message }`。
+ * @param {boolean} [config.includeMessage] 是否在 data 上合并响应顶层 message，供任务失败原因等场景使用。
+ * @returns {Promise<*>} 接口 data；开启 includeMessage 时返回合并了顶层 message 的 data 对象。
  */
 export default function request(config) {
   const method = (config.method || "GET").toUpperCase();
