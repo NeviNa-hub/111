@@ -17,64 +17,69 @@
         label-position="top"
         class="render-form"
       >
-        <view class="preview-card">
-          <view class="preview-thumb">
-            <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
-            <text class="preview-badge">影片</text>
-          </view>
-          <view class="preview-info">
-            <view class="preview-head">
-              <text class="preview-title">{{ renderConfig.previewTitle }}</text>
-              <text class="preview-state">已立意</text>
+        <view class="config-card">
+          <view class="config-title"><em>壹 ·</em> 动卷预览</view>
+          <view class="preview-body">
+            <view class="preview-thumb">
+              <app-image
+                class="preview-image"
+                :src="previewSource"
+                mode="aspectFill"
+              />
+              <text class="preview-badge">影片</text>
             </view>
-            <view class="preview-tags">
-              <text class="preview-tag">{{ draft.ratioName }}</text>
-              <text class="preview-tag is-accent">
-                {{ renderConfig.cameraMove }}
-              </text>
-            </view>
-            <text class="preview-desc">“{{ promptText }}”</text>
-          </view>
-        </view>
-
-        <view class="section-head">
-          <view class="section-title">
-            <view class="section-bar"></view>
-            <text>帧率与渲染画质</text>
-          </view>
-          <text class="section-hint">逐帧重绘水墨湍流</text>
-        </view>
-        <el-form-item prop="fps" class="fps-form-item">
-          <el-radio-group v-model="formData.fps" class="fps-list">
-            <el-radio
-              v-for="option in fpsOptions"
-              :key="option.fpsId"
-              :value="option.value"
-              class="fps-card"
-              :class="{ 'is-selected': formData.fps === option.value }"
-            >
-              <view class="fps-content">
-                <view class="fps-head">
-                  <view
-                    class="fps-dot"
-                    :class="{ 'is-active': formData.fps === option.value }"
-                  ></view>
-                  <text class="fps-name">{{ option.name }}</text>
-                  <text class="fps-tag">{{ option.tag }}</text>
-                </view>
-                <text class="fps-desc">{{ option.description }}</text>
+            <view class="preview-info">
+              <view class="preview-head">
+                <text class="preview-title">{{
+                  renderConfig.previewTitle
+                }}</text>
+                <text class="preview-state">已立意</text>
               </view>
-              <el-icon v-if="formData.fps === option.value" class="fps-check">
-                <Check />
-              </el-icon>
-              <view v-else class="fps-radio"></view>
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
+              <view class="preview-tags">
+                <text class="preview-tag">{{ draft.ratioName }}</text>
+                <text class="preview-tag is-accent">
+                  {{ renderConfig.cameraMove }}
+                </text>
+              </view>
+              <text class="preview-desc">“{{ promptText }}”</text>
+            </view>
+          </view>
+        </view>
 
-        <view class="resource-card">
-          <view class="resource-head">
-            <text class="resource-title">渲染资源结算</text>
+        <view class="config-card">
+          <view class="config-title"><em>贰 ·</em> 帧率与渲染画质</view>
+          <el-form-item prop="fps" class="fps-form-item">
+            <el-radio-group v-model="formData.fps" class="fps-list">
+              <el-radio
+                v-for="option in fpsOptions"
+                :key="option.fpsId"
+                :value="option.value"
+                class="fps-card"
+                :class="{ 'is-selected': formData.fps === option.value }"
+              >
+                <view class="fps-content">
+                  <view class="fps-head">
+                    <view
+                      class="fps-dot"
+                      :class="{ 'is-active': formData.fps === option.value }"
+                    ></view>
+                    <text class="fps-name">{{ option.name }}</text>
+                    <text class="fps-tag">{{ option.tag }}</text>
+                  </view>
+                  <text class="fps-desc">{{ option.description }}</text>
+                </view>
+                <el-icon v-if="formData.fps === option.value" class="fps-check">
+                  <Check />
+                </el-icon>
+                <view v-else class="fps-radio"></view>
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </view>
+
+        <view class="config-card">
+          <view class="config-title resource-title">
+            <view><em>叁 ·</em> 渲染资源结算</view>
             <el-button class="boost-button" @click="showBoostTip">
               <el-icon><Lightning /></el-icon>
               尊享加速通道
@@ -113,7 +118,11 @@
     </scroll-view>
 
     <view class="bottom-bar">
-      <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
+      <el-button
+        class="previous-button"
+        :disabled="isSubmitting"
+        @click="goPreviousStep"
+      >
         <el-icon><ArrowLeft /></el-icon>
         上一步
       </el-button>
@@ -124,7 +133,7 @@
         @click="handleRender"
       >
         <el-icon v-if="!isSubmitting"><VideoPlay /></el-icon>
-        挥毫渲染动卷（耗 {{ renderConfig.cost }} 点）
+        挥毫渲染动卷
         <el-icon v-if="!isSubmitting" class="render-arrow">
           <ArrowRight />
         </el-icon>
@@ -179,7 +188,10 @@ import {
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
-import { createVideoGeneration, getVideoTaskStatus } from "@/apis/video-creation";
+import {
+  createVideoGeneration,
+  getVideoTaskStatus,
+} from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -225,12 +237,14 @@ const taskStatusData = ref(null);
 
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
 
-const taskStage = computed(() => taskStatusData.value?.stageLabel || "云端逐帧重绘");
+const taskStage = computed(
+  () => taskStatusData.value?.stageLabel || "云端逐帧重绘",
+);
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.note ||
-    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。"
+    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
 );
 
 const { start: startPolling } = useTaskPolling({
@@ -401,7 +415,7 @@ onShow(() => {
 .content {
   height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-4 $space-7 $space-9;
+  padding: 35rpx $space-7 $space-9;
   box-sizing: border-box;
 }
 
@@ -478,14 +492,34 @@ onShow(() => {
   }
 }
 
-/* 动卷预览 */
-.preview-card {
-  display: flex;
-  gap: $space-4;
-  padding: $space-5;
+/* 卡片与区块标题：与文字生图页统一样式 */
+.config-card {
+  margin-top: $space-6;
+  padding: $space-6;
   border-radius: $radius-xl;
   background: $color-surface;
-  box-shadow: $shadow-card;
+  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
+}
+
+.config-card:first-child {
+  margin-top: 0;
+}
+
+.config-title {
+  padding-bottom: $space-6;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+}
+
+.config-title em {
+  color: $color-accent-clay;
+}
+
+/* 动卷预览 */
+.preview-body {
+  display: flex;
+  gap: $space-4;
 }
 
 .preview-thumb {
@@ -571,36 +605,6 @@ onShow(() => {
 }
 
 /* 帧率画质 */
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-  margin: $space-6 $space-1 $space-3;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-}
-
-.section-bar {
-  width: 7rpx;
-  height: 30rpx;
-  margin-right: $space-2;
-  border-radius: 6rpx;
-  background: $color-primary;
-}
-
-.section-hint {
-  flex-shrink: 0;
-  color: $color-muted;
-  font-size: $font-size-caption;
-}
-
 .fps-form-item {
   margin-bottom: 0;
 
@@ -734,24 +738,11 @@ onShow(() => {
 }
 
 /* 资源结算 */
-.resource-card {
-  margin-top: $space-6;
-  padding: $space-5;
-  border-radius: $radius-xl;
-  background: linear-gradient(145deg, #eaf5f0, #f2f8f5);
-}
-
-.resource-head {
+.resource-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: $space-3;
-}
-
-.resource-title {
-  color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
 }
 
 .boost-button {
@@ -783,7 +774,7 @@ onShow(() => {
   margin-top: $space-4;
   padding: $space-4 $space-2;
   border-radius: $radius-md;
-  background: $color-surface;
+  background: $color-surface-muted;
 }
 
 .resource-item {

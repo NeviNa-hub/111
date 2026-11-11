@@ -20,90 +20,83 @@
         label-position="top"
         class="creation-form"
       >
-        <view class="section-head">
-          <view class="section-title">
-            <view class="section-bar"></view>
-            <text>规制画幅</text>
-          </view>
-          <text class="section-hint">决定动卷取景视野</text>
-        </view>
-        <el-form-item prop="ratio" class="ratio-form-item">
-          <el-radio-group v-model="formData.ratio" class="ratio-list">
-            <el-radio
-              v-for="ratio in ratios"
-              :key="ratio.ratioId"
-              :value="ratio.value"
-              class="ratio-card"
-              :class="{ 'is-selected': formData.ratio === ratio.value }"
-            >
-              <view class="ratio-card-main">
+        <view class="config-card">
+          <view class="config-title"><em>壹 ·</em> 规制画幅</view>
+          <el-form-item prop="ratio" class="ratio-form-item">
+            <el-radio-group v-model="formData.ratio" class="ratio-list">
+              <el-radio
+                v-for="(ratio, index) in ratios"
+                :key="ratio.ratioId"
+                :value="ratio.value"
+                class="ratio-card"
+                :class="[
+                  `is-ratio-${index + 1}`,
+                  { 'is-selected': formData.ratio === ratio.value },
+                ]"
+              >
                 <text class="ratio-badge">{{ ratio.value }}</text>
-                <view class="ratio-info">
-                  <view class="ratio-name">
-                    <text>{{ ratio.name }}</text>
-                    <text v-if="ratio.recommended" class="recommend"> 默认推荐 </text>
-                  </view>
-                  <text class="ratio-desc">{{ ratio.description }}</text>
-                </view>
-              </view>
-              <el-icon v-if="formData.ratio === ratio.value" class="ratio-check">
-                <Check />
-              </el-icon>
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
+                <text class="ratio-name">{{ ratio.name }}</text>
+                <text class="ratio-desc">{{ ratio.description }}</text>
+                <text v-if="ratio.recommended" class="recommend">推荐</text>
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </view>
 
-        <el-radio-group
-          v-model="formData.mode"
-          class="mode-switch"
-          @change="handleModeChange"
-        >
-          <el-radio-button
-            v-for="mode in modes"
-            :key="mode.modeId"
-            :value="mode.modeId"
-            class="mode-option"
+        <view class="config-card">
+          <view class="config-title"><em>贰 ·</em> 创作模式</view>
+          <el-radio-group
+            v-model="formData.mode"
+            class="mode-switch"
+            @change="handleModeChange"
           >
-            <el-icon>
-              <VideoCamera v-if="mode.modeId === 'text'" />
-              <PictureFilled v-else />
-            </el-icon>
-            <text>{{ mode.name }}</text>
-          </el-radio-button>
-        </el-radio-group>
+            <el-radio-button
+              v-for="mode in modes"
+              :key="mode.modeId"
+              :value="mode.modeId"
+              class="mode-option"
+            >
+              <el-icon>
+                <VideoCamera v-if="mode.modeId === 'text'" />
+                <PictureFilled v-else />
+              </el-icon>
+              <text>{{ mode.name }}</text>
+            </el-radio-button>
+          </el-radio-group>
 
-        <el-form-item
-          v-if="formData.mode === 'image'"
-          prop="imagePath"
-          class="image-form-item"
-        >
-          <view class="image-picker">
-            <app-image
-              v-if="selectedImage"
-              class="image-thumb"
-              :src="selectedImage.url || selectedImage.path"
-              mode="aspectFill"
-            />
-            <view class="image-copy">
-              <text class="image-title">{{ imageTitle }}</text>
-              <text class="image-hint">{{ imageHint }}</text>
-            </view>
-            <el-button class="image-pick-button" @click="chooseImage">
-              <el-icon><Upload /></el-icon>
-              {{ selectedImage ? "更换" : "选图" }}
-            </el-button>
-          </view>
-        </el-form-item>
-
-        <el-form-item prop="prompt" class="prompt-form-item">
-          <view class="prompt-card">
-            <view class="prompt-head">
-              <text class="prompt-title">意境构想</text>
-              <el-button link class="prompt-clear" @click="clearPrompt">
-                <el-icon><RefreshLeft /></el-icon>
-                清空辞藻
+          <el-form-item
+            v-if="formData.mode === 'image'"
+            prop="imagePath"
+            class="image-form-item"
+          >
+            <view class="image-picker">
+              <app-image
+                v-if="selectedImage"
+                class="image-thumb"
+                :src="selectedImage.url || selectedImage.path"
+                mode="aspectFill"
+              />
+              <view class="image-copy">
+                <text class="image-title">{{ imageTitle }}</text>
+                <text class="image-hint">{{ imageHint }}</text>
+              </view>
+              <el-button class="image-pick-button" @click="chooseImage">
+                <el-icon><Upload /></el-icon>
+                {{ selectedImage ? "更换" : "选图" }}
               </el-button>
             </view>
+          </el-form-item>
+        </view>
+
+        <view class="config-card">
+          <view class="config-title prompt-title">
+            <view><em>叁 ·</em> 意境构想</view>
+            <el-button link class="prompt-clear" @click="clearPrompt">
+              <el-icon><RefreshLeft /></el-icon>
+              清空辞藻
+            </el-button>
+          </view>
+          <el-form-item prop="prompt" class="prompt-form-item">
             <el-input
               v-model="formData.prompt"
               type="textarea"
@@ -113,32 +106,32 @@
               class="prompt-input"
               placeholder="写下动卷意境，点染光影与运镜"
             />
-            <view class="prompt-foot">
-              <text class="prompt-count">
-                {{ formData.prompt.length }} / {{ promptLimit }}字
-              </text>
-              <el-button class="polish-button" @click="polishPrompt">
-                <el-icon><MagicStick /></el-icon>
-                润色辞藻
-              </el-button>
-            </view>
+          </el-form-item>
+          <view class="prompt-foot">
+            <text class="prompt-count">
+              {{ formData.prompt.length }} / {{ promptLimit }}字
+            </text>
+            <el-button class="polish-button" @click="polishPrompt">
+              <el-icon><MagicStick /></el-icon>
+              润色辞藻
+            </el-button>
           </view>
-        </el-form-item>
 
-        <view class="suggestion-head">
-          <el-icon><EditPen /></el-icon>
-          <text>笔墨词枕 · 点击引入灵感</text>
-        </view>
-        <view class="suggestions">
-          <el-button
-            v-for="item in suggestions"
-            :key="item"
-            class="suggestion-chip"
-            @click="appendPrompt(item)"
-          >
-            <el-icon><Plus /></el-icon>
-            <text>{{ item }}</text>
-          </el-button>
+          <view class="suggestion-head">
+            <el-icon><EditPen /></el-icon>
+            <text>笔墨词枕 · 点击引入灵感</text>
+          </view>
+          <view class="suggestions">
+            <el-button
+              v-for="item in suggestions"
+              :key="item"
+              class="suggestion-chip"
+              @click="appendPrompt(item)"
+            >
+              <el-icon><Plus /></el-icon>
+              <text>{{ item }}</text>
+            </el-button>
+          </view>
         </view>
       </el-form>
     </scroll-view>
@@ -173,7 +166,6 @@ import { computed, reactive, ref } from "vue";
 // #ifdef H5
 import {
   ArrowRight,
-  Check,
   EditPen,
   MagicStick,
   PictureFilled,
@@ -186,7 +178,6 @@ import {
 
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
 import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 import { chooseSingleImage } from "@/utils/image-picker";
@@ -197,21 +188,21 @@ const ratios = [
   {
     ratioId: 1,
     value: "16:9",
-    name: "16:9 横屏",
-    description: "视野宽广 · 磅礴画卷",
+    name: "横屏画卷",
+    description: "磅礴画卷",
     recommended: true,
   },
   {
     ratioId: 2,
     value: "9:16",
-    name: "9:16 竖屏",
-    description: "长幅沉浸 · 适宜移轴",
+    name: "竖屏立轴",
+    description: "适宜移轴",
   },
   {
     ratioId: 3,
     value: "1:1",
-    name: "1:1 镜心",
-    description: "方正静穆 · 斗方小品",
+    name: "方正镜心",
+    description: "斗方小品",
   },
 ];
 const modes = [
@@ -363,8 +354,6 @@ const goNext = async () => {
     },
   });
 };
-
-// 加载规制与意境配置，供首次进入与失败重试复用。
 </script>
 
 <style scoped lang="scss">
@@ -388,16 +377,36 @@ const goNext = async () => {
   --content-bottom-pad: #{$space-9};
   height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-5 $space-7 var(--content-bottom-pad);
+  padding: 35rpx $space-7 var(--content-bottom-pad);
   box-sizing: border-box;
-}
-
-.options-state {
-  margin-top: $space-6;
 }
 
 .creation-form {
   width: 100%;
+}
+
+/* 卡片与区块标题：与文字生图页统一样式 */
+.config-card {
+  margin-top: $space-6;
+  padding: $space-6;
+  border-radius: $radius-xl;
+  background: $color-surface;
+  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
+}
+
+.config-card:first-child {
+  margin-top: 0;
+}
+
+.config-title {
+  padding-bottom: $space-6;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+}
+
+.config-title em {
+  color: $color-accent-clay;
 }
 
 /* 步骤条：与文字生图页统一样式 */
@@ -457,36 +466,6 @@ const goNext = async () => {
 }
 
 /* 画幅规制 */
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-  margin: $space-6 $space-1 $space-3;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-}
-
-.section-bar {
-  width: 7rpx;
-  height: 30rpx;
-  margin-right: $space-2;
-  border-radius: 6rpx;
-  background: $color-primary;
-}
-
-.section-hint {
-  flex-shrink: 0;
-  color: $color-muted;
-  font-size: $font-size-caption;
-}
-
 .ratio-form-item {
   margin-bottom: 24rpx;
 
@@ -501,21 +480,22 @@ const goNext = async () => {
 }
 
 .ratio-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-3;
   width: 100%;
 }
 
 .ratio-card {
+  position: relative;
   width: 100%;
   height: auto;
-  min-height: 92rpx;
+  min-height: 0;
   margin: 0;
-  padding: $space-5;
+  padding: $space-5 $space-2 $space-3;
   border: 2rpx solid transparent;
-  border-radius: $radius-xl;
-  background: $color-surface;
+  border-radius: $radius-lg;
+  background: $color-surface-muted;
   box-sizing: border-box;
 
   :deep(.el-radio__input) {
@@ -524,8 +504,10 @@ const goNext = async () => {
 
   :deep(.el-radio__label) {
     display: flex;
+    flex-direction: column;
     flex: 1;
     align-items: center;
+    gap: $space-2;
     width: 100%;
     padding: 0;
     color: inherit;
@@ -535,15 +517,9 @@ const goNext = async () => {
 
   &.is-selected {
     border-color: $color-primary;
-    box-shadow: 0 8rpx 20rpx rgba(5, 96, 76, 0.08);
+    background: linear-gradient(135deg, $color-primary-light 0%, #f7faf8 100%);
+    box-shadow: 0 0 0 1rpx $color-primary inset;
   }
-}
-
-.ratio-card-main {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  min-width: 0;
 }
 
 .ratio-badge {
@@ -551,13 +527,27 @@ const goNext = async () => {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 100rpx;
-  height: 64rpx;
+  width: 88rpx;
+  height: 52rpx;
   border-radius: $radius-sm;
-  background: $color-primary-light;
-  color: $color-primary-soft;
   font-size: $font-size-badge;
   font-weight: $font-weight-bold;
+}
+
+/* 各画幅徽章的识别色，选中时统一归为主色 */
+.ratio-card.is-ratio-1 .ratio-badge {
+  background: #e6f2ee;
+  color: $color-primary;
+}
+
+.ratio-card.is-ratio-2 .ratio-badge {
+  background: #f7efdd;
+  color: $color-warning;
+}
+
+.ratio-card.is-ratio-3 .ratio-badge {
+  background: #eceaf6;
+  color: $color-accent-violet;
 }
 
 .ratio-card.is-selected .ratio-badge {
@@ -565,48 +555,33 @@ const goNext = async () => {
   color: #fff;
 }
 
-.ratio-info {
-  flex: 1;
-  min-width: 0;
-  margin-left: $space-4;
-}
-
 .ratio-name {
-  display: flex;
-  align-items: center;
   color: $color-ink;
-  font-size: $font-size-aux;
+  font-size: $font-size-caption;
   font-weight: $font-weight-bold;
 }
 
-.recommend {
-  flex-shrink: 0;
-  margin-left: $space-2;
-  padding: 4rpx $space-1;
-  border-radius: $radius-xs;
-  background: $color-primary-light;
-  color: $color-primary-soft;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-regular;
+.ratio-card.is-selected .ratio-name {
+  color: $color-primary;
 }
 
 .ratio-desc {
-  display: block;
-  margin-top: $space-1;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: $font-size-badge;
+  line-height: $line-height-tight;
+  @include text-ellipsis;
 }
 
-.ratio-check {
-  flex-shrink: 0;
-  width: 38rpx;
-  height: 38rpx;
-  margin-left: $space-3;
-  border-radius: 50%;
-  background: $color-primary;
-  color: #fff;
-  font-size: $font-size-badge;
+.recommend {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  background: rgba(217, 190, 155, 0.4);
+  color: #8a6a3e;
+  font-size: 18rpx;
+  line-height: 1.5;
 }
 
 /* 创作模式 */
@@ -614,7 +589,7 @@ const goNext = async () => {
   display: flex;
   gap: 8rpx;
   width: 100%;
-  margin-top: 6rpx;
+  margin-top: 0;
   padding: 8rpx;
   border-radius: $radius-lg;
   background: $color-primary-light;
@@ -653,7 +628,7 @@ const goNext = async () => {
 
 /* 图卷选择 */
 .image-form-item {
-  margin: 20rpx 0 0;
+  margin: $space-4 0 0;
 
   :deep(.el-form-item__content) {
     display: block;
@@ -731,7 +706,7 @@ const goNext = async () => {
 
 /* 意境构想 */
 .prompt-form-item {
-  margin: 22rpx 0 0;
+  margin: 0;
 
   :deep(.el-form-item__content) {
     display: block;
@@ -743,23 +718,11 @@ const goNext = async () => {
   }
 }
 
-.prompt-card {
-  padding: $space-6 $space-5;
-  border-radius: $radius-xl;
-  background: $color-surface;
-}
-
-.prompt-head {
+.prompt-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: $space-3;
-}
-
-.prompt-title {
-  color: $color-ink;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
 }
 
 .prompt-clear {
