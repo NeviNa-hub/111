@@ -21,9 +21,7 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">支持宣纸留白与精细排版</text>
-          <button class="footer-button" @click="startTool('文字生图')">
-            研墨生图
-          </button>
+          <button class="footer-button" @click="startTool('文字生图')">研墨生图</button>
         </view>
       </view>
 
@@ -49,11 +47,7 @@
             </view>
           </view>
           <view class="film-frames">
-            <view
-              v-for="frame in frames"
-              :key="frame.frameId"
-              class="film-frame"
-            >
+            <view v-for="frame in frames" :key="frame.frameId" class="film-frame">
               <i class="frame-thumb"></i>
               <small class="frame-label">{{ frame.name }}</small>
             </view>
@@ -62,10 +56,7 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">四镜连贯 · 独立成片</text>
-          <button
-            class="footer-button button-blue"
-            @click="startTool('视频创作')"
-          >
+          <button class="footer-button button-blue" @click="startTool('视频创作')">
             逐帧调度
           </button>
         </view>
@@ -96,10 +87,7 @@
         </view>
         <view class="card-footer">
           <text class="footer-note">最大支持五千万像素解析</text>
-          <button
-            class="footer-button button-purple"
-            @click="startTool('图片优化')"
-          >
+          <button class="footer-button button-purple" @click="startTool('图片优化')">
             净炼重绘
           </button>
         </view>
@@ -287,9 +275,10 @@ const startTool = (name) => {
   padding: 0 $space-4;
   border: 0;
   border-radius: $radius-md;
-  background: $color-primary;
+  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
   color: #fff;
   font-size: $font-size-caption;
+  font-weight: $font-weight-bold;
   line-height: 1;
 }
 
@@ -297,20 +286,21 @@ const startTool = (name) => {
   border: 0;
 }
 
-/* 三种工具共用墨绿主色，仅保留原有类名占位，避免模板引用失效 */
-.tag-blue,
-.tag-purple {
-  color: $color-primary;
+.footer-button:active {
+  opacity: 0.85;
 }
 
-.ready-blue,
-.ready-purple {
-  color: $color-primary;
+/* 02 视频创作：胶卷主题的描边浅蓝按钮 */
+.button-blue {
+  border: 1rpx solid rgba(80, 181, 255, 0.55);
+  background: rgba(80, 181, 255, 0.12);
+  color: #1e7cc8;
 }
 
-.button-blue,
+/* 03 图片优化：重塑主题的实心黛紫按钮 */
 .button-purple {
-  background: $color-primary;
+  background: $color-accent-violet;
+  color: #fff;
 }
 
 /* ========== 01 文字生图 · 插图角标 ========== */
@@ -381,13 +371,7 @@ const startTool = (name) => {
   min-width: 0;
   margin-left: 20rpx;
   overflow: hidden;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 12%,
-    #000 88%,
-    transparent
-  );
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 
 .film-marquee-track {

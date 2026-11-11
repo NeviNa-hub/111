@@ -2,90 +2,86 @@
   <view class="home-page">
     <app-page-header title="妙笔生花" />
 
-    <scroll-view scroll-y :show-scrollbar="false" class="main-scroll">
+    <scroll-view
+      scroll-y
+      :show-scrollbar="false"
+      class="main-scroll"
+      :scroll-into-view="scrollIntoId"
+      scroll-with-animation
+    >
       <view class="page-body">
         <!-- 问候语 -->
-        <view class="greeting-row">
+        <!-- <view class="greeting-row">
           <view class="greeting-left">
             <text class="greeting-title">东方意象美学</text>
-            <view class="greeting-marquee">
-              <view class="marquee-track"> 以笔为引，以意生花 · 极简智能多模态创作 </view>
-            </view>
+            <text class="greeting-desc">以笔为引，以意生花 · 极简智能多模态创作</text>
           </view>
           <text class="weather">{{ weatherText }}</text>
-        </view>
+        </view> -->
 
-        <!-- 今日推荐 -->
-        <view class="config-title"><em>壹 ·</em> 今日推荐</view>
-        <view class="hero-card">
+        <!-- 主视觉 -->
+        <view class="hero">
+          <text class="hero-title">把灵感变成作品</text>
+          <text class="hero-subtitle">AI 帮你快速生成图片、视频并优化画面效果</text>
           <view class="hero-art">
-            <app-image class="hero-image" :src="hero.image_url" mode="aspectFill" />
-            <view class="hero-label">{{ hero.label }}</view>
-            <view class="hero-caption">{{ hero.caption }}</view>
-            <view class="hero-hint">提示词：{{ hero.prompt }}</view>
+            <app-image class="hero-image" src="/static/home/home.jpg" mode="aspectFill" />
+            <view class="hero-label">今日推荐</view>
+            <view class="hero-caption">AI 大模型</view>
+            <view class="hero-hint">提示词：水墨淋漓，青绿设色，微风拂动 ...</view>
           </view>
-          <view class="hero-footer">
-            <view class="hero-meta">
-              <text class="meta-title">{{ hero.model_name }}</text>
-              <text class="meta-subtitle">已生成 {{ generatedCountText }} 次</text>
+          <view class="hero-meta"> </view>
+          <view class="hero-actions">
+            <button class="action-primary" @click="goWorkbench">开始创作</button>
+            <button class="action-secondary" @click="browseIdeas">
+              <!-- #ifdef H5 -->
+              <el-icon class="action-star"><Star /></el-icon>
+              <!-- #endif -->
+              浏览灵感
+            </button>
+          </view>
+        </view>
+
+        <!-- 灵感工坊 -->
+        <view id="workshop-anchor" class="workshop">
+          <view class="workshop-head">
+            <text class="workshop-title">灵感工坊</text>
+            <text class="workshop-subtitle">选择一种创作方式，把想法变成作品</text>
+          </view>
+          <view
+            v-for="(mode, index) in creationModes"
+            :key="mode.key"
+            class="mode-row"
+            :class="`mode-row-${index + 1}`"
+            @click="openMode(mode.url)"
+          >
+            <view class="mode-icon">
+              <!-- #ifdef H5 -->
+              <el-icon><component :is="mode.icon" /></el-icon>
+              <!-- #endif -->
             </view>
-            <button class="try-button" @click="handleTryCreation">同款创作</button>
-          </view>
-        </view>
-
-        <!-- 灵感工坊，展示推荐的创作模式 -->
-        <view class="config-title workshop-title"><em>贰 ·</em> 灵感工坊</view>
-        <view
-          v-if="creations.length"
-          class="carousel-stage"
-          @touchstart="handleTouchStart"
-          @touchend="handleTouchEnd"
-        >
-          <view class="carousel-container">
-            <view
-              v-for="(creation, index) in creations"
-              :key="creation.creation_id"
-              class="creation-card"
-              :class="[getCardPosition(index), `creation-card-${index + 1}`]"
-              @click="openCreation(creation.url)"
-            >
-              <view>
-                <text class="card-label">{{ creation.eyebrow }}</text>
-                <text class="creation-title">{{ creation.title }}</text>
-                <view class="mock-input">
-                  <text class="input-prefix">{{ creation.input_label }}</text>
-                  <text class="input-value">{{ creation.input_value }}</text>
-                  <text class="input-icon">{{ creation.icon }}</text>
-                </view>
-              </view>
-
-              <!-- 创作模式卡片底部 -->
-              <view class="card-bottom">
-                <text class="footer-note">{{ creation.note }}</text>
-                <view class="action-button">
-                  <text>{{ creation.action }}</text>
-                </view>
-              </view>
+            <view class="mode-copy">
+              <text class="mode-name">{{ mode.name }}</text>
+              <text class="mode-desc">{{ mode.input }}</text>
+              <text class="mode-note">{{ mode.note }}</text>
             </view>
+            <!-- #ifdef H5 -->
+            <el-icon class="mode-arrow"><ArrowRight /></el-icon>
+            <!-- #endif -->
           </view>
         </view>
-        <app-state-hint
-          v-else
-          class="home-state"
-          type="empty"
-          title="暂无灵感推荐"
-          description="稍后刷新即可查看新的创作模式"
-        />
-        <view v-if="creations.length" class="pagination-dots">
-          <text
-            v-for="index in creationCount"
-            :key="index"
-            :class="{ 'active-dot': index - 1 === currentCreation }"
-            @click="selectCreation(index - 1)"
-          ></text>
+
+        <!-- 创作想法入口 -->
+        <view class="prompt-bar" @click="goCreation">
+          <text class="prompt-placeholder">输入你的创作想法</text>
+          <view class="prompt-button">
+            <!-- #ifdef H5 -->
+            <el-icon class="prompt-edit"><EditPen /></el-icon>
+            <!-- #endif -->
+            <text>去探索</text>
+          </view>
         </view>
 
-        <view class="quote">{{ quote }}</view>
+        <view class="quote">— {{ quote }} —</view>
       </view>
     </scroll-view>
 
@@ -96,6 +92,17 @@
 <script setup>
 import { computed, ref } from "vue";
 
+// #ifdef H5
+import {
+  ArrowRight,
+  Brush,
+  EditPen,
+  MagicStick,
+  Star,
+  VideoPlay,
+} from "@element-plus/icons-vue";
+// #endif
+
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -103,74 +110,64 @@ import AppPageHeader from "@/components/AppPageHeader/index.vue";
 const homeData = {
   weather_text: "今日谷雨",
   quote: "造法自然 · 意致千里",
-  hero: {
-    label: "今日推荐 · 烟岚登翠",
-    caption: "青绿水墨江南",
-    prompt: "水墨淋漓，宋式青绿设色，微风拂动湖面 ...",
-    image_url: "/static/home/home-1.jpg",
-    model_name: "国产大模型",
-    generated_count: 1280,
-  },
-  creations: [
-    {
-      creation_id: 1,
-      eyebrow: "IMAGE INK",
-      title: "文字生图",
-      input_label: "意境：",
-      input_value: "宋式青绿水墨...",
-      icon: "✦",
-      note: "字句勾勒意境",
-      action: "去探索",
-      url: "/pages/image-creation/index",
-    },
-    {
-      creation_id: 2,
-      eyebrow: "MOTION INK",
-      title: "生成视频",
-      input_label: "镜头：",
-      input_value: "微风荡起波澜...",
-      icon: "▣",
-      note: "融汇静止为流动",
-      action: "去创作",
-      url: "/pages/video-creation/index",
-    },
-    {
-      creation_id: 3,
-      eyebrow: "IMAGE REFINE",
-      title: "图片优化",
-      input_label: "优化：",
-      input_value: "超高清晰画质",
-      icon: "✨",
-      note: "一键唤醒纤毫纹理",
-      action: "还原",
-      url: "/pages/image-optimization/index",
-    },
-  ],
+  generated_count: 1280,
 };
-const currentCreation = ref(0);
-const touchStartX = ref(0);
+const creationModes = [
+  {
+    key: "image",
+    name: "文字生图",
+    input: "意境：宋式青绿水墨...",
+    note: "字句勾勒意境",
+    icon: Brush,
+    url: "/pages/image-creation/index",
+  },
+  {
+    key: "video",
+    name: "视频创作",
+    input: "镜头：微风荡起波澜...",
+    note: "融汇静止为流动",
+    icon: VideoPlay,
+    url: "/pages/video-creation/index",
+  },
+  {
+    key: "optimization",
+    name: "图片优化",
+    input: "优化：超高清晰画质",
+    note: "一键唤醒纤毫纹理",
+    icon: MagicStick,
+    url: "/pages/image-optimization/index",
+  },
+];
+const scrollIntoId = ref("");
 
-const creations = computed(() => homeData.creations);
-const creationCount = computed(() => creations.value.length);
 const weatherText = computed(() => homeData.weather_text);
 const quote = computed(() => homeData.quote);
-const hero = computed(() => homeData.hero);
 const generatedCountText = computed(() =>
-  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  String(homeData.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 );
 
-// 开始同款创作
-const handleTryCreation = () => {
-  uni.navigateTo({ url: "/pages/image-creation/index" });
+// 进入创作台开始创作
+const goWorkbench = () => {
+  uni.navigateTo({ url: "/pages/workbench/index" });
+};
+
+// 滚动到灵感工坊区块
+const browseIdeas = () => {
+  scrollIntoId.value = "";
+
+  // 先清空再赋值，保证重复点击也能触发滚动
+  setTimeout(() => {
+    scrollIntoId.value = "workshop-anchor";
+  }, 50);
 };
 
 /**
- * 打开灵感工坊卡片对应的创作页面。
+ * 打开对应创作方式页面。
  *
- * @param {string} url 创作页面地址
+ * @param {string} url 创作页面地址。
  * @returns {void}
  */
-const openCreation = (url) => {
+const openMode = (url) => {
   if (!url) {
     return;
   }
@@ -178,66 +175,9 @@ const openCreation = (url) => {
   uni.navigateTo({ url });
 };
 
-/**
- * 切换到指定索引的灵感工坊卡片。
- *
- * @param {number} index 目标卡片索引
- * @returns {void}
- */
-const selectCreation = (index) => {
-  currentCreation.value = index;
-};
-
-/**
- * 获取卡片在轮播舞台中的位置类名。
- *
- * @param {number} index 卡片索引
- * @returns {string} 卡片位置类名
- */
-const getCardPosition = (index) => {
-  if (!creationCount.value) {
-    return "";
-  }
-
-  if (index === currentCreation.value) {
-    return "active";
-  }
-
-  return index === (currentCreation.value + 1) % creationCount.value ? "right" : "left";
-};
-
-/**
- * 记录滑动开始时的横向坐标。
- *
- * @param {object} event 触摸开始事件
- * @returns {void}
- */
-const handleTouchStart = (event) => {
-  touchStartX.value = event.changedTouches[0].clientX;
-};
-
-/**
- * 根据横向滑动距离切换灵感工坊卡片。
- *
- * @param {object} event 触摸结束事件
- * @returns {void}
- */
-const handleTouchEnd = (event) => {
-  if (!creationCount.value) {
-    return;
-  }
-
-  const distance = event.changedTouches[0].clientX - touchStartX.value;
-
-  if (distance > 50) {
-    selectCreation(
-      (currentCreation.value - 1 + creationCount.value) % creationCount.value
-    );
-  }
-
-  if (distance < -50) {
-    selectCreation((currentCreation.value + 1) % creationCount.value);
-  }
+// 进入文字生图流程
+const goCreation = () => {
+  uni.navigateTo({ url: "/pages/image-creation/index" });
 };
 </script>
 
@@ -245,7 +185,7 @@ const handleTouchEnd = (event) => {
 .home-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #fff9f0 0%, #fbeeda 100%);
   color: $color-ink;
 }
 
@@ -261,19 +201,6 @@ const handleTouchEnd = (event) => {
   padding-top: $space-2;
 }
 
-.home-state {
-  margin-top: $space-6;
-
-  &.is-loading {
-    min-height: calc(
-      100vh - 210rpx - var(--status-bar-height, 0px) - #{$space-2} - #{$space-4}
-    );
-    margin-top: 0;
-    border: 0;
-    background: transparent;
-  }
-}
-
 /* 问候语 */
 .greeting-row {
   display: flex;
@@ -286,7 +213,8 @@ const handleTouchEnd = (event) => {
 .greeting-left {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: baseline;
+  gap: $space-3;
   min-width: 0;
 }
 
@@ -295,43 +223,14 @@ const handleTouchEnd = (event) => {
   color: $color-primary-soft;
   font-size: $font-size-body;
   font-weight: $font-weight-semibold;
-  animation: title-pulse 5s ease-in-out infinite;
 }
 
-@keyframes title-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.greeting-marquee {
+.greeting-desc {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  margin-left: $space-3;
-}
-
-.marquee-track {
-  display: inline-flex;
   color: $color-muted;
   font-size: $font-size-caption;
-  white-space: nowrap;
-  animation: marquee-scroll 8s linear infinite;
-}
-
-@keyframes marquee-scroll {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+  @include text-ellipsis;
 }
 
 .weather {
@@ -340,56 +239,52 @@ const handleTouchEnd = (event) => {
   font-size: $font-size-caption;
 }
 
-/* 区块标题：与创作页“壹 ·/贰 ·”序号样式统一 */
-.config-title {
-  padding-bottom: $space-5;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
+/* 主视觉 */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: $space-4;
+}
+
+.hero-title {
+  color: #8a5a1f;
+  font-size: 56rpx;
   font-weight: $font-weight-bold;
+  letter-spacing: 4rpx;
 }
 
-.config-title em {
-  color: $color-accent-clay;
-}
-
-.workshop-title {
-  margin-top: $space-7;
-}
-
-/* 今日推荐 */
-.hero-card {
-  padding: $space-6;
-  overflow: hidden;
-  border: 1rpx solid rgba(0, 0, 0, 0.02);
-  border-radius: 34rpx;
-  background: $color-surface;
-  box-shadow: $shadow-card;
+.hero-subtitle {
+  margin-top: $space-2;
+  color: #b08d5f;
+  font-size: $font-size-caption;
 }
 
 .hero-art {
   position: relative;
-  height: 280rpx;
-  overflow: hidden;
-  border-radius: 80rpx 30rpx 100rpx 30rpx;
+  width: 100%;
+  height: 300rpx;
+  margin-top: $space-5;
+  padding: 10rpx;
+  border-radius: 36rpx;
+  background: #fff;
+  box-shadow: 0 16rpx 40rpx rgba(190, 140, 70, 0.12);
+  box-sizing: border-box;
 }
 
 .hero-image {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
+  border-radius: 28rpx;
 }
 
+/* 图片上的文字靠底部渐变保证可读性 */
 .hero-art:after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.28),
-    transparent 45%,
-    rgba(45, 53, 50, 0.58)
-  );
+  inset: 10rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, transparent 40%, rgba(45, 53, 50, 0.55) 100%);
 }
 
 .hero-label,
@@ -399,11 +294,11 @@ const handleTouchEnd = (event) => {
   z-index: 1;
   left: $space-6;
   right: $space-6;
-  color: white;
+  color: #fff;
 }
 
 .hero-label {
-  top: $space-3;
+  top: $space-5;
   right: auto;
   padding: $space-1 $space-3;
   border-radius: $radius-pill;
@@ -420,40 +315,32 @@ const handleTouchEnd = (event) => {
 }
 
 .hero-hint {
-  bottom: $space-4;
+  bottom: $space-5;
   font-size: $font-size-caption;
   opacity: 0.86;
   @include text-ellipsis;
 }
 
-.hero-footer {
+.hero-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-  padding-top: $space-6;
-}
-
-.hero-meta,
-.card-bottom {
-  display: flex;
-  align-items: center;
-}
-
-.meta-title,
-.meta-subtitle {
-  display: block;
+  gap: $space-2;
+  width: 100%;
+  margin-top: $space-4;
+  padding: 0 $space-1;
+  box-sizing: border-box;
 }
 
 .meta-title {
-  color: $color-ink;
+  color: #6b4423;
   font-size: $font-size-title;
   font-weight: $font-weight-bold;
 }
 
 .meta-subtitle {
-  margin-left: $space-2;
-  color: $color-muted;
+  flex: 1;
+  min-width: 0;
+  color: #b3a08a;
   font-size: $font-size-caption;
   @include numeric;
 }
@@ -463,9 +350,10 @@ const handleTouchEnd = (event) => {
   flex-shrink: 0;
   margin: 0;
   padding: 0 $space-4;
+  border: 0;
   border-radius: $radius-pill;
   background: $color-primary;
-  color: white;
+  color: #fff;
   font-size: $font-size-caption;
   line-height: 1;
 }
@@ -474,172 +362,181 @@ const handleTouchEnd = (event) => {
   border: 0;
 }
 
-/* 灵感工坊轮播 */
-.carousel-stage {
-  position: relative;
+.hero-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: $space-6 0;
-  overflow: hidden;
-  perspective: 1200px;
+  gap: $space-4;
+  margin-top: $space-5;
 }
 
-.carousel-container {
-  position: relative;
-  width: 480rpx;
-  height: 400rpx;
-  transform-style: preserve-3d;
+.action-primary {
+  @include tap-area(80rpx);
+  margin: 0;
+  padding: 0 $space-8;
+  border: 0;
+  border-radius: $radius-pill;
+  background: linear-gradient(135deg, #f3a851 0%, #e07f23 100%);
+  color: #fff;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+  line-height: 1;
 }
 
-.creation-card {
-  position: absolute;
-  inset: 0;
+.action-primary:after {
+  border: 0;
+}
+
+.action-secondary {
+  @include tap-area(80rpx);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  margin: 0;
+  padding: 0 $space-5;
+  border: 1rpx solid #ecd9bd;
+  border-radius: $radius-pill;
+  background: #fffdf8;
+  color: #9a6b34;
+  font-size: $font-size-body;
+  line-height: 1;
+}
+
+.action-secondary:after {
+  border: 0;
+}
+
+.action-star {
+  color: #e8a24a;
+  font-size: $font-size-aux;
+}
+
+/* 灵感工坊 */
+.workshop {
+  margin-top: $space-8;
+}
+
+.workshop-head {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: $space-6;
-  box-sizing: border-box;
-  border: 1rpx solid rgba(255, 255, 255, 0.9);
-  border-radius: 48rpx;
-  transition: transform 0.6s ease, opacity 0.6s ease, filter 0.6s ease;
-  pointer-events: none;
+  gap: $space-1;
+  margin-bottom: $space-4;
 }
 
-.creation-card-1 {
-  background: linear-gradient(135deg, #ffffff 30%, #e8f1ec 100%);
-}
-
-.creation-card-2 {
-  background: linear-gradient(135deg, #ffffff 30%, #faf0e4 100%);
-}
-
-.creation-card-3 {
-  background: linear-gradient(135deg, #ffffff 30%, #ece8f1 100%);
-}
-
-.creation-card.active {
-  z-index: 3;
-  transform: translate3d(0, 0, 0) scale(1);
-  opacity: 1;
-  filter: blur(0);
-  pointer-events: auto;
-  box-shadow: 0 28rpx 60rpx rgba(95, 133, 117, 0.15);
-}
-
-.creation-card.left {
-  z-index: 1;
-  transform: translate3d(-150rpx, 0, -120rpx) scale(0.85) rotateY(40deg);
-  opacity: 0.55;
-  filter: blur(1rpx);
-}
-
-.creation-card.right {
-  z-index: 1;
-  transform: translate3d(150rpx, 0, -120rpx) scale(0.85) rotateY(-40deg);
-  opacity: 0.55;
-  filter: blur(1rpx);
-}
-
-.creation-title {
-  display: block;
-  margin-top: $space-1;
-  color: $color-art-ink;
-  font-size: $font-size-body-lg;
+.workshop-title {
+  color: #6b4423;
+  font-size: $font-size-title;
   font-weight: $font-weight-bold;
 }
 
-.card-label {
-  display: block;
-  color: rgba(32, 32, 34, 0.38);
+.workshop-subtitle {
+  color: #b3a08a;
   font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 2rpx;
 }
 
-.mock-input {
+.mode-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: $space-5;
-  padding: $space-3 $space-4;
-  border-top: 1rpx solid rgba(212, 189, 150, 0.3);
-  border-bottom: 1rpx solid rgba(212, 189, 150, 0.3);
-  background: #faf9f5;
-  font-size: $font-size-caption;
+  gap: $space-3;
+  margin-top: $space-3;
+  padding: $space-4;
+  border: 1rpx solid #f4e4c6;
+  border-radius: $radius-lg;
+  background: #fdf3e2;
 }
 
-.input-prefix {
+.mode-row-3 {
+  border-color: #eee4d2;
+  background: #fffdf8;
+}
+
+.mode-icon {
+  display: flex;
   flex-shrink: 0;
-  color: $color-art-muted;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-md;
+  background: #fff;
+  color: #e8942f;
+  font-size: $font-size-body-lg;
+  box-shadow: 0 4rpx 12rpx rgba(190, 140, 70, 0.1);
 }
 
-.input-value {
+.mode-row-3 .mode-icon {
+  color: $color-primary;
+}
+
+.mode-copy {
   flex: 1;
   min-width: 0;
-  color: #2d2b30;
+}
+
+.mode-name {
+  display: block;
+  color: #6b4423;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+}
+
+.mode-desc {
+  display: block;
+  margin-top: 4rpx;
+  color: #8d7657;
+  font-size: $font-size-caption;
   @include text-ellipsis;
 }
 
-.input-icon {
-  flex-shrink: 0;
-  margin-left: $space-3;
-  color: $color-accent-cinnabar;
+.mode-note {
+  display: block;
+  margin-top: 2rpx;
+  color: #b3a08a;
+  font-size: $font-size-badge;
+  @include text-ellipsis;
 }
 
-.card-bottom {
-  justify-content: space-between;
+.mode-arrow {
+  flex-shrink: 0;
+  color: #d8c3a5;
+  font-size: $font-size-aux;
+}
+
+/* 创作想法入口 */
+.prompt-bar {
+  display: flex;
+  align-items: center;
   gap: $space-3;
-  padding-top: $space-3;
-  border-top: 1rpx solid rgba(32, 32, 34, 0.07);
+  margin-top: $space-6;
+  padding: $space-2 $space-2 $space-2 $space-4;
+  border: 1rpx solid #f0e2c8;
+  border-radius: $radius-pill;
+  background: #fffdf8;
+  box-shadow: 0 8rpx 24rpx rgba(190, 140, 70, 0.08);
+}
+
+.prompt-placeholder {
+  flex: 1;
+  min-width: 0;
+  color: #c4ad8d;
   font-size: $font-size-caption;
 }
 
-.footer-note {
-  min-width: 0;
-  color: #aaa7ae;
-  @include text-ellipsis;
-}
-
-.action-button {
-  @include tap-area(72rpx);
+.prompt-button {
+  @include tap-area(64rpx);
+  display: flex;
   flex-shrink: 0;
-  width: 132rpx;
+  align-items: center;
+  gap: 6rpx;
+  padding: 0 $space-4;
   border-radius: $radius-pill;
-  background: $color-primary;
+  background: linear-gradient(135deg, #f3a851 0%, #e07f23 100%);
   color: #fff;
   font-size: $font-size-caption;
   font-weight: $font-weight-bold;
 }
 
-.pagination-dots {
-  padding: $space-1 0 $space-3;
-  text-align: center;
-}
-
-.pagination-dots text {
-  position: relative;
-  display: inline-block;
-  width: 10rpx;
-  height: 10rpx;
-  margin: 0 $space-3;
-  border-radius: 50%;
-  background: #d1d5d4;
-}
-
-.pagination-dots text::before {
-  position: absolute;
-  top: (-$space-3);
-  right: (-$space-2);
-  bottom: (-$space-3);
-  left: (-$space-2);
-  content: "";
-}
-
-.pagination-dots .active-dot {
-  width: 40rpx;
-  border-radius: $radius-xs;
-  background: $color-primary-soft;
+.prompt-edit {
+  font-size: $font-size-badge;
 }
 
 /* 底部卷尾语 */
@@ -648,12 +545,5 @@ const handleTouchEnd = (event) => {
   color: $color-muted;
   font-size: $font-size-caption;
   text-align: center;
-
-  &::before,
-  &::after {
-    margin: 0 $space-2;
-    color: $color-accent-clay;
-    content: "—";
-  }
 }
 </style>

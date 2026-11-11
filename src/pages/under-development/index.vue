@@ -1,17 +1,17 @@
 <template>
   <view class="development-page">
     <app-page-header :title="title" />
-    <view class="content-area">
+    <scroll-view scroll-y :show-scrollbar="false" class="content-area">
       <view class="content-card">
         <view class="icon"></view>
         <text class="title">{{ title }}正在建设中</text>
-        <text class="description"
-          >该功能暂未开放，我们正在持续完善创作体验。</text
-        >
+        <text class="description">该功能暂未开放，我们正在持续完善创作体验。</text>
         <button class="primary-button" @tap="goWorkbench">返回创作台</button>
         <button class="secondary-button" @tap="goBack">返回上一页</button>
       </view>
-    </view>
+      <!-- 灵感工坊：功能未开放时同样提供创作入口 -->
+      <inspiration-carousel class="workshop-section" />
+    </scroll-view>
     <app-bottom-nav active="workshop" />
   </view>
 </template>
@@ -22,6 +22,7 @@ import { onLoad } from "@dcloudio/uni-app";
 
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import InspirationCarousel from "@/components/InspirationCarousel/index.vue";
 
 const title = ref("功能");
 
@@ -58,17 +59,15 @@ const goBack = () => {
 }
 
 .content-area {
-  flex: 1;
-  min-height: 0;
-  display: flex;
+  height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
+  overflow-x: hidden;
   padding: 0 $space-7 calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .content-card {
   width: 100%;
-  margin: auto;
-  transform: translateY(-$space-6);
+  margin-top: $space-6;
   padding: $space-10 $space-8;
   box-sizing: border-box;
   border: 1rpx solid $color-line;
@@ -76,6 +75,10 @@ const goBack = () => {
   background: $color-surface;
   box-shadow: $shadow-card;
   text-align: center;
+}
+
+.workshop-section {
+  margin-bottom: $space-6;
 }
 
 .icon {

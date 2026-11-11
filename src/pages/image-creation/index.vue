@@ -11,21 +11,21 @@
         <view class="config-title"><em>壹 ·</em> 风格定品</view>
         <view class="option-grid">
           <view
-            v-for="style in styleOptions"
+            v-for="(style, index) in styleOptions"
             :key="style.styleId"
             class="option-card"
-            :class="{ selected: selectedStyleId === style.styleId }"
+            :class="[
+              `is-style-${index + 1}`,
+              { selected: selectedStyleId === style.styleId },
+            ]"
             @click="selectedStyleId = style.styleId"
           >
-            <view class="option-head">
-              <!-- #ifdef H5 -->
-              <el-icon class="option-icon">
-                <component :is="style.icon" />
-              </el-icon>
-              <!-- #endif -->
-              <text class="option-name">{{ style.name }}</text>
-            </view>
-            <small>{{ style.description }}</small>
+            <!-- #ifdef H5 -->
+            <el-icon class="option-icon">
+              <component :is="style.icon" />
+            </el-icon>
+            <!-- #endif -->
+            <text class="option-name">{{ style.name }}</text>
           </view>
         </view>
       </view>
@@ -33,13 +33,19 @@
         <view class="config-title"><em>贰 ·</em> 画幅比例</view>
         <view class="option-grid four">
           <view
-            v-for="ratio in ratios"
+            v-for="(ratio, index) in ratios"
             :key="ratio.ratioId"
             class="option-card compact"
-            :class="{ selected: selectedRatio === ratio.value }"
+            :class="[
+              `is-ratio-${index + 1}`,
+              { selected: selectedRatio === ratio.value },
+            ]"
             @click="selectedRatio = ratio.value"
-            >{{ ratio.value }}</view
           >
+            <i class="ratio-glyph"></i>
+            <text class="ratio-value">{{ ratio.value }}</text>
+            <text class="ratio-label">{{ ratio.label }}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -62,40 +68,19 @@ import { ArrowRight, Brush, Camera, Dish, MagicStick } from "@element-plus/icons
 // #endif
 
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 
 const styleOptions = [
-  {
-    styleId: 1,
-    name: "宋式水墨",
-    description: "写意淡墨，温润留白，淡雅韵味。",
-    icon: Brush,
-  },
-  {
-    styleId: 2,
-    name: "真实摄影",
-    description: "微质感，柔和光影，细腻真实。",
-    icon: Camera,
-  },
-  {
-    styleId: 3,
-    name: "宋瓷青釉",
-    description: "手工釉色肌理，低饱和大地色。",
-    icon: Dish,
-  },
-  {
-    styleId: 4,
-    name: "温润插画",
-    description: "轻笔与木刻手绘感，质朴温暖。",
-    icon: MagicStick,
-  },
+  { styleId: 1, name: "宋式水墨", icon: Brush },
+  { styleId: 2, name: "真实摄影", icon: Camera },
+  { styleId: 3, name: "宋瓷青釉", icon: Dish },
+  { styleId: 4, name: "温润插画", icon: MagicStick },
 ];
 const ratios = [
-  { name: "1:1 方形", description: "适合朋友圈 / 头像", value: "1:1" },
-  { name: "16:9 横卷", description: "电脑宽幅长卷", value: "16:9" },
-  { name: "9:16 立轴", description: "移动壁纸画轴", value: "9:16" },
-  { name: "4:3 经典", description: "雅致画册典藏", value: "4:3" },
+  { ratioId: 1, value: "1:1", label: "方形" },
+  { ratioId: 2, value: "16:9", label: "横卷" },
+  { ratioId: 3, value: "9:16", label: "立轴" },
+  { ratioId: 4, value: "4:3", label: "经典" },
 ];
 const selectedStyleId = ref(1);
 const selectedRatio = ref("1:1");
@@ -224,7 +209,12 @@ const goNext = () => {
 }
 
 .option-card {
-  min-height: 96rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  min-height: 150rpx;
   padding: $space-4;
   border: 1rpx solid rgba(0, 0, 0, 0.08);
   border-radius: $radius-md;
@@ -234,73 +224,43 @@ const goNext = () => {
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.option-head {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-}
-
 .option-icon {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 56rpx;
-  height: 56rpx;
+  width: 64rpx;
+  height: 64rpx;
   border-radius: $radius-sm;
   background: $color-primary-light;
   color: $color-primary;
-  font-size: $font-size-body;
+  font-size: $font-size-body-lg;
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* 各画风图标的识别色，选中时统一归为主色 */
+.option-card.is-style-1 .option-icon {
+  background: #e6f2ee;
+  color: $color-primary;
+}
+
+.option-card.is-style-2 .option-icon {
+  background: rgba(80, 181, 255, 0.16);
+  color: #1e7cc8;
+}
+
+.option-card.is-style-3 .option-icon {
+  background: #f7efdd;
+  color: #8a6a3e;
+}
+
+.option-card.is-style-4 .option-icon {
+  background: #eceaf6;
+  color: $color-accent-violet;
 }
 
 .option-name {
   font-weight: $font-weight-bold;
-}
-
-.option-card small {
-  display: block;
-  margin-top: $space-2;
-  color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-tight;
-}
-
-.option-card.compact {
-  min-height: 88rpx;
-  padding: $space-2 $space-1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.option-grid.four .option-card.compact::before {
-  display: block;
-  width: 38rpx;
-  height: 38rpx;
-  margin: 0 auto $space-1;
-  border: 1rpx solid $color-muted;
-  border-radius: 5rpx;
-  content: "";
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.option-grid.four .option-card:nth-child(2)::before {
-  width: 48rpx;
-  height: 28rpx;
-}
-
-.option-grid.four .option-card:nth-child(3)::before {
-  width: 28rpx;
-  height: 48rpx;
-}
-
-.option-grid.four .option-card:nth-child(4)::before {
-  width: 44rpx;
-  height: 34rpx;
 }
 
 .option-card.selected {
@@ -308,7 +268,6 @@ const goNext = () => {
   border-color: $color-primary;
   background: linear-gradient(135deg, $color-primary-light 0%, #f7faf8 100%);
   color: $color-primary;
-  font-weight: $font-weight-bold;
   box-shadow: 0 0 0 1rpx $color-primary inset;
 }
 
@@ -317,13 +276,55 @@ const goNext = () => {
   color: #fff;
 }
 
-.option-card.selected small {
-  color: $color-primary-soft;
+/* 画幅磁贴：字形 + 比例值 + 小类目标签 */
+.option-card.compact {
+  min-height: 150rpx;
+  padding: $space-3 $space-1 $space-2;
+  gap: $space-1;
+  line-height: 1.3;
 }
 
-.option-grid.four .option-card.selected::before {
-  border-color: $color-primary;
-  background: $color-primary;
+.ratio-glyph {
+  display: block;
+  border-radius: 6rpx;
+  transition: background 0.2s ease;
+}
+
+.option-card.is-ratio-1 .ratio-glyph {
+  width: 40rpx;
+  height: 40rpx;
+  background: #e6f2ee;
+  box-shadow: inset 0 0 0 1rpx rgba(5, 96, 76, 0.35);
+}
+
+.option-card.is-ratio-2 .ratio-glyph {
+  width: 54rpx;
+  height: 32rpx;
+  background: rgba(80, 181, 255, 0.16);
+  box-shadow: inset 0 0 0 1rpx rgba(30, 124, 200, 0.35);
+}
+
+.option-card.is-ratio-3 .ratio-glyph {
+  width: 32rpx;
+  height: 54rpx;
+  background: #fdf6e8;
+  box-shadow: inset 0 0 0 1rpx rgba(169, 118, 28, 0.35);
+}
+
+.option-card.is-ratio-4 .ratio-glyph {
+  width: 50rpx;
+  height: 38rpx;
+  background: #eceaf6;
+  box-shadow: inset 0 0 0 1rpx rgba(89, 91, 220, 0.35);
+}
+
+.ratio-value {
+  font-weight: $font-weight-bold;
+}
+
+.ratio-label {
+  color: $color-muted;
+  font-size: $font-size-badge;
 }
 
 .next-card {

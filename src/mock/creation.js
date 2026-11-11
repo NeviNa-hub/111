@@ -6,11 +6,11 @@ export const HOME_OVERVIEW = {
   weather_text: "今日谷雨",
   quote: "造法自然 · 意致千里",
   hero: {
-    label: "今日推荐 · 烟岚登翠",
-    caption: "青绿水墨江南",
-    prompt: "水墨淋漓，宋式青绿设色，微风拂动湖面 ...",
-    image_url: "/static/home/home-1.jpg",
-    model_name: "国产大模型",
+    label: "今日推荐",
+    caption: "妙笔生花，一念成画",
+    prompt: "水墨淋漓，=，微风拂动湖面 ...",
+    image_url: "/static/home/home.jpg",
+    model_name: "AI 大模型",
     generated_count: 1280,
   },
   creations: [
@@ -81,28 +81,78 @@ export const WORKBENCH_OVERVIEW = {
 };
 
 const LIBRARY_WORKS = [
-  { work_id: 1, title: "《寒江独钓图》", status: "completed", class_name: "river-work" },
+  {
+    work_id: 1,
+    title: "《寒江独钓图》",
+    status: "completed",
+    class_name: "river-work",
+  },
   {
     work_id: 2,
     title: "《空山新雨竹影》",
     status: "completed",
     class_name: "bamboo-work",
   },
-  { work_id: 3, title: "《烟渚微茫图》", status: "creating", class_name: "mist-work" },
-  { work_id: 4, title: "《茶室听雪静物》", status: "draft", class_name: "tea-work" },
+  {
+    work_id: 3,
+    title: "《烟渚微茫图》",
+    status: "creating",
+    class_name: "mist-work",
+  },
+  {
+    work_id: 4,
+    title: "《茶室听雪静物》",
+    status: "draft",
+    class_name: "tea-work",
+  },
   {
     work_id: 5,
     title: "《远岫青绿长卷》",
     status: "completed",
     class_name: "river-work",
   },
-  { work_id: 6, title: "《松风煮茶图》", status: "completed", class_name: "bamboo-work" },
-  { work_id: 7, title: "《溪桥暮雪》", status: "draft", class_name: "mist-work" },
-  { work_id: 8, title: "《竹窗夜读》", status: "completed", class_name: "bamboo-work" },
-  { work_id: 9, title: "《秋山问道》", status: "completed", class_name: "river-work" },
-  { work_id: 10, title: "《古寺疏钟》", status: "draft", class_name: "tea-work" },
-  { work_id: 11, title: "《云壑观泉》", status: "completed", class_name: "mist-work" },
-  { work_id: 12, title: "《一蓑烟雨》", status: "draft", class_name: "river-work" },
+  {
+    work_id: 6,
+    title: "《松风煮茶图》",
+    status: "completed",
+    class_name: "bamboo-work",
+  },
+  {
+    work_id: 7,
+    title: "《溪桥暮雪》",
+    status: "draft",
+    class_name: "mist-work",
+  },
+  {
+    work_id: 8,
+    title: "《竹窗夜读》",
+    status: "completed",
+    class_name: "bamboo-work",
+  },
+  {
+    work_id: 9,
+    title: "《秋山问道》",
+    status: "completed",
+    class_name: "river-work",
+  },
+  {
+    work_id: 10,
+    title: "《古寺疏钟》",
+    status: "draft",
+    class_name: "tea-work",
+  },
+  {
+    work_id: 11,
+    title: "《云壑观泉》",
+    status: "completed",
+    class_name: "mist-work",
+  },
+  {
+    work_id: 12,
+    title: "《一蓑烟雨》",
+    status: "draft",
+    class_name: "river-work",
+  },
 ];
 
 const buildTabs = (works) => [
@@ -149,7 +199,7 @@ export const buildLibraryData = (params = {}, isEmpty = false) => {
   }
 
   const filteredWorks = LIBRARY_WORKS.filter(
-    (item) => status === "all" || item.status === status
+    (item) => status === "all" || item.status === status,
   );
   const start = (page - 1) * pageSize;
   const creatingWork = LIBRARY_WORKS.find((item) => item.status === "creating");
