@@ -17,7 +17,14 @@
             :class="{ selected: selectedStyleId === style.styleId }"
             @click="selectedStyleId = style.styleId"
           >
-            <text>{{ style.name }}</text>
+            <view class="option-head">
+              <!-- #ifdef H5 -->
+              <el-icon class="option-icon">
+                <component :is="style.icon" />
+              </el-icon>
+              <!-- #endif -->
+              <text class="option-name">{{ style.name }}</text>
+            </view>
             <small>{{ style.description }}</small>
           </view>
         </view>
@@ -37,13 +44,22 @@
       </view>
     </scroll-view>
     <view class="next-card">
-      <button @click="goNext">下一步：构想意象</button>
+      <button @click="goNext">
+        下一步：构想意象
+        <!-- #ifdef H5 -->
+        <el-icon class="next-icon"><ArrowRight /></el-icon>
+        <!-- #endif -->
+      </button>
     </view>
   </view>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
+
+// #ifdef H5
+import { ArrowRight, Brush, Camera, Dish, MagicStick } from "@element-plus/icons-vue";
+// #endif
 
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
@@ -54,10 +70,26 @@ const styleOptions = [
     styleId: 1,
     name: "宋式水墨",
     description: "写意淡墨，温润留白，淡雅韵味。",
+    icon: Brush,
   },
-  { styleId: 2, name: "真实摄影", description: "微质感，柔和光影，细腻真实。" },
-  { styleId: 3, name: "宋瓷青釉", description: "手工釉色肌理，低饱和大地色。" },
-  { styleId: 4, name: "温润插画", description: "轻笔与木刻手绘感，质朴温暖。" },
+  {
+    styleId: 2,
+    name: "真实摄影",
+    description: "微质感，柔和光影，细腻真实。",
+    icon: Camera,
+  },
+  {
+    styleId: 3,
+    name: "宋瓷青釉",
+    description: "手工釉色肌理，低饱和大地色。",
+    icon: Dish,
+  },
+  {
+    styleId: 4,
+    name: "温润插画",
+    description: "轻笔与木刻手绘感，质朴温暖。",
+    icon: MagicStick,
+  },
 ];
 const ratios = [
   { name: "1:1 方形", description: "适合朋友圈 / 头像", value: "1:1" },
@@ -184,7 +216,7 @@ const goNext = () => {
 .option-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $space-6;
+  gap: $space-4;
 }
 
 .option-grid.four {
@@ -199,11 +231,36 @@ const goNext = () => {
   background: linear-gradient(135deg, #fcfcfa 0%, #fafbf9 100%);
   color: $color-ink;
   font-size: $font-size-body-lg;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.option-head {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.option-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-sm;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: $font-size-body;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.option-name {
+  font-weight: $font-weight-bold;
 }
 
 .option-card small {
   display: block;
-  margin-top: $space-1;
+  margin-top: $space-2;
   color: $color-muted;
   font-size: $font-size-caption;
   line-height: $line-height-tight;
@@ -228,6 +285,7 @@ const goNext = () => {
   border: 1rpx solid $color-muted;
   border-radius: 5rpx;
   content: "";
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .option-grid.four .option-card:nth-child(2)::before {
@@ -246,10 +304,21 @@ const goNext = () => {
 }
 
 .option-card.selected {
-  border: 2rpx solid $color-primary;
-  background: linear-gradient(135deg, #e6f0ea 0%, #fafbf9 100%);
+  /* 用阴影描边替代加粗边框，避免选中时卡片抖动 */
+  border-color: $color-primary;
+  background: linear-gradient(135deg, $color-primary-light 0%, #f7faf8 100%);
   color: $color-primary;
   font-weight: $font-weight-bold;
+  box-shadow: 0 0 0 1rpx $color-primary inset;
+}
+
+.option-card.selected .option-icon {
+  background: $color-primary;
+  color: #fff;
+}
+
+.option-card.selected small {
+  color: $color-primary-soft;
 }
 
 .option-grid.four .option-card.selected::before {
@@ -283,5 +352,10 @@ const goNext = () => {
 
 .next-card button:after {
   border: 0;
+}
+
+.next-icon {
+  margin-left: $space-1;
+  font-size: $font-size-aux;
 }
 </style>
