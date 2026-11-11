@@ -12,14 +12,10 @@
       class="content"
       :style="contentKeyboardStyle"
     >
-      <text class="step-count">步骤 2 / 3</text>
-      <text class="page-title">第二步：甄选且现风格</text>
-      <text class="page-desc">择取最合心意的笔触与气韵，使意境自然成章。</text>
-
-      <view class="prompt-card">
+      <view class="config-card">
+        <view class="config-title"> <em>壹 ·</em> 画面主旨 </view>
         <view class="prompt-head">
-          <text>画面主旨意象</text>
-          <text>{{ prompt.length }} / {{ promptLimit }}字</text>
+          <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
         </view>
         <textarea
           v-model="prompt"
@@ -28,23 +24,39 @@
           placeholder="写下你想描绘的意象"
         />
         <view class="prompt-tools"
-          ><button @click="polishPrompt">✦ 灵感润色</button
-          ><button @click="randomPrompt">⟳ 随机意象</button
+          ><button @click="polishPrompt">
+            <!-- #ifdef H5 -->
+            <el-icon class="tool-icon"><MagicStick /></el-icon>
+            <!-- #endif -->
+            灵感润色</button
+          ><button @click="randomPrompt">
+            <!-- #ifdef H5 -->
+            <el-icon class="tool-icon"><RefreshLeft /></el-icon>
+            <!-- #endif -->
+            随机意象</button
           ><text @click="prompt = ''">清空</text></view
         >
       </view>
-      <view class="suggestion-head">
-        <text>灵感引线（轻触即添）</text><text>点击注入画面要素</text>
+
+      <view class="config-card">
+        <view class="config-title"><em>贰 ·</em> 灵感引线</view>
+        <view class="suggestions">
+          <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
+            ＋ {{ item }}
+          </button>
+        </view>
       </view>
-      <view class="suggestions">
-        <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
-          ＋ {{ item }}
-        </button>
-      </view>
-      <view class="tuning-card">
-        <view>● 画境点睛 · 气韵微调</view>
-        <text>意境基调　清润淡雅　墨韵沉静</text>
-        <text>留白比例　迂阔（60%）　虚实均亭</text>
+
+      <view class="config-card">
+        <view class="config-title"><em>叁 ·</em> 画境点睛</view>
+        <view class="tuning-row">
+          <text class="tuning-label">意境基调</text>
+          <text class="tuning-value">清润淡雅　墨韵沉静</text>
+        </view>
+        <view class="tuning-row">
+          <text class="tuning-label">留白比例</text>
+          <text class="tuning-value">迂阔（60%）　虚实均亭</text>
+        </view>
       </view>
 
       <view class="detail-card">
@@ -94,6 +106,10 @@
 <script setup>
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
+
+// #ifdef H5
+import { MagicStick, RefreshLeft } from "@element-plus/icons-vue";
+// #endif
 
 import { TASK_STATUS } from "@/apis/constants";
 import { createImageGeneration, getImageTaskStatus } from "@/apis/text-to-image";
@@ -389,7 +405,7 @@ onShow(() => {
   --content-bottom-pad: 160rpx;
   height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 34rpx $space-7 var(--content-bottom-pad);
+  padding: 35rpx $space-7 var(--content-bottom-pad);
   box-sizing: border-box;
 }
 
@@ -397,28 +413,34 @@ onShow(() => {
   display: none;
 }
 
-.prompt-card,
-.tuning-card {
-  margin-top: $space-5;
-  padding: $space-5;
-  border: 1rpx solid $color-line;
+/* 卡片与区块标题：与构思页统一样式 */
+.config-card {
+  margin-top: $space-6;
+  padding: $space-6;
   border-radius: $radius-xl;
   background: $color-surface;
-  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.05);
+  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
 
-.prompt-head,
-.prompt-tools,
-.suggestion-head {
+.config-card:first-child {
+  margin-top: 0;
+}
+
+.config-title {
+  padding-bottom: $space-6;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+}
+
+.config-title em {
+  color: $color-accent-clay;
+}
+
+.prompt-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $space-2;
-}
-
-.prompt-head text:last-child,
-.suggestion-head text:last-child,
-.tuning-card text {
+  justify-content: flex-end;
   color: $color-muted;
   font-size: $font-size-caption;
 }
@@ -426,20 +448,24 @@ onShow(() => {
 .prompt-input {
   width: 100%;
   height: 250rpx;
-  margin-top: $space-3;
+  margin-top: $space-2;
   font-size: $font-size-body;
   line-height: $line-height-normal;
 }
 
 .prompt-tools {
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
   margin-top: $space-3;
 }
 
 .prompt-tools button,
 .suggestions button {
   @include tap-area(64rpx);
-  margin: 0 $space-2 $space-2 0;
+  gap: $space-1;
+  margin: 0;
   padding: 0 $space-3;
   border: 1rpx solid $color-line;
   border-radius: $radius-sm;
@@ -454,63 +480,45 @@ onShow(() => {
   border: 0;
 }
 
+.tool-icon {
+  font-size: $font-size-aux;
+}
+
 .prompt-tools text {
   margin-left: auto;
   color: $color-muted;
   font-size: $font-size-caption;
 }
 
-.suggestion-head {
-  margin-top: $space-5;
-  color: $color-primary;
-  font-size: $font-size-aux;
-}
-
 .suggestions {
   display: flex;
   flex-wrap: wrap;
   gap: $space-2;
-  margin-top: $space-3;
 }
 
 .suggestions button {
   color: $color-ink-soft;
 }
 
-.tuning-card view {
-  margin-bottom: $space-3;
-  color: $color-ink;
-  font-weight: $font-weight-bold;
-}
-
-.tuning-card text {
-  display: block;
+.tuning-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
   padding: $space-3 0;
   border-top: 1rpx solid $color-line;
 }
 
-.step-count {
-  display: block;
+.tuning-label {
+  flex-shrink: 0;
+  color: $color-ink;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+}
+
+.tuning-value {
   color: $color-muted;
   font-size: $font-size-caption;
-  @include numeric;
-}
-
-.page-title {
-  display: block;
-  margin-top: $space-1;
-  color: $color-ink;
-  font-size: $font-size-page-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
-}
-
-.page-desc {
-  display: block;
-  margin-top: $space-1;
-  color: $color-muted;
-  font-size: $font-size-aux;
-  line-height: $line-height-normal;
 }
 
 .bottom-actions {
