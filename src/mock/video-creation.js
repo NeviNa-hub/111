@@ -65,7 +65,7 @@ export const VIDEO_RENDER_OPTIONS = {
 };
 
 /**
- * 生成视频任务状态数据。
+ * 视频创作任务状态数据。
  * @param {Object} record 模拟任务记录。
  * @returns {Object} 任务状态数据。
  */
@@ -76,11 +76,11 @@ export const buildVideoTaskStatus = (record) => {
     task_id: record.taskId,
     status: record.status,
     progress: record.progress,
-    progress_title: "动卷渲染中",
-    stage_label: isCompleted ? "动卷已完成 · 可入作品库" : "云端逐帧重绘",
+    progress_title: "视频创作渲染中",
+    stage_label: isCompleted ? "视频创作已完成 · 可入作品库" : "云端逐帧重绘",
     estimated_time: VIDEO_RENDER_OPTIONS.estimated_time,
     note: isCompleted
-      ? "动卷已完成并归档至作品库"
-      : "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
+      ? "视频创作已完成并归档至作品库"
+      : "视频创作已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
   };
 };

@@ -28,7 +28,7 @@ export const HOME_OVERVIEW = {
     {
       creation_id: 2,
       eyebrow: "MOTION INK",
-      title: "生成视频",
+      title: "视频创作",
       input_label: "镜头：",
       input_value: "微风荡起波澜...",
       icon: "▣",

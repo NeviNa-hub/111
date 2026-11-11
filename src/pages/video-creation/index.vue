@@ -1,7 +1,7 @@
 <template>
   <!-- #ifdef H5 -->
   <view class="video-creation-page">
-    <app-page-header title="生成视频" />
+    <app-page-header title="视频创作" />
     <view class="step-bar">
       <view class="step active"> <i>1</i><text>规制与意境</text> </view>
       <view class="step-connector"></view>
@@ -152,7 +152,7 @@
 
   <!-- #ifndef H5 -->
   <view class="platform-unavailable">
-    <app-page-header title="生成视频" />
+    <app-page-header title="视频创作" />
     <text class="platform-tip">
       视频创作依赖 Element Plus，请使用 H5 端体验完整交互。
     </text>
@@ -364,10 +364,10 @@ const goNext = async () => {
   color: $color-ink;
 
   --el-color-primary: #{$color-primary};
-  --el-color-primary-light-3: #3b8873;
-  --el-color-primary-light-5: #6fa99a;
-  --el-color-primary-light-7: #a8c9bf;
-  --el-color-primary-light-9: #e7f2ee;
+  --el-color-primary-light-3: #c89a63;
+  --el-color-primary-light-5: #d6b689;
+  --el-color-primary-light-7: #e4d0ad;
+  --el-color-primary-light-9: #f7edde;
   --el-border-radius-base: #{$radius-sm};
   --el-font-family: #{$font-family-base};
   --el-font-size-base: #{$font-size-body};
@@ -578,8 +578,8 @@ const goNext = async () => {
   right: 8rpx;
   padding: 2rpx 10rpx;
   border-radius: $radius-xs;
-  background: rgba(217, 190, 155, 0.4);
-  color: #8a6a3e;
+  background: #9dff3d;
+  color: #1c5e09;
   font-size: 18rpx;
   line-height: 1.5;
 }
@@ -779,12 +779,12 @@ const goNext = async () => {
   padding: 0 $space-5;
   border: 0;
   border-radius: $radius-md;
-  background: #d9efe6;
+  background: #f3e4cd;
   color: $color-primary;
   font-size: $font-size-badge;
 
   &:hover {
-    background: #c7e7db;
+    background: #ecd8b8;
     color: $color-primary;
   }
 

@@ -527,8 +527,8 @@ const handleSubmit = async () => {
   gap: $space-3;
   border: 0;
   border-radius: $radius-lg;
-  background: #006b60;
-  box-shadow: 0 8rpx 14rpx rgba(0, 86, 75, 0.18);
+  background: $color-primary;
+  box-shadow: 0 8rpx 14rpx rgba(156, 110, 56, 0.22);
   color: #fff;
   font-size: $font-size-body-lg;
   font-weight: $font-weight-bold;

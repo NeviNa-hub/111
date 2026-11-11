@@ -1,7 +1,7 @@
 <template>
   <!-- #ifdef H5 -->
   <view class="video-render-page">
-    <app-page-header title="生成视频" />
+    <app-page-header title="视频创作" />
     <view class="step-bar">
       <view class="step done" @click="goPreviousStep">
         <i>1</i><text>规制与意境</text>
@@ -21,18 +21,12 @@
           <view class="config-title"><em>壹 ·</em> 动卷预览</view>
           <view class="preview-body">
             <view class="preview-thumb">
-              <app-image
-                class="preview-image"
-                :src="previewSource"
-                mode="aspectFill"
-              />
+              <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
               <text class="preview-badge">影片</text>
             </view>
             <view class="preview-info">
               <view class="preview-head">
-                <text class="preview-title">{{
-                  renderConfig.previewTitle
-                }}</text>
+                <text class="preview-title">{{ renderConfig.previewTitle }}</text>
                 <text class="preview-state">已立意</text>
               </view>
               <view class="preview-tags">
@@ -107,22 +101,12 @@
               </view>
             </view>
           </view>
-          <view class="resource-tip">
-            <el-icon class="tip-icon"><InfoFilled /></el-icon>
-            <text>
-              支持后台云端独立渲染，退出或锁屏均不影响进度，完成后自动归档至作品库。
-            </text>
-          </view>
         </view>
       </el-form>
     </scroll-view>
 
     <view class="bottom-bar">
-      <el-button
-        class="previous-button"
-        :disabled="isSubmitting"
-        @click="goPreviousStep"
-      >
+      <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
         <el-icon><ArrowLeft /></el-icon>
         上一步
       </el-button>
@@ -164,7 +148,7 @@
 
   <!-- #ifndef H5 -->
   <view class="platform-unavailable">
-    <app-page-header title="生成视频" />
+    <app-page-header title="视频创作" />
     <text class="platform-tip">
       视频创作依赖 Element Plus，请使用 H5 端体验完整交互。
     </text>
@@ -188,10 +172,7 @@ import {
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
-import {
-  createVideoGeneration,
-  getVideoTaskStatus,
-} from "@/apis/video-creation";
+import { createVideoGeneration, getVideoTaskStatus } from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -237,14 +218,12 @@ const taskStatusData = ref(null);
 
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
 
-const taskStage = computed(
-  () => taskStatusData.value?.stageLabel || "云端逐帧重绘",
-);
+const taskStage = computed(() => taskStatusData.value?.stageLabel || "云端逐帧重绘");
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.note ||
-    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
+    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。"
 );
 
 const { start: startPolling } = useTaskPolling({
@@ -403,10 +382,10 @@ onShow(() => {
   color: $color-ink;
 
   --el-color-primary: #{$color-primary};
-  --el-color-primary-light-3: #3b8873;
-  --el-color-primary-light-5: #6fa99a;
-  --el-color-primary-light-7: #a8c9bf;
-  --el-color-primary-light-9: #e7f2ee;
+  --el-color-primary-light-3: #c89a63;
+  --el-color-primary-light-5: #d6b689;
+  --el-color-primary-light-7: #e4d0ad;
+  --el-color-primary-light-9: #f7edde;
   --el-border-radius-base: #{$radius-sm};
   --el-font-family: #{$font-family-base};
   --el-font-size-base: #{$font-size-body};
@@ -591,7 +570,7 @@ onShow(() => {
   font-size: $font-size-badge;
 
   &.is-accent {
-    background: #def0e7;
+    background: #f3e4cd;
     color: $color-primary;
   }
 }
@@ -701,7 +680,7 @@ onShow(() => {
 }
 
 .fps-card.is-selected .fps-tag {
-  background: #def0e7;
+  background: #f3e4cd;
   color: $color-primary;
 }
 

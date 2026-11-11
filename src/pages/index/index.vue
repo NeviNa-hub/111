@@ -449,7 +449,7 @@ const openMode = (url) => {
 .mode-row-2 {
   border-color: #fffefc;
   background: linear-gradient(150deg, #fbffed 0%, #fffefc 100%);
-  box-shadow: 0 8rpx 22rpx rgba(96, 98, 200, 0.14);
+  box-shadow: 0 8rpx 22rpx rgba(200, 75, 49, 0.14);
 }
 
 .mode-row-3 {
@@ -465,12 +465,12 @@ const openMode = (url) => {
   justify-content: center;
   width: 72rpx;
   height: 72rpx;
-  color: #d97c1e;
+  color: #c26108;
   font-size: 44rpx;
 }
 
 .mode-row-2 .mode-icon {
-  color: $color-accent-violet;
+  color: #b8402a;
 }
 
 .mode-row-3 .mode-icon {
@@ -507,27 +507,27 @@ const openMode = (url) => {
 
 /* 各行文字随模块配色 */
 .mode-row-1 .mode-name {
-  color: #c26a10;
+  color: #a34a08;
 }
 
 .mode-row-1 .mode-desc {
-  color: #d18a3a;
+  color: #bc6215;
 }
 
 .mode-row-1 .mode-note {
-  color: #e0aa6b;
+  color: #d68d4a;
 }
 
 .mode-row-2 .mode-name {
-  color: #5c5ecf;
+  color: #b03a20;
 }
 
 .mode-row-2 .mode-desc {
-  color: #8889d6;
+  color: #c25136;
 }
 
 .mode-row-2 .mode-note {
-  color: #a9aae4;
+  color: #d69a86;
 }
 
 .mode-row-3 .mode-name {

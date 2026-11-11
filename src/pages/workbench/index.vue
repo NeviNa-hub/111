@@ -116,8 +116,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -288,19 +286,6 @@ const startTool = (name) => {
 
 .footer-button:active {
   opacity: 0.85;
-}
-
-/* 02 视频创作：胶卷主题的描边浅蓝按钮 */
-.button-blue {
-  border: 1rpx solid rgba(80, 181, 255, 0.55);
-  background: rgba(80, 181, 255, 0.12);
-  color: #1e7cc8;
-}
-
-/* 03 图片优化：重塑主题的实心黛紫按钮 */
-.button-purple {
-  background: $color-accent-violet;
-  color: #fff;
 }
 
 /* ========== 01 文字生图 · 插图角标 ========== */

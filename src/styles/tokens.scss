@@ -4,7 +4,8 @@
  */
 
 /* 字体：只保留一套系统字体栈，不引入字体文件或外部字体 */
-$font-family-base: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
   "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
 
 /* 字号阶梯：22 角标 / 24 辅助 / 26 次要 / 28 正文 / 30 正文强调 / 34 区块标题 / 38 页面标题 / 44 数字 / 56 展示 / 68 主指标 */
@@ -50,22 +51,21 @@ $radius-2xl: 28rpx;
 $radius-3xl: 32rpx;
 $radius-pill: 999rpx;
 
-/* 颜色：墨绿 + 宣纸底色，压掉散落的高饱和色 */
+/* 颜色：茶金主题色 + 暖杏底色 */
 $color-ink: #16352f;
 $color-ink-soft: #4e665e;
 $color-muted: #7b8d86;
 $color-faint: #a3b1ab;
-$color-primary: #05604c;
-$color-primary-dark: #04483a;
-$color-primary-light: #e6f2ee;
-$color-primary-soft: #3f6656;
+$color-primary: #b8864e;
+$color-primary-dark: #9c6e38;
+$color-primary-light: #f7edde;
+$color-primary-soft: #8a6840;
 $color-accent-clay: #d9be9b;
 $color-accent-cinnabar: #c84b31;
 $color-warning: #a9761c;
 $color-warning-bg: #fdf6e8;
 $color-warning-line: #f0e0bd;
 $color-danger: #b93a2f;
-/* 全局页面背景：暖杏渐变，自上而下逐步变淡 */
 $color-bg-page: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
 $color-surface: #ffffff;
 $color-surface-muted: #f8faf7;
@@ -78,7 +78,6 @@ $color-art-ink: #202022;
 $color-art-muted: #9b999f;
 
 $shadow-card: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
-$shadow-float: 0 12rpx 32rpx rgba(22, 53, 47, 0.12);
 
 /* 关键尺寸 */
 $header-height: 100rpx;

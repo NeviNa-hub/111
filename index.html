@@ -1,13 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <script>
-      var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') ||
-        CSS.supports('top: constant(a)'))
+      var coverSupport =
+        "CSS" in window &&
+        typeof CSS.supports === "function" &&
+        (CSS.supports("top: env(a)") || CSS.supports("top: constant(a)"));
       document.write(
         '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
-        (coverSupport ? ', viewport-fit=cover' : '') + '" />')
+          (coverSupport ? ", viewport-fit=cover" : "") +
+          '" />',
+      );
     </script>
     <title></title>
     <!--preload-links-->
@@ -21,9 +25,10 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
-          "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
-          "Noto Sans CJK SC", sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC",
+          sans-serif;
       }
 
       #boot-shell {
@@ -32,14 +37,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f6f7f3;
+        background: #fff8ec;
       }
 
       .boot-spinner {
         width: 28px;
         height: 28px;
-        border: 3px solid rgba(5, 96, 76, 0.16);
-        border-top-color: #05604c;
+        border: 3px solid rgba(184, 134, 78, 0.2);
+        border-top-color: #b8864e;
         border-radius: 50%;
         animation: boot-spin 0.9s linear infinite;
       }
@@ -72,7 +77,7 @@
       }
 
       .boot-nav .is-active {
-        color: #05604c;
+        color: #b8864e;
         font-weight: 600;
       }
 
@@ -101,22 +106,22 @@
     <script>
       // 应用挂载出首个页面后移除静态加载壳，避免遮挡页面内容
       (function () {
-        var shell = document.getElementById('boot-shell')
-        var app = document.getElementById('app')
+        var shell = document.getElementById("boot-shell");
+        var app = document.getElementById("app");
 
         if (!shell || !app || !window.MutationObserver) {
-          return
+          return;
         }
 
         var observer = new MutationObserver(function () {
           if (app.children.length) {
-            shell.parentNode.removeChild(shell)
-            observer.disconnect()
+            shell.parentNode.removeChild(shell);
+            observer.disconnect();
           }
-        })
+        });
 
-        observer.observe(app, { childList: true })
-      })()
+        observer.observe(app, { childList: true });
+      })();
     </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
