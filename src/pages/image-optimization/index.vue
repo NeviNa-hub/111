@@ -59,6 +59,17 @@
         {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
       </button>
     </view>
+    <generation-dialog
+      v-if="isProgressVisible"
+      type="optimization"
+      :status="taskStatus"
+      :progress="taskProgress"
+      :progress-label="taskStageLabel"
+      :note="taskNote"
+      :result-url="taskResultUrl"
+      @back="goWorkbench"
+      @library="goLibrary"
+    />
   </view>
 </template>
 
@@ -69,19 +80,78 @@ import { computed, ref } from "vue";
 import { MagicStick, Plus, Upload, ZoomIn } from "@element-plus/icons-vue";
 // #endif
 
-import { createImageOptimization } from "@/apis/image-optimization";
+import { TASK_STATUS } from "@/apis/constants";
+import {
+  createImageOptimization,
+  getImageOptimizationTaskStatus,
+} from "@/apis/image-optimization";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import GenerationDialog from "@/components/GenerationDialog/index.vue";
+import useTaskPolling from "@/hooks/useTaskPolling";
 import { chooseSingleImage } from "@/utils/image-picker";
 import { getErrorMessage, isApiError } from "@/utils/request";
 
 const cost = 3;
 const promptLimit = 200;
+const progressNote = "已投入云端淬炼池，离开页面不影响任务进度。";
 const prompt = ref("");
 const selectedImage = ref(null);
 const isSubmitting = ref(false);
+const isProgressVisible = ref(false);
+const taskId = ref("");
+const taskProgress = ref(0);
+const taskStatus = ref(TASK_STATUS.PENDING);
+const taskResultUrl = ref("");
+const taskNote = ref(progressNote);
 
 const costText = computed(() => cost);
+
+const taskStageLabel = computed(() => {
+  if (taskStatus.value === TASK_STATUS.COMPLETED) {
+    return "生成完成";
+  }
+
+  if (taskStatus.value === TASK_STATUS.FAILED) {
+    return "生成失败";
+  }
+
+  return "云端淬炼中";
+});
+
+const { start: startPolling } = useTaskPolling({
+  fetchTask: () => getImageOptimizationTaskStatus({ taskId: taskId.value }),
+  interval: 3000,
+  maxAttempts: 60,
+  isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
+  isFailed: (data) => data.status === TASK_STATUS.FAILED,
+  onProgress: (data) => {
+    taskStatus.value = data.status || TASK_STATUS.PROCESSING;
+    taskProgress.value = Number(data.progress) || 0;
+
+    if (data.result_urls?.[0]) {
+      taskResultUrl.value = data.result_urls[0];
+    }
+  },
+  onCompleted: (data) => {
+    taskStatus.value = TASK_STATUS.COMPLETED;
+    taskProgress.value = 100;
+    taskResultUrl.value = data.result_urls?.[0] || "";
+    taskNote.value = "任务已完成，可前往作品库查看。";
+  },
+  onFailed: (error) => {
+    const isRequestError = isApiError(error);
+
+    taskStatus.value = TASK_STATUS.FAILED;
+    taskNote.value = isRequestError
+      ? "任务状态查询失败，请稍后在作品库确认结果。"
+      : getErrorMessage(error, "任务进度获取失败，请稍后重试");
+
+    if (!isRequestError) {
+      uni.showToast({ title: taskNote.value, icon: "none" });
+    }
+  },
+});
 
 // 从系统相册或相机选择图片并上传，失败时保留已有图片
 const chooseImage = async () => {
@@ -127,11 +197,13 @@ const startOptimization = async () => {
       return;
     }
 
-    uni.navigateTo({
-      url: `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
-        task.task_id
-      )}`,
-    });
+    taskId.value = task.task_id;
+    taskProgress.value = 0;
+    taskStatus.value = TASK_STATUS.PROCESSING;
+    taskResultUrl.value = "";
+    taskNote.value = progressNote;
+    isProgressVisible.value = true;
+    startPolling();
   } catch (error) {
     if (!isApiError(error)) {
       uni.showToast({
@@ -142,6 +214,16 @@ const startOptimization = async () => {
   } finally {
     isSubmitting.value = false;
   }
+};
+
+// 返回创作台
+const goWorkbench = () => {
+  uni.reLaunch({ url: "/pages/workbench/index" });
+};
+
+// 前往作品库查看
+const goLibrary = () => {
+  uni.navigateTo({ url: "/pages/library/index" });
 };
 </script>
 
