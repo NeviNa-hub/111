@@ -2,7 +2,7 @@
   <view class="app-page-header">
     <view v-if="canGoBack" class="header-back" @click="handleBack">‹</view>
     <view class="header-title">{{ title }}</view>
-    <view class="header-points">
+    <view v-if="showPoints" class="header-points">
       <text class="points-icon">✦</text>
       <text class="points-label">积分</text>
       <text class="points-value">{{ pointsText }}</text>
@@ -18,10 +18,22 @@ import { getPointsInfo } from "@/apis/points";
 
 /**
  * @property {string} title 页头标题。
+ * @property {boolean} showPoints 是否显示积分信息，默认显示；登录与注册页关闭。
  */
-defineProps({
+const props = defineProps({
   title: { type: String, required: true },
+  showPoints: { type: Boolean, default: true },
 });
+
+// 底部导航主页面没有上级页面，即使 H5 历史里仍有旧记录也不显示返回箭头。
+const TOP_LEVEL_ROUTES = [
+  "pages/auth/index",
+  "pages/index/index",
+  "pages/workbench/index",
+  "pages/library/index",
+  "pages/under-development/index",
+  "pages/profile/index",
+];
 
 const pointsBalance = ref(null);
 const canGoBack = ref(false);
@@ -29,9 +41,23 @@ const pointsText = computed(() =>
   pointsBalance.value === null ? "—" : pointsBalance.value
 );
 
+// 判断当前页面是否为底部导航主页面。
+const isTopLevelPage = () => {
+  const pages = getCurrentPages();
+  const route = pages[pages.length - 1]?.route || "";
+
+  return TOP_LEVEL_ROUTES.includes(route.replace(/^\//, ""));
+};
+
 // 根据当前页面栈与浏览器历史决定是否显示返回箭头。
 // H5 刷新后页面栈会重置为 1，但浏览器历史里仍保留上一个路由，此时按历史判断。
 const updateBackState = () => {
+  if (isTopLevelPage()) {
+    canGoBack.value = false;
+
+    return;
+  }
+
   // #ifdef H5
   canGoBack.value = getCurrentPages().length > 1 || Boolean(window.history.state?.back);
   // #endif
@@ -66,7 +92,10 @@ const loadPointsBalance = async () => {
 
 onMounted(() => {
   updateBackState();
-  loadPointsBalance();
+
+  if (props.showPoints) {
+    loadPointsBalance();
+  }
 });
 </script>
 

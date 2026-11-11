@@ -1,14 +1,10 @@
 <template>
   <view class="auth-page">
-    <view class="top-bar">
-      <text class="back-icon" @tap="goBack">‹</text>
-      <text class="top-title">{{ isRegister ? "请注册" : "请登录" }}</text>
-      <view class="profile-icon">♙</view>
-    </view>
+    <app-page-header title="妙笔生花" :show-points="false" />
 
     <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
       <view class="hero-card">
-        <text class="auth-eyebrow">妙笔生花</text>
+        <text class="auth-eyebrow">{{ isRegister ? "请注册" : "请登录" }}</text>
         <text class="brand-subtitle">
           {{
             isRegister
@@ -112,6 +108,7 @@ import { computed, nextTick, reactive, ref } from "vue";
 import { PAGE_PATHS } from "@/apis/constants";
 import { loginUser, registerUser } from "@/apis/auth";
 import { initializeSession } from "@/stores";
+import AppPageHeader from "@/components/AppPageHeader/index.vue";
 
 const formRef = ref(null);
 const formModel = reactive({
@@ -194,13 +191,6 @@ const toggleMode = () => {
   });
 };
 
-// 返回上一页；从应用入口打开时留在登录页。
-const goBack = () => {
-  if (getCurrentPages().length > 1) {
-    uni.navigateBack();
-  }
-};
-
 // 校验表单并提交登录或注册，成功后初始化会话并进入首页。
 const handleSubmit = async () => {
   if (isSubmitting.value) {
@@ -253,45 +243,8 @@ const handleSubmit = async () => {
   color: $color-ink;
 }
 
-.top-bar {
-  height: calc(96rpx + var(--status-bar-height, 0px));
-  padding: var(--status-bar-height, 0px) 32rpx 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-}
-
-.back-icon {
-  width: 72rpx;
-  color: #122b43;
-  font-size: 64rpx;
-  line-height: 1;
-}
-
-.top-title {
-  flex: 1;
-  text-align: center;
-  color: #142a40;
-  font-size: 32rpx;
-  font-weight: 600;
-}
-
-.profile-icon {
-  width: 60rpx;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20rpx;
-  background: $color-primary;
-  color: #fff;
-  font-size: 34rpx;
-}
-
 .auth-scroll {
-  height: calc(100vh - 96rpx - var(--status-bar-height, 0px));
+  height: calc(100vh - 100rpx - var(--status-bar-height, 0px));
   padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
