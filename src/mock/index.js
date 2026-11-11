@@ -2,8 +2,12 @@
  * Mock 路由：按真实接口路径返回与后端一致的 { code, message, data } 结构。
  */
 import { API_PATHS, ERROR_CODES, PAGE_DEFAULTS } from "../apis/constants.js";
-import { ACCOUNT_OVERVIEW } from "./account.js";
-import { HOME_OVERVIEW, WORKBENCH_OVERVIEW, buildLibraryData } from "./creation.js";
+import { ACCOUNT_OVERVIEW, MOCK_LOGIN, POINTS_INFO } from "./account.js";
+import {
+  HOME_OVERVIEW,
+  WORKBENCH_OVERVIEW,
+  buildLibraryData,
+} from "./creation.js";
 import {
   IMAGE_OPTIMIZATION_OPTIONS,
   buildOptimizationTaskStatus,
@@ -62,7 +66,42 @@ const createTaskResponse = (type, data, requiredFields) => {
 };
 
 const exactRoutes = {
+  [`POST ${API_PATHS.AUTH_REGISTER}`]: (params) => {
+    if (!params?.username || !params?.account || !params?.password) {
+      return fail(
+        ERROR_CODES.INVALID_PARAMS,
+        "缺少必要参数：username/account/password",
+      );
+    }
+
+    // 与真实契约一致：注册只返回用户资料，不签发令牌
+    return ok({
+      user_id: MOCK_LOGIN.user_id,
+      username: params.username,
+      account: params.account,
+    });
+  },
+  [`POST ${API_PATHS.AUTH_LOGIN}`]: (params) => {
+    if (!params?.account || !params?.password) {
+      return fail(ERROR_CODES.INVALID_PARAMS, "缺少必要参数：account/password");
+    }
+
+    // 本地 Mock 不校验口令，任意账号密码均可登录，便于离线开发
+    return ok({
+      ...MOCK_LOGIN,
+      username: params.account,
+      account: params.account,
+    });
+  },
+  [`POST ${API_PATHS.AUTH_LOGOUT}`]: () => ok(null),
   [`GET ${API_PATHS.ACCOUNT_OVERVIEW}`]: () => ok(ACCOUNT_OVERVIEW),
+  [`GET ${API_PATHS.POINTS_MY_INFO}`]: (_params, scenario) => {
+    if (scenario === "empty") {
+      return ok({ ...POINTS_INFO, items: [] });
+    }
+
+    return ok(POINTS_INFO);
+  },
   [`GET ${API_PATHS.HOME_OVERVIEW}`]: (_params, scenario) => {
     if (scenario === "empty") {
       return ok({ ...HOME_OVERVIEW, creations: [] });
@@ -81,11 +120,14 @@ const exactRoutes = {
     const page = Number(params.page) || PAGE_DEFAULTS.PAGE;
     const pageSize = Math.min(
       Number(params.page_size) || PAGE_DEFAULTS.PAGE_SIZE,
-      PAGE_DEFAULTS.MAX_PAGE_SIZE
+      PAGE_DEFAULTS.MAX_PAGE_SIZE,
     );
 
     return ok(
-      buildLibraryData({ ...params, page, page_size: pageSize }, scenario === "empty")
+      buildLibraryData(
+        { ...params, page, page_size: pageSize },
+        scenario === "empty",
+      ),
     );
   },
   [`GET ${API_PATHS.IMAGE_CREATION_OPTIONS}`]: () => ok(IMAGE_CREATION_OPTIONS),
@@ -93,7 +135,8 @@ const exactRoutes = {
   [`GET ${API_PATHS.IMAGE_CANVAS_OPTIONS}`]: () => ok(IMAGE_CANVAS_OPTIONS),
   [`POST ${API_PATHS.IMAGE_TASKS}`]: (params) =>
     createTaskResponse("image", params, ["prompt", "style"]),
-  [`GET ${API_PATHS.IMAGE_OPTIMIZATION_OPTIONS}`]: () => ok(IMAGE_OPTIMIZATION_OPTIONS),
+  [`GET ${API_PATHS.IMAGE_OPTIMIZATION_OPTIONS}`]: () =>
+    ok(IMAGE_OPTIMIZATION_OPTIONS),
   [`POST ${API_PATHS.IMAGE_OPTIMIZATION_TASKS}`]: (params) =>
     createTaskResponse("optimization", params, ["image_path", "prompt"]),
   [`GET ${API_PATHS.VIDEO_CREATION_OPTIONS}`]: () => ok(VIDEO_CREATION_OPTIONS),
@@ -122,7 +165,8 @@ const taskRoutes = [
   {
     method: "GET",
     pattern: /^\/text-to-image\/tasks\/([^/]+)$/,
-    handler: (taskId) => resolveTaskStatus(taskId, buildImageTaskStatus, "image"),
+    handler: (taskId) =>
+      resolveTaskStatus(taskId, buildImageTaskStatus, "image"),
   },
   {
     method: "GET",
@@ -133,7 +177,8 @@ const taskRoutes = [
   {
     method: "GET",
     pattern: /^\/video\/tasks\/([^/]+)$/,
-    handler: (taskId) => resolveTaskStatus(taskId, buildVideoTaskStatus, "video"),
+    handler: (taskId) =>
+      resolveTaskStatus(taskId, buildVideoTaskStatus, "video"),
   },
 ];
 
@@ -154,7 +199,7 @@ export const resolveMock = (method, url, params = {}, scenario = "normal") => {
   }
 
   const dynamicRoute = taskRoutes.find(
-    (route) => route.method === method && route.pattern.test(url)
+    (route) => route.method === method && route.pattern.test(url),
   );
 
   if (dynamicRoute) {

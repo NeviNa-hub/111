@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from "@/apis/http";
 
 /**
  * 获取创作台数据。

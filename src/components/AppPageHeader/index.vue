@@ -26,17 +26,31 @@ defineProps({
 const pointsBalance = ref(null);
 const canGoBack = ref(false);
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value,
+  pointsBalance.value === null ? "—" : pointsBalance.value
 );
 
-// 根据当前页面栈决定是否显示返回箭头。
+// 根据当前页面栈与浏览器历史决定是否显示返回箭头。
+// H5 刷新后页面栈会重置为 1，但浏览器历史里仍保留上一个路由，此时按历史判断。
 const updateBackState = () => {
+  // #ifdef H5
+  canGoBack.value = getCurrentPages().length > 1 || Boolean(window.history.state?.back);
+  // #endif
+  // #ifndef H5
   canGoBack.value = getCurrentPages().length > 1;
+  // #endif
 };
 
-// 返回上一页。
+// 返回上一页；页面栈不可回退时（如 H5 刷新后直接打开）退回浏览器历史。
 const handleBack = () => {
-  uni.navigateBack();
+  if (getCurrentPages().length > 1) {
+    uni.navigateBack();
+
+    return;
+  }
+
+  // #ifdef H5
+  window.history.back();
+  // #endif
 };
 
 // 读取当前积分余额，与「我的」页共用同一接口。

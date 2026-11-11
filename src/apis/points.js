@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from "@/apis/http";
 
 /**
  * 获取灵感点余额与流水。

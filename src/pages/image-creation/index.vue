@@ -69,9 +69,7 @@ const selectedStyleId = ref(1);
 const selectedRatio = ref("1:1");
 
 const selectedStyleName = computed(
-  () =>
-    styleOptions.find((style) => style.styleId === selectedStyleId.value)
-      ?.name || "",
+  () => styleOptions.find((style) => style.styleId === selectedStyleId.value)?.name || ""
 );
 
 // 校验并保存构思草稿，进入画风挑选页
@@ -142,11 +140,13 @@ const goNext = () => {
 }
 
 .step.active {
+  background: $color-primary;
   color: #fff;
   font-weight: $font-weight-bold;
 
   i {
-    background: $color-primary;
+    /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
+    background: rgba(255, 255, 255, 0.24);
     color: #fff;
   }
 }
@@ -212,6 +212,10 @@ const goNext = () => {
 .option-card.compact {
   min-height: 88rpx;
   padding: $space-2 $space-1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   line-height: 1.4;
 }
@@ -258,15 +262,16 @@ const goNext = () => {
 }
 
 .next-card button {
+  /* uni-app button 默认带内边距且文本不居中，改为 flex 居中并清掉内边距 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: $tap-size;
+  padding: 0;
   border: 0;
   border-radius: $radius-xl;
-  background: linear-gradient(
-    135deg,
-    $color-primary-soft 0%,
-    $color-primary-dark 100%
-  );
+  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
   color: #fff;
   font-size: $font-size-body;
   font-weight: $font-weight-bold;

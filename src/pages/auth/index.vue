@@ -8,21 +8,14 @@
 
     <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
       <view class="hero-card">
-        <view class="landscape">
-          <view class="mountain mountain-back"></view>
-          <view class="mountain mountain-front"></view>
-          <view class="red-seal">落<br />笔</view>
-          <view class="hero-panel">
-            <view class="seal-mark">墨</view>
-            <text class="hero-kicker">丹青引客 · 启卷</text>
-          </view>
-        </view>
-        <text class="brand-title">落笔生花</text>
-        <text class="brand-subtitle">墨韵入画，落笔成境</text>
-      </view>
-
-      <view class="form-heading">
-        {{ isRegister ? "创建账号" : "账号密码登录" }}
+        <text class="auth-eyebrow">妙笔生花</text>
+        <text class="brand-subtitle">
+          {{
+            isRegister
+              ? "创建账号，收藏你的第一份灵感。"
+              : "登录后继续创作，查看你的作品。"
+          }}
+        </text>
       </view>
 
       <el-form
@@ -68,10 +61,7 @@
             autocomplete="current-password"
           >
             <template #suffix>
-              <text
-                class="eye-toggle"
-                @tap="isPasswordVisible = !isPasswordVisible"
-              >
+              <text class="eye-toggle" @tap="isPasswordVisible = !isPasswordVisible">
                 {{ isPasswordVisible ? "◉" : "◎" }}
               </text>
             </template>
@@ -79,11 +69,7 @@
         </el-form-item>
 
         <view v-if="isRegister" class="field-label">确认密码</view>
-        <el-form-item
-          v-if="isRegister"
-          prop="confirmPassword"
-          class="auth-form-item"
-        >
+        <el-form-item v-if="isRegister" prop="confirmPassword" class="auth-form-item">
           <el-input
             v-model="formModel.confirmPassword"
             class="field-input"
@@ -103,12 +89,8 @@
             <text class="link-text">《行卷隐私保护政策》</text>
           </text>
         </view>
-        <button
-          class="submit-button"
-          :disabled="isSubmitting"
-          @tap="handleSubmit"
-        >
-          {{ isRegister ? "创建丹青画境" : "开启丹青画境" }} <text>→</text>
+        <button class="submit-button" :disabled="isSubmitting" @tap="handleSubmit">
+          {{ isRegister ? "创建账号" : "登录" }} <text>→</text>
         </button>
       </el-form>
 
@@ -315,11 +297,16 @@ const handleSubmit = async () => {
 }
 
 .hero-card {
-  overflow: hidden;
-  padding-bottom: $space-8;
-  border-radius: $radius-xl;
-  background: #fff;
-  text-align: center;
+  padding: 36rpx 32rpx 32rpx;
+  text-align: left;
+}
+
+.auth-eyebrow {
+  display: block;
+  color: #3f6656;
+  font-size: 34rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
 }
 
 .landscape {
@@ -404,16 +391,16 @@ const handleSubmit = async () => {
 
 .brand-title {
   display: block;
-  margin-top: -$space-1;
-  color: #102b43;
-  font-size: 48rpx;
+  margin-top: 10rpx;
+  color: #183830;
+  font-size: 46rpx;
   font-weight: $font-weight-bold;
   line-height: 1.35;
 }
 
 .brand-subtitle {
   display: block;
-  margin-top: $space-1;
+  margin-top: 10rpx;
   color: #64778a;
   font-size: $font-size-body;
 }
@@ -533,6 +520,7 @@ const handleSubmit = async () => {
 .submit-button {
   width: 100%;
   height: 88rpx;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;

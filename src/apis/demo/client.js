@@ -5,17 +5,24 @@
  * 页面只依赖封装后的 API 方法，不感知 Mock 与真实请求的差异。
  */
 import { MOCK_DELAY, MOCK_SLOW_DELAY } from "@/apis/config";
-import { ERROR_CODES, MOCK_SCENARIOS, MOCK_SCENARIO_STORAGE_KEY } from "@/apis/constants";
+import {
+  ERROR_CODES,
+  MOCK_SCENARIOS,
+  MOCK_SCENARIO_STORAGE_KEY,
+} from "@/apis/constants";
 import { resolveMock } from "@/mock";
 import { ApiError } from "@/utils/request";
 
-const delay = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+const delay = (duration) =>
+  new Promise((resolve) => setTimeout(resolve, duration));
 
 // 读取本地 Mock 场景，未设置时走正常分支
 const readScenario = () => {
   const stored = uni.getStorageSync(MOCK_SCENARIO_STORAGE_KEY);
 
-  return Object.values(MOCK_SCENARIOS).includes(stored) ? stored : MOCK_SCENARIOS.NORMAL;
+  return Object.values(MOCK_SCENARIOS).includes(stored)
+    ? stored
+    : MOCK_SCENARIOS.NORMAL;
 };
 
 /**
@@ -24,6 +31,7 @@ const readScenario = () => {
  * @param {string} config.url 接口路径。
  * @param {string} [config.method] 请求方法，默认 GET。
  * @param {Object} [config.params] 请求参数。
+ * @param {boolean} [config.includeMessage] 是否在 data 上合并响应顶层 message，与真实请求行为一致。
  * @returns {Promise<*>} 接口 data。
  */
 export default async function demoRequest(config) {
@@ -41,6 +49,10 @@ export default async function demoRequest(config) {
 
   if (response.code !== ERROR_CODES.SUCCESS) {
     throw new ApiError(response.code, response.message, response.data);
+  }
+
+  if (config.includeMessage) {
+    return { ...response.data, message: response.message || "" };
   }
 
   return response.data;

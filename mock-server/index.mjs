@@ -40,7 +40,11 @@ const ERROR_MESSAGES = {
 /** 服务支持的端点，启动时打印便于联调。 */
 const ENDPOINTS = [
   "GET  /health",
+  "POST /auth/register",
+  "POST /auth/login",
+  "POST /auth/logout",
   "GET  /account/overview",
+  "GET  /points/myInfo",
   "GET  /home/overview",
   "GET  /workbench",
   "GET  /library",
@@ -59,7 +63,8 @@ const ENDPOINTS = [
   "POST /uploads/images",
 ];
 
-const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+const wait = (duration) =>
+  new Promise((resolve) => setTimeout(resolve, duration));
 
 // 读取 JSON 请求体，空请求体按 {} 处理
 const readJsonBody = (request) =>
@@ -107,7 +112,7 @@ const readScenario = (request, searchParams) => {
     request,
     searchParams,
     "x-mock-scenario",
-    "__mock_scenario__"
+    "__mock_scenario__",
   );
 
   return SCENARIOS.includes(scenario) ? scenario : MOCK_SCENARIOS.NORMAL;
@@ -115,7 +120,12 @@ const readScenario = (request, searchParams) => {
 
 // 读取调试用强制错误码，非法值忽略
 const readForceErrorCode = (request, searchParams) => {
-  const raw = readControl(request, searchParams, "x-mock-error", "__mock_error__");
+  const raw = readControl(
+    request,
+    searchParams,
+    "x-mock-error",
+    "__mock_error__",
+  );
   const code = Number(raw);
 
   return ERROR_MESSAGES[code] ? code : 0;
@@ -209,10 +219,15 @@ const handleRequest = async (request, response) => {
   if (forceErrorCode) {
     payload = buildErrorPayload(forceErrorCode);
   } else if (scenario === MOCK_SCENARIOS.FAILURE) {
-    payload = buildErrorPayload(ERROR_CODES.SERVER_ERROR, "模拟服务异常，请稍后重试");
+    payload = buildErrorPayload(
+      ERROR_CODES.SERVER_ERROR,
+      "模拟服务异常，请稍后重试",
+    );
   } else {
     const params =
-      method === "GET" ? readQueryParams(url.searchParams) : await readJsonBody(request);
+      method === "GET"
+        ? readQueryParams(url.searchParams)
+        : await readJsonBody(request);
 
     payload = resolveMock(method, pathname, params, scenario);
   }
@@ -223,7 +238,7 @@ const handleRequest = async (request, response) => {
   const duration = Date.now() - startedAt;
 
   console.log(
-    `[mock-server] ${method} ${pathname} → ${status} ${payload.code} (${duration}ms, ${scenario})`
+    `[mock-server] ${method} ${pathname} → ${status} ${payload.code} (${duration}ms, ${scenario})`,
   );
 };
 
@@ -233,7 +248,7 @@ const server = http.createServer((request, response) => {
       sendEnvelope(
         request,
         response,
-        buildErrorPayload(ERROR_CODES.INVALID_PARAMS, "请求体过大")
+        buildErrorPayload(ERROR_CODES.INVALID_PARAMS, "请求体过大"),
       );
       return;
     }
@@ -242,7 +257,7 @@ const server = http.createServer((request, response) => {
       sendEnvelope(
         request,
         response,
-        buildErrorPayload(ERROR_CODES.INVALID_PARAMS, "请求体不是合法 JSON")
+        buildErrorPayload(ERROR_CODES.INVALID_PARAMS, "请求体不是合法 JSON"),
       );
       return;
     }
@@ -251,14 +266,16 @@ const server = http.createServer((request, response) => {
     sendEnvelope(
       request,
       response,
-      buildErrorPayload(ERROR_CODES.SERVER_ERROR, "模拟服务处理请求失败")
+      buildErrorPayload(ERROR_CODES.SERVER_ERROR, "模拟服务处理请求失败"),
     );
   });
 });
 
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {
-    console.error(`[mock-server] 端口 ${PORT} 已被占用，请设置 MOCK_PORT 后重试`);
+    console.error(
+      `[mock-server] 端口 ${PORT} 已被占用，请设置 MOCK_PORT 后重试`,
+    );
   } else {
     console.error("[mock-server] 启动失败", error);
   }
@@ -268,7 +285,9 @@ server.on("error", (error) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`[mock-server] listening on http://${HOST}:${PORT}`);
-  console.log(`[mock-server] 默认延迟 ${MOCK_DELAY}ms，慢场景 ${MOCK_SLOW_DELAY}ms`);
+  console.log(
+    `[mock-server] 默认延迟 ${MOCK_DELAY}ms，慢场景 ${MOCK_SLOW_DELAY}ms`,
+  );
   console.log("[mock-server] endpoints:");
   ENDPOINTS.forEach((endpoint) => console.log(`  ${endpoint}`));
 });

@@ -1,7 +1,14 @@
 <template>
   <!-- #ifdef H5 -->
   <view class="video-render-page">
-    <app-page-header title="画质与渲染" />
+    <app-page-header title="生成视频" />
+    <view class="step-bar">
+      <view class="step done" @click="goPreviousStep">
+        <i>1</i><text>规制与意境</text>
+      </view>
+      <view class="step-connector"></view>
+      <view class="step active"><i>2</i><text>画质与渲染</text></view>
+    </view>
     <scroll-view scroll-y :show-scrollbar="false" class="content">
       <el-form
         ref="formRef"
@@ -10,32 +17,9 @@
         label-position="top"
         class="render-form"
       >
-        <view class="compact-steps">
-          <view class="compact-step is-done" @click="goPreviousStep">
-            <view class="step-check">
-              <el-icon><Check /></el-icon>
-            </view>
-            <text>01 规制与意境</text>
-          </view>
-          <view class="step-link"></view>
-          <view class="compact-step is-active">
-            <text class="step-number">02</text>
-            <text>画质与渲染</text>
-          </view>
-          <view class="power-pill">
-            <el-icon class="power-icon"><StarFilled /></el-icon>
-            <text class="power-value">{{ renderConfig.power }}</text>
-            <text>算力</text>
-          </view>
-        </view>
-
         <view class="preview-card">
           <view class="preview-thumb">
-            <app-image
-              class="preview-image"
-              :src="previewSource"
-              mode="aspectFill"
-            />
+            <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
             <text class="preview-badge">影片</text>
           </view>
           <view class="preview-info">
@@ -129,11 +113,7 @@
     </scroll-view>
 
     <view class="bottom-bar">
-      <el-button
-        class="previous-button"
-        :disabled="isSubmitting"
-        @click="goPreviousStep"
-      >
+      <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
         <el-icon><ArrowLeft /></el-icon>
         上一步
       </el-button>
@@ -175,7 +155,7 @@
 
   <!-- #ifndef H5 -->
   <view class="platform-unavailable">
-    <app-page-header title="画质与渲染" />
+    <app-page-header title="生成视频" />
     <text class="platform-tip">
       视频创作依赖 Element Plus，请使用 H5 端体验完整交互。
     </text>
@@ -194,16 +174,12 @@ import {
   Check,
   InfoFilled,
   Lightning,
-  StarFilled,
   VideoPlay,
 } from "@element-plus/icons-vue";
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
-import {
-  createVideoGeneration,
-  getVideoTaskStatus,
-} from "@/apis/video-creation";
+import { createVideoGeneration, getVideoTaskStatus } from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -249,14 +225,12 @@ const taskStatusData = ref(null);
 
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
 
-const taskStage = computed(
-  () => taskStatusData.value?.stageLabel || "云端逐帧重绘",
-);
+const taskStage = computed(() => taskStatusData.value?.stageLabel || "云端逐帧重绘");
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.note ||
-    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
+    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。"
 );
 
 const { start: startPolling } = useTaskPolling({
@@ -425,7 +399,7 @@ onShow(() => {
 }
 
 .content {
-  height: calc(100vh - 240rpx - var(--status-bar-height, 0px));
+  height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
   padding: $space-4 $space-7 $space-9;
   box-sizing: border-box;
@@ -439,86 +413,69 @@ onShow(() => {
   width: 100%;
 }
 
-/* 步骤条 */
-.compact-steps {
+/* 步骤条：与文字生图页统一样式 */
+.step-bar {
+  height: 82rpx;
+  margin: $space-3 $space-7 0;
+  padding: $space-1;
   display: flex;
   align-items: center;
-  gap: $space-2;
-  padding: $space-2 $space-1 $space-5;
+  border: 1rpx solid rgba(63, 102, 86, 0.12);
+  border-radius: $radius-2xl;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
-.compact-step {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: $space-1;
+.step {
+  flex: 1;
+  padding: $space-2 0;
+  border-radius: $radius-md;
   color: $color-muted;
+  text-align: center;
   font-size: $font-size-caption;
+  white-space: nowrap;
 }
 
-.compact-step.is-done {
-  color: $color-primary-soft;
-}
-
-.step-check {
-  display: flex;
+.step i {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34rpx;
-  height: 34rpx;
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: $space-1;
   border-radius: 50%;
-  background: $color-primary;
-  color: #fff;
+  background: #dfdfd5;
+  color: $color-muted;
+  font-style: normal;
   font-size: $font-size-badge;
 }
 
-.step-link {
+.step-connector {
   flex: 1;
   height: 2rpx;
-  background: #cfe3db;
+  margin: 0 $space-3;
+  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
 }
 
-.step-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34rpx;
-  height: 34rpx;
-  border-radius: 50%;
+.step.done {
+  color: $color-primary-soft;
+
+  i {
+    background: $color-primary-light;
+    color: $color-primary;
+  }
+}
+
+.step.active {
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-badge;
   font-weight: $font-weight-bold;
-  @include numeric;
-}
 
-.compact-step.is-active {
-  color: $color-ink;
-  font-weight: $font-weight-bold;
-}
-
-.power-pill {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 6rpx;
-  margin-left: auto;
-  padding: $space-1 $space-3;
-  border-radius: $radius-md;
-  background: $color-primary-light;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
-}
-
-.power-icon {
-  color: $color-primary;
-  font-size: $font-size-badge;
-}
-
-.power-value {
-  color: $color-primary;
-  font-weight: $font-weight-bold;
-  @include numeric;
+  i {
+    /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+  }
 }
 
 /* 动卷预览 */
@@ -883,15 +840,15 @@ onShow(() => {
 }
 
 .previous-button {
-  width: 180rpx;
+  width: 150rpx;
   flex-shrink: 0;
   height: $tap-size;
   margin: 0;
   border: 1rpx solid $color-line;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   background: $color-surface;
   color: $color-ink-soft;
-  font-size: $font-size-caption;
+  font-size: $font-size-body;
 
   &:hover {
     border-color: #bfd8ce;

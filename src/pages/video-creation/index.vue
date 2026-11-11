@@ -1,7 +1,12 @@
 <template>
   <!-- #ifdef H5 -->
   <view class="video-creation-page">
-    <app-page-header title="规制与意境" />
+    <app-page-header title="生成视频" />
+    <view class="step-bar">
+      <view class="step active"> <i>1</i><text>规制与意境</text> </view>
+      <view class="step-connector"></view>
+      <view class="step inactive"><i>2</i><text>画质与渲染</text></view>
+    </view>
     <scroll-view
       scroll-y
       :show-scrollbar="false"
@@ -15,34 +20,6 @@
         label-position="top"
         class="creation-form"
       >
-        <view class="flow-card">
-          <view class="flow-head">
-            <text class="flow-kicker">创作流程</text>
-            <view class="power-pill">
-              <el-icon class="power-icon"><StarFilled /></el-icon>
-              <text>余量</text>
-              <text class="power-value">{{ power }}</text>
-              <text>算力</text>
-            </view>
-          </view>
-          <view class="flow-steps">
-            <view
-              v-for="(step, index) in flowSteps"
-              :key="step.title"
-              class="flow-step"
-              :class="{ 'is-active': index === 0 }"
-            >
-              <text class="step-index">{{ step.index }}</text>
-              <view class="step-copy">
-                <text class="step-name">{{ step.title }}</text>
-                <text class="step-status">
-                  {{ index === 0 ? "进行中" : "待开启" }}
-                </text>
-              </view>
-            </view>
-          </view>
-        </view>
-
         <view class="section-head">
           <view class="section-title">
             <view class="section-bar"></view>
@@ -64,17 +41,12 @@
                 <view class="ratio-info">
                   <view class="ratio-name">
                     <text>{{ ratio.name }}</text>
-                    <text v-if="ratio.recommended" class="recommend">
-                      默认推荐
-                    </text>
+                    <text v-if="ratio.recommended" class="recommend"> 默认推荐 </text>
                   </view>
                   <text class="ratio-desc">{{ ratio.description }}</text>
                 </view>
               </view>
-              <el-icon
-                v-if="formData.ratio === ratio.value"
-                class="ratio-check"
-              >
+              <el-icon v-if="formData.ratio === ratio.value" class="ratio-check">
                 <Check />
               </el-icon>
             </el-radio>
@@ -172,10 +144,6 @@
     </scroll-view>
 
     <view class="bottom-bar" :style="barKeyboardStyle">
-      <view class="step-note">
-        <text>当前步骤 1/2</text>
-        <text class="step-emphasis">画幅与词藻已备</text>
-      </view>
       <el-button
         class="next-button"
         :loading="isSubmitting"
@@ -191,7 +159,7 @@
 
   <!-- #ifndef H5 -->
   <view class="platform-unavailable">
-    <app-page-header title="规制与意境" />
+    <app-page-header title="生成视频" />
     <text class="platform-tip">
       视频创作依赖 Element Plus，请使用 H5 端体验完整交互。
     </text>
@@ -211,7 +179,6 @@ import {
   PictureFilled,
   Plus,
   RefreshLeft,
-  StarFilled,
   Upload,
   VideoCamera,
 } from "@element-plus/icons-vue";
@@ -226,10 +193,6 @@ import { chooseSingleImage } from "@/utils/image-picker";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
 import { getErrorMessage } from "@/utils/request";
 
-const flowSteps = [
-  { index: "01", title: "规制与意境" },
-  { index: "02", title: "画质与渲染" },
-];
 const ratios = [
   {
     ratioId: 1,
@@ -256,7 +219,6 @@ const modes = [
   { modeId: "image", name: "图卷生动境" },
 ];
 const suggestions = ["清溪泛舟", "浮岚暖翠", "寒江雪霁", "竹影摇曳"];
-const power = 800;
 const promptLimit = 300;
 const polishSuffix = "水波微澜，晨雾轻笼，气韵徐徐流转";
 const selectedImage = ref(null);
@@ -283,7 +245,7 @@ const imageTitle = computed(() => selectedImage.value?.name || "传入一张图�
 const imageHint = computed(() =>
   selectedImage.value
     ? "点击更换图卷，将以图卷起点延展运镜"
-    : "从相册选择或拍摄，作为动卷起点",
+    : "从相册选择或拍摄，作为动卷起点"
 );
 
 /**
@@ -351,7 +313,7 @@ const polishPrompt = () => {
   formData.prompt = polishPromptText(
     formData.prompt.trim(),
     suffix,
-    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`,
+    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`
   );
 };
 
@@ -384,9 +346,7 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.find(
-    (ratio) => ratio.value === formData.ratio,
-  );
+  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {
@@ -426,7 +386,7 @@ const goNext = async () => {
 
 .content {
   --content-bottom-pad: #{$space-9};
-  height: calc(100vh - 240rpx - var(--status-bar-height, 0px));
+  height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
   padding: $space-5 $space-7 var(--content-bottom-pad);
   box-sizing: border-box;
@@ -440,121 +400,60 @@ const goNext = async () => {
   width: 100%;
 }
 
-/* 创作流程 */
-.flow-card {
-  padding: $space-6 $space-5;
+/* 步骤条：与文字生图页统一样式 */
+.step-bar {
+  height: 82rpx;
+  margin: $space-3 $space-7 0;
+  padding: $space-1;
+  display: flex;
+  align-items: center;
+  border: 1rpx solid rgba(63, 102, 86, 0.12);
   border-radius: $radius-2xl;
-  background: $color-surface;
-  box-shadow: $shadow-card;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
-.flow-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-}
-
-.flow-kicker {
-  flex-shrink: 0;
-  color: $color-primary;
-  font-size: $font-size-caption;
-
-  &::before {
-    display: inline-block;
-    width: 14rpx;
-    height: 14rpx;
-    margin-right: $space-2;
-    border-radius: 50%;
-    background: #4cbfa6;
-    content: "";
-  }
-}
-
-.power-pill {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 6rpx;
-  padding: $space-1 $space-3;
-  border-radius: $radius-md;
-  background: $color-primary-light;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
-}
-
-.power-icon {
-  color: $color-primary;
-  font-size: $font-size-badge;
-}
-
-.power-value {
-  color: $color-primary;
-  font-weight: $font-weight-bold;
-  @include numeric;
-}
-
-.flow-steps {
-  display: flex;
-  gap: $space-3;
-  margin-top: $space-5;
-}
-
-.flow-step {
-  display: flex;
+.step {
   flex: 1;
-  align-items: center;
-  gap: $space-3;
-  min-width: 0;
-}
-
-.step-index {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 50%;
-  background: $color-primary-light;
-  color: $color-ink-soft;
+  padding: $space-2 0;
+  border-radius: $radius-md;
+  color: $color-muted;
+  text-align: center;
   font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
-  @include numeric;
-}
-
-.flow-step.is-active .step-index {
-  background: $color-primary;
-  color: #fff;
-}
-
-.step-copy {
-  min-width: 0;
-}
-
-.step-name {
-  display: block;
-  overflow: hidden;
-  color: $color-ink-soft;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.flow-step.is-active .step-name {
-  color: $color-ink;
-}
-
-.step-status {
-  display: block;
-  margin-top: 4rpx;
+.step i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: $space-1;
+  border-radius: 50%;
+  background: #dfdfd5;
   color: $color-muted;
+  font-style: normal;
   font-size: $font-size-badge;
 }
 
-.flow-step.is-active .step-status {
-  color: $color-primary-soft;
+.step-connector {
+  flex: 1;
+  height: 2rpx;
+  margin: 0 $space-3;
+  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+}
+
+.step.active {
+  background: $color-primary;
+  color: #fff;
+  font-weight: $font-weight-bold;
+
+  i {
+    /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+  }
 }
 
 /* 画幅规制 */
@@ -981,29 +880,11 @@ const goNext = async () => {
   @include action-bar;
   display: flex;
   align-items: center;
-  gap: $space-4;
-}
-
-.step-note {
-  width: 200rpx;
-  flex-shrink: 0;
-}
-
-.step-note text {
-  display: block;
-  color: $color-muted;
-  font-size: $font-size-badge;
-}
-
-.step-note .step-emphasis {
-  margin-top: 4rpx;
-  color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
 }
 
 .next-button {
   flex: 1;
+  width: 100%;
   height: $tap-size;
   min-width: 0;
   margin: 0;

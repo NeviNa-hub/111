@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from "@/apis/http";
 
 /**
  * 上传图片。
@@ -7,7 +7,7 @@ import request from "@/utils/request";
  */
 export const uploadImage = (params = {}) => {
   return request({
-    url: "/upl  oads/images",
+    url: "/uploads/images",
     method: "POST",
     params,
   });

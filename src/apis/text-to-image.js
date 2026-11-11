@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from "@/apis/http";
 
 /**
  * 创建文字生图任务。

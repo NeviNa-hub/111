@@ -9,29 +9,19 @@
           {{ selectedImage ? "更换图片" : "导入图片" }}
         </button>
       </view>
-      <view
-        class="preview"
-        :class="{ empty: !selectedImage }"
-        @click="chooseImage"
-      >
+      <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
         <app-image
           v-if="selectedImage"
           class="preview-media"
           :src="selectedImage.url || selectedImage.path"
           mode="aspectFit"
         />
-        <text v-else class="empty-tip">
-          ＋<small>从相册选择或拍摄图片</small>
-        </text>
+        <text v-else class="empty-tip"> ＋<small>从相册选择或拍摄图片</small> </text>
         <text v-if="selectedImage" class="cover"> 已选封面</text>
-        <text v-if="selectedImage" class="ready">
-          原图解析就绪 · 4K重绘待命</text
-        >
+        <text v-if="selectedImage" class="ready"> 原图解析就绪 · 4K重绘待命</text>
         <text v-if="selectedImage" class="zoom">⌕</text>
       </view>
-      <view class="hint" @click="chooseImage"
-        >　点击重新从系统相册导入或拍摄</view
-      >
+      <view class="hint" @click="chooseImage">　点击重新从系统相册导入或拍摄</view>
       <view class="heading">
         优化提示词 <small>{{ prompt.length }} / {{ promptLimit }} 字</small>
       </view>
@@ -50,13 +40,8 @@
         <text>预计消耗 {{ costText }} 灵感点</text>
         <text>账户结余以实际扣减为准</text>
       </view>
-      <button
-        :disabled="!selectedImage || isSubmitting"
-        @click="startOptimization"
-      >
-        {{
-          isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）`
-        }}
+      <button :disabled="!selectedImage || isSubmitting" @click="startOptimization">
+        {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
       </button>
       <text>云端蒸馏级处理 · 支持高清直存至作品库</text>
     </view>
@@ -126,7 +111,7 @@ const startOptimization = async () => {
 
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
-        task.task_id,
+        task.task_id
       )}`,
     });
   } catch (error) {
@@ -329,8 +314,13 @@ const startOptimization = async () => {
 }
 
 .actions button {
+  /* uni-app button 默认带内边距且文本不居中，改为 flex 居中并清掉内边距 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: $tap-size;
+  padding: 0;
   border: 0;
   border-radius: $radius-xl;
   background: $color-primary;

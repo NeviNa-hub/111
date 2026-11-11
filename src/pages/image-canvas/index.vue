@@ -1,10 +1,12 @@
 <template>
   <view class="canvas-page">
-    <app-page-header title="设定画幅" />
+    <app-page-header title="文字生图" />
     <view class="step-bar">
-      <view class="step done">一构思</view>
-      <view class="step done">二画风</view>
-      <view class="step active">三规划成画</view>
+      <view class="step done"><i>1</i><text>落墨构想</text></view>
+      <view class="step-connector"></view>
+      <view class="step done"><i>2</i><text>甄选画风</text></view>
+      <view class="step-connector"></view>
+      <view class="step active"><i>3</i><text>设定画幅</text></view>
     </view>
     <scroll-view scroll-y :show-scrollbar="false" class="content">
       <text class="step-count">步骤 3 / 3</text>
@@ -18,9 +20,7 @@
           <view class="summary-row">构想意境　{{ options.prompt }}</view>
           <view class="summary-row">甄选画风　{{ options.style }}</view>
         </view>
-        <view class="section-title">
-          画幅比例 <text>影响构图与空间意象</text>
-        </view>
+        <view class="section-title"> 画幅比例 <text>影响构图与空间意象</text> </view>
         <view class="ratio-grid">
           <view
             v-for="ratio in options.ratios"
@@ -32,9 +32,7 @@
             <view class="ratio-icon"></view>
             <text class="ratio-name">{{ ratio.name }}</text>
             <text class="ratio-desc">{{ ratio.description }}</text>
-            <text v-if="selectedRatio === ratio.value" class="chosen">
-              已选
-            </text>
+            <text v-if="selectedRatio === ratio.value" class="chosen"> 已选 </text>
           </view>
         </view>
         <view class="cost-card">
@@ -60,11 +58,7 @@ import { onShow } from "@dcloudio/uni-app";
 
 import { createImageGeneration } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import {
-  DRAFT_KEYS,
-  readCreationDraft,
-  saveCreationDraft,
-} from "@/utils/creation-draft";
+import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
 import { getErrorMessage } from "@/utils/request";
 
 const options = ref({
@@ -82,7 +76,7 @@ const pointsBalance = ref(800);
 const isSubmitting = ref(false);
 
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value,
+  pointsBalance.value === null ? "—" : pointsBalance.value
 );
 
 const selectedCost = 2;
@@ -127,7 +121,7 @@ const generate = async () => {
     saveCreationDraft(DRAFT_KEYS.image, requestData);
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
-        task.task_id,
+        task.task_id
       )}`,
     });
   } catch (error) {
@@ -160,34 +154,66 @@ onShow(() => {
 
 .step-bar {
   height: 82rpx;
-  margin: 18rpx $space-7 0;
+  margin: $space-3 $space-7 0;
   padding: $space-1;
   display: flex;
   align-items: center;
-  border: 1rpx solid $color-line;
+  border: 1rpx solid rgba(63, 102, 86, 0.12);
   border-radius: $radius-2xl;
-  background: $color-surface;
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 $space-1;
+  padding: $space-2 0;
   border-radius: $radius-md;
-  color: $color-faint;
+  color: $color-muted;
   text-align: center;
   font-size: $font-size-caption;
   white-space: nowrap;
 }
 
+.step i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: $space-1;
+  border-radius: 50%;
+  background: #dfdfd5;
+  color: $color-muted;
+  font-style: normal;
+  font-size: $font-size-badge;
+}
+
+.step-connector {
+  flex: 1;
+  height: 2rpx;
+  margin: 0 $space-3;
+  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+}
+
 .step.done {
   color: $color-primary-soft;
+
+  i {
+    background: $color-primary-light;
+    color: $color-primary;
+  }
 }
 
 .step.active {
   background: $color-primary;
   color: #fff;
   font-weight: $font-weight-bold;
+
+  i {
+    /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+  }
 }
 
 .content {
@@ -358,7 +384,12 @@ onShow(() => {
 }
 
 .bottom-actions button {
+  /* uni-app button 默认带内边距且文本不居中，改为 flex 居中并清掉内边距 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: $tap-size;
+  padding: 0;
   border-radius: $radius-md;
   font-size: $font-size-body;
   line-height: 1;
@@ -369,7 +400,7 @@ onShow(() => {
 }
 
 .previous {
-  width: 160rpx;
+  width: 150rpx;
   flex-shrink: 0;
   border: 1rpx solid $color-line;
   background: $color-surface;

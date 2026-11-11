@@ -1,10 +1,10 @@
 <template>
   <view class="style-page">
-    <app-page-header title="挑选画风" />
+    <app-page-header title="文字生图" />
     <view class="step-bar">
-      <view class="step done">一构思</view>
-      <view class="step active">二甄选画风</view>
-      <view class="step">三规划成画</view>
+      <view class="step done"><i>1</i><text>落墨构想</text></view>
+      <view class="step-connector"></view>
+      <view class="step active"><i>2</i><text>甄选画风</text></view>
     </view>
     <scroll-view
       scroll-y
@@ -37,11 +37,7 @@
         <text>灵感引线（轻触即添）</text><text>点击注入画面要素</text>
       </view>
       <view class="suggestions">
-        <button
-          v-for="item in suggestions"
-          :key="item"
-          @click="appendPrompt(item)"
-        >
+        <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
           ＋ {{ item }}
         </button>
       </view>
@@ -100,36 +96,22 @@ import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 import { TASK_STATUS } from "@/apis/constants";
-import {
-  createImageGeneration,
-  getImageTaskStatus,
-} from "@/apis/text-to-image";
+import { createImageGeneration, getImageTaskStatus } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
 import useTaskPolling from "@/hooks/useTaskPolling";
-import {
-  DRAFT_KEYS,
-  readCreationDraft,
-  saveCreationDraft,
-} from "@/utils/creation-draft";
+import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
 import { getErrorMessage, isApiError } from "@/utils/request";
 
 const selectedStyle = ref("");
 const prompt = ref("");
 const promptLimit = 500;
-const suggestions = [
-  "江南烟雨",
-  "宋代山水",
-  "青绿设色",
-  "晨曦微光",
-  "枯墨留白",
-];
+const suggestions = ["江南烟雨", "宋代山水", "青绿设色", "晨曦微光", "枯墨留白"];
 const polishSuffix = "画面空灵雅致，留白自然，笔触细腻";
-const randomPromptText =
-  "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
+const randomPromptText = "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
 const estimatedTime = "约 6~8 秒";
 const generationCost = 2;
 const TASK_STAGE_TEXT = {
@@ -139,8 +121,7 @@ const TASK_STAGE_TEXT = {
   [TASK_STATUS.FAILED]: "生成失败",
 };
 const TASK_NOTE_TEXT = {
-  [TASK_STATUS.PENDING]:
-    "任务已创建，正在排队等待云端处理，离开页面不影响生成。",
+  [TASK_STATUS.PENDING]: "任务已创建，正在排队等待云端处理，离开页面不影响生成。",
   [TASK_STATUS.PROCESSING]: "云端研墨中，离开页面或切换画风不影响生成。",
   [TASK_STATUS.COMPLETED]: "画卷已完成，可轻触画卷放大查看或前往作品库。",
 };
@@ -166,18 +147,14 @@ const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 
-const taskStage = computed(
-  () => TASK_STAGE_TEXT[taskStatus.value] || "任务已创建",
-);
+const taskStage = computed(() => TASK_STAGE_TEXT[taskStatus.value] || "任务已创建");
 
 const taskNote = computed(() => {
   if (taskStatus.value === TASK_STATUS.FAILED) {
     return taskMessage.value || "生成失败，请返回重新尝试。";
   }
 
-  return (
-    TASK_NOTE_TEXT[taskStatus.value] || TASK_NOTE_TEXT[TASK_STATUS.PENDING]
-  );
+  return TASK_NOTE_TEXT[taskStatus.value] || TASK_NOTE_TEXT[TASK_STATUS.PENDING];
 });
 
 const { start: startPolling } = useTaskPolling({
@@ -218,7 +195,7 @@ const polishPrompt = () => {
   prompt.value = polishPromptText(
     prompt.value,
     polishSuffix,
-    `江南烟雨中的远山与归舟，${polishSuffix}`,
+    `江南烟雨中的远山与归舟，${polishSuffix}`
   );
 };
 
@@ -342,38 +319,66 @@ onShow(() => {
 
 .step-bar {
   height: 82rpx;
-  margin: 18rpx $space-7 0;
+  margin: $space-3 $space-7 0;
   padding: $space-1;
   display: flex;
   align-items: center;
-  border: 1rpx solid $color-line;
+  border: 1rpx solid rgba(63, 102, 86, 0.12);
   border-radius: $radius-2xl;
-  background: $color-surface;
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 $space-1;
+  padding: $space-2 0;
   border-radius: $radius-md;
-  color: $color-faint;
+  color: $color-muted;
   text-align: center;
   font-size: $font-size-caption;
   white-space: nowrap;
 }
 
+.step i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: $space-1;
+  border-radius: 50%;
+  background: #dfdfd5;
+  color: $color-muted;
+  font-style: normal;
+  font-size: $font-size-badge;
+}
+
+.step-connector {
+  flex: 1;
+  height: 2rpx;
+  margin: 0 $space-3;
+  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+}
+
 .step.done {
   color: $color-primary-soft;
+
+  i {
+    background: $color-primary-light;
+    color: $color-primary;
+  }
 }
 
 .step.active {
   background: $color-primary;
   color: #fff;
   font-weight: $font-weight-bold;
-}
 
-.step-bar .step:nth-child(3) {
-  display: none;
+  i {
+    /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+  }
 }
 
 .content-state {
@@ -515,7 +520,12 @@ onShow(() => {
 }
 
 .bottom-actions button {
+  /* uni-app button 默认带内边距且文本不居中，改为 flex 居中并清掉内边距 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: $tap-size;
+  padding: 0;
   border-radius: $radius-md;
   font-size: $font-size-body;
   line-height: 1;

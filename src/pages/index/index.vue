@@ -1,29 +1,25 @@
-﻿<template>
+<template>
   <view class="home-page">
     <app-page-header title="妙笔生花" />
 
     <scroll-view scroll-y :show-scrollbar="false" class="main-scroll">
-      <view>
-        <!-- 欢迎语 -->
+      <view class="page-body">
+        <!-- 问候语 -->
         <view class="greeting-row">
           <view class="greeting-left">
             <text class="greeting-title">东方意象美学</text>
             <view class="greeting-marquee">
-              <view class="marquee-track">
-                以笔为引，以意生花 · 极简智能多模态创作
-              </view>
+              <view class="marquee-track"> 以笔为引，以意生花 · 极简智能多模态创作 </view>
             </view>
           </view>
           <text class="weather">{{ weatherText }}</text>
         </view>
-        <!-- 推荐创作 -->
+
+        <!-- 今日推荐 -->
+        <view class="config-title"><em>壹 ·</em> 今日推荐</view>
         <view class="hero-card">
           <view class="hero-art">
-            <app-image
-              class="hero-image"
-              :src="hero.image_url"
-              mode="aspectFill"
-            />
+            <app-image class="hero-image" :src="hero.image_url" mode="aspectFill" />
             <view class="hero-label">{{ hero.label }}</view>
             <view class="hero-caption">{{ hero.caption }}</view>
             <view class="hero-hint">提示词：{{ hero.prompt }}</view>
@@ -31,25 +27,14 @@
           <view class="hero-footer">
             <view class="hero-meta">
               <text class="meta-title">{{ hero.model_name }}</text>
-              <text class="meta-subtitle"
-                >已生成 {{ generatedCountText }} 次</text
-              >
+              <text class="meta-subtitle">已生成 {{ generatedCountText }} 次</text>
             </view>
-            <button class="try-button" @click="handleTryCreation">
-              同款创作
-            </button>
+            <button class="try-button" @click="handleTryCreation">同款创作</button>
           </view>
         </view>
 
         <!-- 灵感工坊，展示推荐的创作模式 -->
-        <view class="section-heading">
-          <text class="section-title">灵感工坊</text>
-          <text class="section-page">
-            {{ currentCreation + 1 }}
-            <text class="muted">/ {{ creationCount }}</text>
-          </text>
-        </view>
-        <!-- 创作模式卡片 -->
+        <view class="config-title workshop-title"><em>贰 ·</em> 灵感工坊</view>
         <view
           v-if="creations.length"
           class="carousel-stage"
@@ -99,6 +84,7 @@
             @click="selectCreation(index - 1)"
           ></text>
         </view>
+
         <view class="quote">{{ quote }}</view>
       </view>
     </scroll-view>
@@ -170,7 +156,7 @@ const weatherText = computed(() => homeData.weather_text);
 const quote = computed(() => homeData.quote);
 const hero = computed(() => homeData.hero);
 const generatedCountText = computed(() =>
-  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+  String(hero.value.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 );
 
 // 开始同款创作
@@ -217,9 +203,7 @@ const getCardPosition = (index) => {
     return "active";
   }
 
-  return index === (currentCreation.value + 1) % creationCount.value
-    ? "right"
-    : "left";
+  return index === (currentCreation.value + 1) % creationCount.value ? "right" : "left";
 };
 
 /**
@@ -247,7 +231,7 @@ const handleTouchEnd = (event) => {
 
   if (distance > 50) {
     selectCreation(
-      (currentCreation.value - 1 + creationCount.value) % creationCount.value,
+      (currentCreation.value - 1 + creationCount.value) % creationCount.value
     );
   }
 
@@ -273,6 +257,10 @@ const handleTouchEnd = (event) => {
   box-sizing: border-box;
 }
 
+.page-body {
+  padding-top: $space-2;
+}
+
 .home-state {
   margin-top: $space-6;
 
@@ -286,6 +274,7 @@ const handleTouchEnd = (event) => {
   }
 }
 
+/* 问候语 */
 .greeting-row {
   display: flex;
   align-items: center;
@@ -351,6 +340,23 @@ const handleTouchEnd = (event) => {
   font-size: $font-size-caption;
 }
 
+/* 区块标题：与创作页“壹 ·/贰 ·”序号样式统一 */
+.config-title {
+  padding-bottom: $space-5;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+}
+
+.config-title em {
+  color: $color-accent-clay;
+}
+
+.workshop-title {
+  margin-top: $space-7;
+}
+
+/* 今日推荐 */
 .hero-card {
   padding: $space-6;
   overflow: hidden;
@@ -468,26 +474,7 @@ const handleTouchEnd = (event) => {
   border: 0;
 }
 
-.section-heading {
-  display: flex;
-  align-items: center;
-  margin: $space-4 $space-1 0;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-}
-
-.section-page {
-  margin-left: auto;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
-  @include numeric;
-}
-
-.muted {
-  color: $color-faint;
-}
-
+/* 灵感工坊轮播 */
 .carousel-stage {
   position: relative;
   display: flex;
@@ -515,10 +502,7 @@ const handleTouchEnd = (event) => {
   box-sizing: border-box;
   border: 1rpx solid rgba(255, 255, 255, 0.9);
   border-radius: 48rpx;
-  transition:
-    transform 0.6s ease,
-    opacity 0.6s ease,
-    filter 0.6s ease;
+  transition: transform 0.6s ease, opacity 0.6s ease, filter 0.6s ease;
   pointer-events: none;
 }
 
@@ -658,10 +642,18 @@ const handleTouchEnd = (event) => {
   background: $color-primary-soft;
 }
 
+/* 底部卷尾语 */
 .quote {
-  padding-bottom: $space-5;
+  padding: $space-5 0;
   color: $color-muted;
   font-size: $font-size-caption;
   text-align: center;
+
+  &::before,
+  &::after {
+    margin: 0 $space-2;
+    color: $color-accent-clay;
+    content: "—";
+  }
 }
 </style>
