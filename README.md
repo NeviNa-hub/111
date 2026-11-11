@@ -56,9 +56,12 @@ src/
 
 
 ### 首页 · 文稿库
+<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/ddd86b69-4b01-46ad-8e8f-dbe8f2e1954b" />
 
 
 ### 创作台
+<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/54831963-e3dc-4f8c-bd6b-cfdd31806c85" />
+<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/187da5c2-0c1d-4e57-9c6a-bd968de786c5" />
 
 
 
@@ -79,9 +82,12 @@ src/
 
 
 ### 我的
+<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/19737a85-74ef-4788-843a-8d67e8db4263" />
+![Uploading image.png…]()
 
 
 
 ### 工作坊
+<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/2a5e88a4-4bf5-4e38-93fc-85d964dbbcac" />
 
 
