@@ -27,11 +27,7 @@
       <text class="dialog-note">{{ note }}</text>
       <!-- #ifdef H5 -->
       <view class="dialog-actions">
-        <el-button
-          class="cancel-button"
-          :disabled="loading"
-          @click="$emit('cancel')"
-        >
+        <el-button class="cancel-button" :disabled="loading" @click="$emit('cancel')">
           再斟酌下
         </el-button>
         <el-button
@@ -47,18 +43,10 @@
       <!-- #endif -->
       <!-- #ifndef H5 -->
       <view class="dialog-actions">
-        <button
-          class="cancel-button"
-          :disabled="loading"
-          @click="$emit('cancel')"
-        >
+        <button class="cancel-button" :disabled="loading" @click="$emit('cancel')">
           再斟酌下
         </button>
-        <button
-          class="confirm-button"
-          :disabled="loading"
-          @click="$emit('confirm')"
-        >
+        <button class="confirm-button" :disabled="loading" @click="$emit('confirm')">
           {{ loading ? "任务创建中…" : confirmText }}
         </button>
       </view>
@@ -82,8 +70,7 @@ defineProps({
   /** 弹窗说明。 */
   note: {
     type: String,
-    default:
-      "确认后将送往云端研磨，期间离开或切换页面均不影响生成，可在作品库静候收卷。",
+    default: "确认后将送往云端研磨，期间离开或切换页面均不影响生成，可在作品库静候收卷。",
   },
   /** 确认按钮文案。 */
   confirmText: { type: String, default: "确认研墨成画" },
@@ -106,40 +93,40 @@ defineEmits(["cancel", "confirm"]);
 
 .dialog-sheet {
   width: 100%;
-  padding: $space-7 $space-6;
-  padding-bottom: calc(#{$space-5} + constant(safe-area-inset-bottom));
-  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
-  border-radius: $radius-3xl $radius-3xl 0 0;
+  padding: 32rpx 28rpx;
+  padding-bottom: calc(#{24rpx} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
+  border-radius: 32rpx 32rpx 0 0;
   background: $color-surface;
   box-sizing: border-box;
 
   --el-color-primary: #{$color-primary};
-  --el-border-radius-base: #{$radius-lg};
+  --el-border-radius-base: #{20rpx};
   --el-font-family: #{$font-family-base};
 }
 
 .dialog-title {
-  padding-bottom: $space-4;
+  padding-bottom: 20rpx;
   border-bottom: 1rpx solid $color-line;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .dialog-meta {
-  margin-top: $space-3;
-  padding: $space-3 $space-4;
-  border: 1rpx solid $color-warning-line;
-  border-radius: $radius-lg;
-  background: $color-warning-bg;
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  border: 1rpx solid #f0e0bd;
+  border-radius: 20rpx;
+  background: #fdf6e8;
 
   view {
     display: flex;
     align-items: center;
     min-height: 56rpx;
     color: #746c5b;
-    font-size: $font-size-caption;
+    font-size: 24rpx;
   }
 
   view + view {
@@ -150,35 +137,35 @@ defineEmits(["cancel", "confirm"]);
 .meta-icon {
   width: 38rpx;
   color: $color-warning;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .meta-value {
   margin-left: auto;
   color: #a65d17;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .dialog-note {
   display: block;
-  margin: $space-4 $space-1 $space-5;
+  margin: 20rpx 8rpx 24rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 .dialog-actions {
   display: flex;
-  gap: $space-3;
+  gap: 16rpx;
 
   :deep(.el-button) {
     flex: 1;
     height: $tap-size;
     margin: 0;
-    border-radius: $radius-lg;
-    font-size: $font-size-aux;
+    border-radius: 20rpx;
+    font-size: 26rpx;
   }
 }
 
@@ -188,8 +175,8 @@ defineEmits(["cancel", "confirm"]);
   height: $tap-size;
   margin: 0;
   padding: 0;
-  border-radius: $radius-lg;
-  font-size: $font-size-aux;
+  border-radius: 20rpx;
+  font-size: 26rpx;
   line-height: $tap-size;
 
   &::after {
@@ -199,7 +186,7 @@ defineEmits(["cancel", "confirm"]);
 
 .meta-icon-text {
   color: $color-warning;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   text-align: center;
 }
 /* #endif */
@@ -207,11 +194,11 @@ defineEmits(["cancel", "confirm"]);
 .cancel-button {
   border: 1rpx solid $color-line;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
 
   &:hover {
     border-color: #bfd8ce;
-    background: $color-surface-muted;
+    background: #f8faf7;
     color: $color-primary;
   }
 }
@@ -222,13 +209,13 @@ defineEmits(["cancel", "confirm"]);
   color: #fff;
 
   &:hover {
-    background: $color-primary-dark;
+    background: #9c6e38;
     color: #fff;
   }
 }
 
 .confirm-icon {
   margin-left: 6rpx;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 </style>

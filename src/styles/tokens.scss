@@ -1,89 +1,25 @@
 /*
- * 设计令牌：单一字体栈、字号/字重/行高阶梯、间距与圆角刻度、墨绿宣纸配色。
- * 由 uni.scss 注入，全部页面与组件的 scss 都可直接使用。
+ * 全局设计令牌：只保留跨页面统一的主题色、字体栈和公共 mixin。
+ * 页面局部的字号、间距、圆角等直接在页面样式里写死。
+ * 由 src/uni.scss 注入，全部页面与组件的 scss 都可直接使用。
  */
 
 /* 字体：只保留一套系统字体栈，不引入字体文件或外部字体 */
-$font-family-base:
-  -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+$font-family-base: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
   "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
-
-/* 字号阶梯：22 角标 / 24 辅助 / 26 次要 / 28 正文 / 30 正文强调 / 34 区块标题 / 38 页面标题 / 44 数字 / 56 展示 / 68 主指标 */
-$font-size-badge: 22rpx;
-$font-size-caption: 24rpx;
-$font-size-aux: 26rpx;
-$font-size-body: 28rpx;
-$font-size-body-lg: 30rpx;
-$font-size-title: 34rpx;
-$font-size-page-title: 38rpx;
-$font-size-display-sm: 44rpx;
-$font-size-display: 56rpx;
-$font-size-metric: 68rpx;
-
-$font-weight-regular: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
-$font-weight-bold: 700;
-
-$line-height-tight: 1.3;
-$line-height-normal: 1.6;
-$line-height-relaxed: 1.8;
-
-/* 间距刻度：8 的倍数，4 个主档位 */
-$space-1: 8rpx;
-$space-2: 12rpx;
-$space-3: 16rpx;
-$space-4: 20rpx;
-$space-5: 24rpx;
-$space-6: 28rpx;
-$space-7: 32rpx;
-$space-8: 40rpx;
-$space-9: 48rpx;
-$space-10: 64rpx;
-
-/* 圆角刻度 */
-$radius-xs: 8rpx;
-$radius-sm: 12rpx;
-$radius-md: 16rpx;
-$radius-lg: 20rpx;
-$radius-xl: 24rpx;
-$radius-2xl: 28rpx;
-$radius-3xl: 32rpx;
-$radius-pill: 999rpx;
 
 /* 颜色：茶金主题色 + 暖杏底色 */
 $color-ink: #16352f;
-$color-ink-soft: #4e665e;
 $color-muted: #7b8d86;
-$color-faint: #a3b1ab;
 $color-primary: #b8864e;
-$color-primary-dark: #9c6e38;
 $color-primary-light: #f7edde;
-$color-primary-soft: #8a6840;
-$color-accent-clay: #d9be9b;
-$color-accent-cinnabar: #c84b31;
 $color-warning: #a9761c;
-$color-warning-bg: #fdf6e8;
-$color-warning-line: #f0e0bd;
 $color-danger: #b93a2f;
-$color-bg-page: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
 $color-surface: #ffffff;
-$color-surface-muted: #f8faf7;
 $color-line: #e3e9e5;
-$color-line-strong: #d2ddd6;
-$color-danger-bg: #fdf3f1;
-$color-info: #50b5ff;
-$color-accent-violet: #595bdc;
-$color-art-ink: #202022;
-$color-art-muted: #9b999f;
 
-$shadow-card: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
-
-/* 关键尺寸 */
-$header-height: 100rpx;
-$nav-height: 102rpx;
+/* 最小点击热区尺寸 */
 $tap-size: 88rpx;
-$desktop-content-width: 750px;
 
 /* 单行截断 */
 @mixin text-ellipsis {
@@ -107,11 +43,11 @@ $desktop-content-width: 750px;
 }
 
 /* 卡片表面 */
-@mixin card-surface($radius: $radius-xl, $padding: $space-5) {
+@mixin card-surface($radius: 24rpx, $padding: 24rpx) {
   padding: $padding;
   border-radius: $radius;
   background: $color-surface;
-  box-shadow: $shadow-card;
+  box-shadow: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
 }
 
 /* 固定底部操作栏，统一安全区，避免被 Home 指示条遮挡 */
@@ -121,9 +57,9 @@ $desktop-content-width: 750px;
   bottom: 0;
   left: 0;
   z-index: 10;
-  padding: $space-3 $space-7 $space-6;
-  padding-bottom: calc(#{$space-6} + constant(safe-area-inset-bottom));
-  padding-bottom: calc(#{$space-6} + env(safe-area-inset-bottom));
+  padding: 16rpx 32rpx 28rpx;
+  padding-bottom: calc(28rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(28rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid $color-line;
   background: rgba(255, 255, 255, 0.97);
 
@@ -131,7 +67,7 @@ $desktop-content-width: 750px;
   @media (min-width: 768px) {
     right: auto;
     left: 50%;
-    width: $desktop-content-width;
+    width: 750px;
     transform: translateX(-50%);
   }
 }

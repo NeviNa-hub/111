@@ -360,7 +360,7 @@ const goNext = async () => {
 .video-creation-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 
   --el-color-primary: #{$color-primary};
@@ -368,16 +368,16 @@ const goNext = async () => {
   --el-color-primary-light-5: #d6b689;
   --el-color-primary-light-7: #e4d0ad;
   --el-color-primary-light-9: #f7edde;
-  --el-border-radius-base: #{$radius-sm};
+  --el-border-radius-base: #{12rpx};
   --el-font-family: #{$font-family-base};
-  --el-font-size-base: #{$font-size-body};
+  --el-font-size-base: #{28rpx};
 }
 
 .content {
-  --content-bottom-pad: #{$space-9};
+  --content-bottom-pad: #{48rpx};
   height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 35rpx $space-7 var(--content-bottom-pad);
+  padding: 35rpx 32rpx var(--content-bottom-pad);
   box-sizing: border-box;
 }
 
@@ -387,9 +387,9 @@ const goNext = async () => {
 
 /* 卡片与区块标题：与文字生图页统一样式 */
 .config-card {
-  margin-top: $space-6;
-  padding: $space-6;
-  border-radius: $radius-xl;
+  margin-top: 28rpx;
+  padding: 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
@@ -399,36 +399,36 @@ const goNext = async () => {
 }
 
 .config-title {
-  padding-bottom: $space-6;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 28rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 /* 步骤条：与文字生图页统一样式 */
 .step-bar {
   height: 82rpx;
-  margin: $space-3 $space-7 0;
-  padding: $space-1;
+  margin: 16rpx 32rpx 0;
+  padding: 8rpx;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 0;
-  border-radius: $radius-md;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
   color: $color-muted;
   text-align: center;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
@@ -438,25 +438,25 @@ const goNext = async () => {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: $space-1;
+  margin-right: 8rpx;
   border-radius: 50%;
   background: #dfdfd5;
   color: $color-muted;
   font-style: normal;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 $space-3;
-  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+  margin: 0 16rpx;
+  background: linear-gradient(90deg, #8a6840, #dfdfd5);
 }
 
 .step.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 
   i {
     /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
@@ -482,7 +482,7 @@ const goNext = async () => {
 .ratio-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: $space-3;
+  gap: 16rpx;
   width: 100%;
 }
 
@@ -492,10 +492,10 @@ const goNext = async () => {
   height: auto;
   min-height: 0;
   margin: 0;
-  padding: $space-5 $space-2 $space-3;
+  padding: 24rpx 12rpx 16rpx;
   border: 2rpx solid transparent;
-  border-radius: $radius-lg;
-  background: $color-surface-muted;
+  border-radius: 20rpx;
+  background: #f8faf7;
   box-sizing: border-box;
 
   :deep(.el-radio__input) {
@@ -507,7 +507,7 @@ const goNext = async () => {
     flex-direction: column;
     flex: 1;
     align-items: center;
-    gap: $space-2;
+    gap: 12rpx;
     width: 100%;
     padding: 0;
     color: inherit;
@@ -517,7 +517,7 @@ const goNext = async () => {
 
   &.is-selected {
     border-color: $color-primary;
-    background: linear-gradient(135deg, $color-primary-light 0%, #f7faf8 100%);
+    background: linear-gradient(135deg, #f7edde 0%, #f7faf8 100%);
     box-shadow: 0 0 0 1rpx $color-primary inset;
   }
 }
@@ -529,9 +529,9 @@ const goNext = async () => {
   justify-content: center;
   width: 88rpx;
   height: 52rpx;
-  border-radius: $radius-sm;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-bold;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 700;
 }
 
 /* 各画幅徽章的识别色，选中时统一归为主色 */
@@ -547,7 +547,7 @@ const goNext = async () => {
 
 .ratio-card.is-ratio-3 .ratio-badge {
   background: #eceaf6;
-  color: $color-accent-violet;
+  color: #595bdc;
 }
 
 .ratio-card.is-selected .ratio-badge {
@@ -557,8 +557,8 @@ const goNext = async () => {
 
 .ratio-name {
   color: $color-ink;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
 }
 
 .ratio-card.is-selected .ratio-name {
@@ -567,8 +567,8 @@ const goNext = async () => {
 
 .ratio-desc {
   color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-tight;
+  font-size: 22rpx;
+  line-height: 1.3;
   @include text-ellipsis;
 }
 
@@ -577,7 +577,7 @@ const goNext = async () => {
   top: 8rpx;
   right: 8rpx;
   padding: 2rpx 10rpx;
-  border-radius: $radius-xs;
+  border-radius: 8rpx;
   background: #9dff3d;
   color: #1c5e09;
   font-size: 18rpx;
@@ -591,8 +591,8 @@ const goNext = async () => {
   width: 100%;
   margin-top: 0;
   padding: 8rpx;
-  border-radius: $radius-lg;
-  background: $color-primary-light;
+  border-radius: 20rpx;
+  background: #f7edde;
 
   :deep(.el-radio-button) {
     flex: 1;
@@ -607,28 +607,28 @@ const goNext = async () => {
     height: 76rpx;
     padding: 0;
     border: 0;
-    border-radius: $radius-md;
+    border-radius: 16rpx;
     background: transparent;
     box-shadow: none;
-    color: $color-ink-soft;
-    font-size: $font-size-caption;
+    color: #4e665e;
+    font-size: 24rpx;
   }
 
   :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
     background: $color-surface;
     color: $color-primary;
-    font-weight: $font-weight-bold;
+    font-weight: 700;
     box-shadow: 0 4rpx 12rpx rgba(5, 96, 76, 0.08);
   }
 
   :deep(.el-icon) {
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
 /* 图卷选择 */
 .image-form-item {
-  margin: $space-4 0 0;
+  margin: 20rpx 0 0;
 
   :deep(.el-form-item__content) {
     display: block;
@@ -643,10 +643,10 @@ const goNext = async () => {
 .image-picker {
   display: flex;
   align-items: center;
-  gap: $space-3;
-  padding: $space-4 $space-5;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
   border: 2rpx dashed #bfd8ce;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
   background: $color-surface;
 }
 
@@ -654,7 +654,7 @@ const goNext = async () => {
   flex-shrink: 0;
   width: 104rpx;
   height: 78rpx;
-  border-radius: $radius-xs;
+  border-radius: 8rpx;
 }
 
 .image-copy {
@@ -666,18 +666,18 @@ const goNext = async () => {
   display: block;
   overflow: hidden;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .image-hint {
   display: block;
-  margin-top: $space-1;
+  margin-top: 8rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-normal;
+  font-size: 22rpx;
+  line-height: 1.6;
 }
 
 .image-pick-button {
@@ -685,21 +685,21 @@ const goNext = async () => {
   flex-shrink: 0;
   height: 72rpx;
   margin: 0;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
   border: 1rpx solid #bfd8ce;
-  border-radius: $radius-sm;
-  background: $color-surface-muted;
-  color: $color-primary-soft;
-  font-size: $font-size-badge;
+  border-radius: 12rpx;
+  background: #f8faf7;
+  color: #8a6840;
+  font-size: 22rpx;
 
   :deep(.el-icon) {
     margin-right: 6rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 
   &:hover {
     border-color: $color-primary;
-    background: $color-primary-light;
+    background: #f7edde;
     color: $color-primary;
   }
 }
@@ -722,15 +722,15 @@ const goNext = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .prompt-clear {
   @include tap-area(56rpx);
   height: 56rpx;
-  padding: 0 $space-1;
+  padding: 0 8rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 
   &:hover {
     color: $color-primary;
@@ -738,24 +738,24 @@ const goNext = async () => {
 
   :deep(.el-icon) {
     margin-right: 4rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
 .prompt-input {
   width: 100%;
-  margin-top: $space-3;
+  margin-top: 16rpx;
 
   :deep(.el-textarea__inner) {
     min-height: 210rpx;
-    padding: $space-4;
+    padding: 20rpx;
     border: 0;
-    border-radius: $radius-md;
-    background: $color-surface-muted;
+    border-radius: 16rpx;
+    background: #f8faf7;
     box-shadow: none;
     color: $color-ink;
-    font-size: $font-size-body;
-    line-height: $line-height-normal;
+    font-size: 28rpx;
+    line-height: 1.6;
   }
 }
 
@@ -763,12 +763,12 @@ const goNext = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: $space-3;
+  margin-top: 16rpx;
 }
 
 .prompt-count {
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   @include numeric;
 }
 
@@ -776,12 +776,12 @@ const goNext = async () => {
   @include tap-area(64rpx);
   height: 64rpx;
   margin: 0;
-  padding: 0 $space-5;
+  padding: 0 24rpx;
   border: 0;
-  border-radius: $radius-md;
+  border-radius: 16rpx;
   background: #f3e4cd;
   color: $color-primary;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 
   &:hover {
     background: #ecd8b8;
@@ -790,7 +790,7 @@ const goNext = async () => {
 
   :deep(.el-icon) {
     margin-right: 6rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
@@ -799,42 +799,42 @@ const goNext = async () => {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  margin: $space-5 $space-1 0;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  margin: 24rpx 8rpx 0;
+  color: #8a6840;
+  font-size: 24rpx;
 
   :deep(.el-icon) {
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
 .suggestions {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-3;
-  margin-top: $space-3;
+  gap: 16rpx;
+  margin-top: 16rpx;
 }
 
 .suggestion-chip {
   height: 64rpx;
   margin: 0;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-md;
+  border-radius: 16rpx;
   background: $color-surface;
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-regular;
+  color: #4e665e;
+  font-size: 22rpx;
+  font-weight: 400;
 
   &:hover {
     border-color: #bfd8ce;
-    background: $color-surface-muted;
-    color: $color-ink-soft;
+    background: #f8faf7;
+    color: #4e665e;
   }
 
   :deep(.el-icon) {
     margin-right: 6rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
@@ -852,14 +852,14 @@ const goNext = async () => {
   min-width: 0;
   margin: 0;
   border: 0;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 
   &:hover {
-    background: $color-primary-dark;
+    background: #9c6e38;
     color: #fff;
   }
 
@@ -870,20 +870,20 @@ const goNext = async () => {
 
 .next-icon {
   margin-left: 8rpx;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .platform-unavailable {
   min-height: 100vh;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
 }
 
 .platform-tip {
   display: block;
-  padding: 80rpx $space-9;
-  color: $color-ink-soft;
-  font-size: $font-size-body;
-  line-height: $line-height-relaxed;
+  padding: 80rpx 48rpx;
+  color: #4e665e;
+  font-size: 28rpx;
+  line-height: 1.8;
   text-align: center;
 }
 </style>

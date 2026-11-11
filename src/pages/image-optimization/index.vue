@@ -149,26 +149,26 @@ const startOptimization = async () => {
 .page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .content {
   height: calc(100vh - 220rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 35rpx $space-7 260rpx;
+  padding: 35rpx 32rpx 260rpx;
   box-sizing: border-box;
 }
 
 .content-state {
-  margin-bottom: $space-5;
+  margin-bottom: 24rpx;
 }
 
 /* 卡片与区块标题：与创作页统一样式 */
 .config-card {
-  margin-top: $space-6;
-  padding: $space-6;
-  border-radius: $radius-xl;
+  margin-top: 28rpx;
+  padding: 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
@@ -178,25 +178,25 @@ const startOptimization = async () => {
 }
 
 .config-title {
-  padding-bottom: $space-6;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 28rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 /* 导入区 */
 .file {
   display: flex;
   align-items: center;
-  gap: $space-3;
+  gap: 16rpx;
   min-width: 0;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
 }
 
 .file text {
@@ -208,14 +208,14 @@ const startOptimization = async () => {
 .file button {
   @include tap-area(64rpx);
   flex-shrink: 0;
-  gap: $space-1;
+  gap: 8rpx;
   margin: 0;
-  padding: 0 $space-4;
+  padding: 0 20rpx;
   border: 0;
-  border-radius: $radius-pill;
-  background: $color-primary-light;
+  border-radius: 999rpx;
+  background: #f7edde;
   color: $color-primary;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   line-height: 1;
 }
 
@@ -224,16 +224,16 @@ const startOptimization = async () => {
 }
 
 .file-icon {
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 .preview {
   position: relative;
   height: 320rpx;
-  margin-top: $space-4;
+  margin-top: 20rpx;
   overflow: hidden;
-  border-radius: $radius-lg;
-  background: $color-surface-muted;
+  border-radius: 20rpx;
+  background: #f8faf7;
 }
 
 .preview-media {
@@ -245,21 +245,21 @@ const startOptimization = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx dashed $color-line-strong;
+  border: 2rpx dashed #d2ddd6;
 }
 
 .empty-tip {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $space-2;
+  gap: 12rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .empty-icon {
-  color: $color-faint;
-  font-size: $font-size-display-sm;
+  color: #a3b1ab;
+  font-size: 44rpx;
 }
 
 .cover,
@@ -272,39 +272,39 @@ const startOptimization = async () => {
 
 .cover,
 .ready {
-  padding: $space-1 $space-3;
-  border-radius: $radius-pill;
-  font-size: $font-size-caption;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
 }
 
 .cover {
-  top: $space-3;
-  left: $space-3;
+  top: 16rpx;
+  left: 16rpx;
 }
 
 .ready {
-  bottom: $space-3;
-  left: $space-3;
+  bottom: 16rpx;
+  left: 16rpx;
   max-width: calc(100% - 110rpx);
   @include text-ellipsis;
 }
 
 .zoom {
   @include tap-area(56rpx);
-  right: $space-3;
-  bottom: $space-3;
+  right: 16rpx;
+  bottom: 16rpx;
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
-  font-size: $font-size-body;
+  font-size: 28rpx;
   line-height: 1;
 }
 
 .hint {
   display: block;
-  margin-top: $space-3;
+  margin-top: 16rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   text-align: center;
 }
 
@@ -313,29 +313,29 @@ const startOptimization = async () => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .prompt-head text {
   color: $color-muted;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-regular;
+  font-size: 24rpx;
+  font-weight: 400;
 }
 
 .prompt-input {
   width: 100%;
   height: 200rpx;
   color: $color-ink;
-  font-size: $font-size-aux;
-  line-height: $line-height-normal;
+  font-size: 26rpx;
+  line-height: 1.6;
   box-sizing: border-box;
 }
 
 .fixed-tip {
   display: block;
-  margin-top: $space-3;
+  margin-top: 16rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 /* 底部操作 */
@@ -343,9 +343,9 @@ const startOptimization = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 $space-1 $space-3;
+  margin: 0 8rpx 16rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .actions {
@@ -358,16 +358,16 @@ const startOptimization = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $space-2;
+  gap: 12rpx;
   width: 100%;
   height: $tap-size;
   padding: 0;
   border: 0;
-  border-radius: $radius-xl;
-  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #8a6840 0%, #9c6e38 100%);
   color: #fff;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .actions button:after {
@@ -375,18 +375,18 @@ const startOptimization = async () => {
 }
 
 .actions button[disabled] {
-  background: $color-line-strong;
+  background: #d2ddd6;
   color: #f4f6f5;
 }
 
 .action-icon {
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 .actions > text {
   display: block;
-  margin-top: $space-3;
+  margin-top: 16rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 </style>

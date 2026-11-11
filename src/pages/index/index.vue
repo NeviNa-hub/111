@@ -169,20 +169,20 @@ const openMode = (url) => {
 .home-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .main-scroll {
   height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-2 $space-7;
-  padding-bottom: calc(#{$space-4} + env(safe-area-inset-bottom));
+  padding: 12rpx 32rpx;
+  padding-bottom: calc(#{20rpx} + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .page-body {
-  padding-top: $space-2;
+  padding-top: 12rpx;
 }
 
 /* 问候语 */
@@ -190,37 +190,37 @@ const openMode = (url) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  margin-bottom: $space-2;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .greeting-left {
   display: flex;
   flex: 1;
   align-items: baseline;
-  gap: $space-3;
+  gap: 16rpx;
   min-width: 0;
 }
 
 .greeting-title {
   flex-shrink: 0;
-  color: $color-primary-soft;
-  font-size: $font-size-body;
-  font-weight: $font-weight-semibold;
+  color: #8a6840;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
 .greeting-desc {
   flex: 1;
   min-width: 0;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   @include text-ellipsis;
 }
 
 .weather {
   flex-shrink: 0;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 /* 主视觉 */
@@ -233,20 +233,20 @@ const openMode = (url) => {
 .hero-title {
   color: #ec8302;
   font-size: 56rpx;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
   letter-spacing: 4rpx;
 }
 
 .hero-subtitle {
   color: #9e7239;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .hero-art {
   position: relative;
   width: 90%;
   height: 300rpx;
-  margin-top: $space-5;
+  margin-top: 24rpx;
   padding: 8rpx;
   border-radius: 36rpx;
   background: #fff;
@@ -274,31 +274,31 @@ const openMode = (url) => {
 .hero-hint {
   position: absolute;
   z-index: 1;
-  left: $space-6;
-  right: $space-6;
+  left: 28rpx;
+  right: 28rpx;
   color: #fff;
 }
 
 .hero-label {
-  top: $space-5;
+  top: 24rpx;
   right: auto;
-  padding: $space-1 $space-3;
-  border-radius: $radius-pill;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.84);
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  color: #8a6840;
+  font-size: 24rpx;
 }
 
 .hero-caption {
   bottom: 58rpx;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
   @include text-ellipsis;
 }
 
 .hero-hint {
-  bottom: $space-5;
-  font-size: $font-size-caption;
+  bottom: 24rpx;
+  font-size: 24rpx;
   opacity: 0.86;
   @include text-ellipsis;
 }
@@ -306,24 +306,24 @@ const openMode = (url) => {
 .hero-meta {
   display: flex;
   align-items: center;
-  gap: $space-2;
+  gap: 12rpx;
   width: 100%;
-  margin-top: $space-4;
-  padding: 0 $space-1;
+  margin-top: 20rpx;
+  padding: 0 8rpx;
   box-sizing: border-box;
 }
 
 .meta-title {
   color: #6b4423;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .meta-subtitle {
   flex: 1;
   min-width: 0;
   color: #b3a08a;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   @include numeric;
 }
 
@@ -331,12 +331,12 @@ const openMode = (url) => {
   @include tap-area(64rpx);
   flex-shrink: 0;
   margin: 0;
-  padding: 0 $space-4;
+  padding: 0 20rpx;
   border: 0;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   line-height: 1;
 }
 
@@ -347,19 +347,19 @@ const openMode = (url) => {
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: $space-8;
+  gap: 40rpx;
 }
 
 .action-primary {
   @include tap-area(80rpx);
   margin: 0;
-  padding: 0 $space-8;
+  padding: 0 40rpx;
   border: 0;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: linear-gradient(135deg, #f3a851 0%, #e07f23 100%);
   color: #fff;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -371,14 +371,14 @@ const openMode = (url) => {
   @include tap-area(80rpx);
   display: flex;
   align-items: center;
-  gap: $space-1;
+  gap: 8rpx;
   margin: 0;
-  padding: 0 $space-5;
+  padding: 0 24rpx;
   border: 1rpx solid #ecd9bd;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: #fffdf8;
   color: #9a6b34;
-  font-size: $font-size-body;
+  font-size: 28rpx;
   line-height: 1;
 }
 
@@ -388,17 +388,17 @@ const openMode = (url) => {
 
 .action-star {
   color: #e8a24a;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 /* 灵感工坊 */
 .workshop {
-  margin-top: $space-7;
+  margin-top: 32rpx;
 }
 
 /* 白色整体底卡：衬托在页面渐变背景上 */
 .workshop-card {
-  padding: $space-5;
+  padding: 24rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.9);
   border-radius: 32rpx;
   background: #fff;
@@ -409,30 +409,30 @@ const openMode = (url) => {
 .workshop-head {
   display: flex;
   flex-direction: column;
-  gap: $space-1;
-  margin-bottom: $space-4;
+  gap: 8rpx;
+  margin-bottom: 20rpx;
 }
 
 .workshop-title {
   color: #6b4423;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .workshop-subtitle {
   color: #b3a08a;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 /* 功能行通用结构；配色由各行类名区分 */
 .mode-row {
   display: flex;
   align-items: center;
-  gap: $space-3;
-  margin-top: $space-3;
-  padding: $space-4;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding: 20rpx;
   border: 1rpx solid transparent;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
   transition: transform 0.15s ease;
 }
 
@@ -485,15 +485,15 @@ const openMode = (url) => {
 .mode-name {
   display: block;
   color: #6b4423;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .mode-desc {
   display: block;
   margin-top: 4rpx;
   color: #8d7657;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   @include text-ellipsis;
 }
 
@@ -501,7 +501,7 @@ const openMode = (url) => {
   display: block;
   margin-top: 2rpx;
   color: #b3a08a;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   @include text-ellipsis;
 }
 
@@ -545,18 +545,18 @@ const openMode = (url) => {
 .mode-arrow {
   flex-shrink: 0;
   color: #d8c3a5;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 /* 创作想法入口 */
 .prompt-bar {
   display: flex;
   align-items: center;
-  gap: $space-3;
-  margin-top: $space-6;
-  padding: $space-2 $space-2 $space-2 $space-4;
+  gap: 16rpx;
+  margin-top: 28rpx;
+  padding: 12rpx 12rpx 12rpx 20rpx;
   border: 1rpx solid #f0e2c8;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: #fffdf8;
   box-shadow: 0 8rpx 24rpx rgba(190, 140, 70, 0.08);
 }
@@ -565,7 +565,7 @@ const openMode = (url) => {
   flex: 1;
   min-width: 0;
   color: #c4ad8d;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .prompt-button {
@@ -574,23 +574,23 @@ const openMode = (url) => {
   flex-shrink: 0;
   align-items: center;
   gap: 6rpx;
-  padding: 0 $space-4;
-  border-radius: $radius-pill;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
   background: linear-gradient(135deg, #f3a851 0%, #e07f23 100%);
   color: #fff;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
 }
 
 .prompt-edit {
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 /* 底部卷尾语 */
 .quote {
-  padding: $space-5 0;
+  padding: 24rpx 0;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   text-align: center;
 }
 </style>

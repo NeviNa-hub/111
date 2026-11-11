@@ -169,68 +169,68 @@ const startTool = (name) => {
 .workbench-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .content {
   height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-6 $space-7;
-  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
+  padding: 28rpx 32rpx;
+  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .content-state {
-  margin-bottom: $space-5;
+  margin-bottom: 24rpx;
 }
 
 /* ========== 工具卡片通用结构 ========== */
 .tool-card {
-  margin-bottom: $space-5;
-  padding: $space-5;
-  border-radius: $radius-2xl;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
   background: $color-surface;
-  box-shadow: $shadow-card;
+  box-shadow: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
 }
 
 /* 卡片标题行 */
 .card-heading {
   display: flex;
   align-items: center;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .card-title {
   flex-shrink: 0;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .card-tag {
   flex-shrink: 0;
-  padding: $space-1 $space-2;
+  padding: 8rpx 12rpx;
   border: 1rpx solid rgba(5, 96, 76, 0.24);
-  border-radius: $radius-xs;
+  border-radius: 8rpx;
   color: $color-primary;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .card-ready {
   flex-shrink: 0;
   margin-left: auto;
   color: $color-primary;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 /* 卡片描述 */
 .card-desc {
   display: block;
-  margin: $space-3 0 $space-4;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  margin: 16rpx 0 20rpx;
+  color: #4e665e;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 /* 插图画区 */
@@ -240,7 +240,7 @@ const startTool = (name) => {
   position: relative;
   height: 320rpx;
   overflow: hidden;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
 }
 
 .art-image {
@@ -255,14 +255,14 @@ const startTool = (name) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  margin-top: $space-4;
+  gap: 16rpx;
+  margin-top: 20rpx;
 }
 
 .footer-note {
   min-width: 0;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  color: #4e665e;
+  font-size: 24rpx;
   @include text-ellipsis;
 }
 
@@ -270,13 +270,13 @@ const startTool = (name) => {
   @include tap-area(72rpx);
   flex-shrink: 0;
   margin: 0;
-  padding: 0 $space-4;
+  padding: 0 20rpx;
   border: 0;
-  border-radius: $radius-md;
-  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #8a6840 0%, #9c6e38 100%);
   color: #fff;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -291,12 +291,12 @@ const startTool = (name) => {
 /* ========== 01 文字生图 · 插图角标 ========== */
 .art-chip {
   position: absolute;
-  bottom: $space-2;
-  padding: $space-1 $space-2;
-  border-radius: $radius-xs;
+  bottom: 12rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
   background: rgba(255, 255, 255, 0.9);
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
+  color: #4e665e;
+  font-size: 22rpx;
   animation: chip-shake 4s ease-in-out infinite;
 }
 
@@ -345,8 +345,8 @@ const startTool = (name) => {
 .film-name {
   flex-shrink: 0;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
   @include text-ellipsis;
 }
 
@@ -379,7 +379,7 @@ const startTool = (name) => {
 
 .film-meta {
   color: #92a3ac;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .film-frames {
@@ -393,9 +393,9 @@ const startTool = (name) => {
  * 模拟胶片分镜的透视感，且窄屏下文字不会换行 */
 .film-frame {
   overflow: hidden;
-  padding: $space-1;
+  padding: 8rpx;
   border: 1rpx solid #a9cde4;
-  border-radius: $radius-sm;
+  border-radius: 12rpx;
   background: #fff;
   text-align: center;
   box-sizing: border-box;
@@ -415,7 +415,7 @@ const startTool = (name) => {
 
 .film-frame:nth-child(4) {
   flex: 1.1 1 auto;
-  border-color: $color-info;
+  border-color: #50b5ff;
   box-shadow: 0 6rpx 16rpx rgba(50, 156, 232, 0.2);
 }
 
@@ -452,23 +452,23 @@ const startTool = (name) => {
   display: block;
   overflow: hidden;
   color: #5a7888;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .film-empty {
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .film-chip {
-  padding: $space-1 $space-2;
+  padding: 8rpx 12rpx;
   border: 1rpx solid #ccf7d3;
-  border-radius: $radius-md;
+  border-radius: 16rpx;
   background: #fff;
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
+  color: #4e665e;
+  font-size: 22rpx;
 }
 
 /* ========== 03 图片优化 · 对比图 ========== */
@@ -485,10 +485,10 @@ const startTool = (name) => {
   height: 46rpx;
   border-radius: 50%;
   background: #fff;
-  color: $color-accent-violet;
+  color: #595bdc;
   line-height: 46rpx;
   text-align: center;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
   animation: handle-sweep 5s ease-in-out infinite;
 }
 
@@ -538,11 +538,11 @@ const startTool = (name) => {
   position: absolute;
   z-index: 3;
   bottom: 82rpx;
-  padding: $space-1 $space-2;
-  border-radius: $radius-xs;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
   background: rgba(62, 75, 85, 0.85);
   color: #fff;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   opacity: 0;
 }
 
@@ -590,17 +590,17 @@ const startTool = (name) => {
   height: 66rpx;
   background: rgba(124, 130, 153, 0.92);
   color: #fff;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   line-height: 66rpx;
   text-align: center;
 }
 
 /* ========== 草稿与便签库 ========== */
 .draft-card {
-  margin-bottom: $space-5;
-  padding: $space-5;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: $color-surface;
 }
 
@@ -608,30 +608,30 @@ const startTool = (name) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  margin-bottom: $space-1;
+  gap: 16rpx;
+  margin-bottom: 8rpx;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .draft-subtitle {
   color: $color-muted;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-regular;
+  font-size: 24rpx;
+  font-weight: 400;
 }
 
 .draft-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  margin-top: $space-2;
-  padding: $space-4 $space-3;
+  gap: 16rpx;
+  margin-top: 12rpx;
+  padding: 20rpx 16rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-md;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  border-radius: 16rpx;
+  color: #4e665e;
+  font-size: 24rpx;
 }
 
 .draft-name {
@@ -642,11 +642,11 @@ const startTool = (name) => {
 
 .draft-status {
   flex-shrink: 0;
-  padding: $space-1 $space-2;
+  padding: 8rpx 12rpx;
   border: 1rpx solid #85e4da;
-  border-radius: $radius-xs;
+  border-radius: 8rpx;
   color: $color-primary;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 /* ============================================================
@@ -655,19 +655,17 @@ const startTool = (name) => {
 @media (min-width: 992px) {
   /* 桌面断点下 rpx 会随视口放大，这里固定一套 px 刻度 */
   /* 与全局 rpx 刻度一致：宽屏下 1rpx ≈ 1px */
-  $desktop-micro: $font-size-badge;
-  $desktop-caption: $font-size-caption;
-  $desktop-aux: $font-size-aux;
-  $desktop-body: $font-size-body;
-  $desktop-metric: $font-size-body-lg;
-  $desktop-heading: $font-size-title;
-  $desktop-title: $font-size-page-title;
+  $desktop-micro: 22rpx;
+  $desktop-caption: 24rpx;
+  $desktop-aux: 26rpx;
+  $desktop-body: 28rpx;
+  $desktop-metric: 30rpx;
+  $desktop-heading: 34rpx;
+  $desktop-title: 38rpx;
 
   .content {
-    height: calc(
-      100vh - #{$header-height} - #{$nav-height} - var(--status-bar-height, 0px)
-    );
-    max-width: $desktop-content-width;
+    height: calc(100vh - #{100rpx} - #{102rpx} - var(--status-bar-height, 0px));
+    max-width: 750px;
     margin: 0 auto;
     padding: 24px 24px 60px;
     display: grid;

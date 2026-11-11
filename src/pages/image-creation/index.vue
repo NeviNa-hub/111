@@ -109,29 +109,29 @@ const goNext = () => {
 .creation-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .step-bar {
   height: 82rpx;
-  margin: $space-3 $space-7 0;
-  padding: $space-1;
+  margin: 16rpx 32rpx 0;
+  padding: 8rpx;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 0;
-  border-radius: $radius-md;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
   color: $color-muted;
   text-align: center;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
@@ -141,25 +141,25 @@ const goNext = () => {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: $space-1;
+  margin-right: 8rpx;
   border-radius: 50%;
   background: #dfdfd5;
   color: $color-muted;
   font-style: normal;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 $space-3;
-  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+  margin: 0 16rpx;
+  background: linear-gradient(90deg, #8a6840, #dfdfd5);
 }
 
 .step.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 
   i {
     /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
@@ -176,32 +176,32 @@ const goNext = () => {
 }
 
 .content-state {
-  margin-top: $space-6;
+  margin-top: 28rpx;
 }
 
 .config-card {
-  margin-top: $space-6;
-  padding: $space-6;
-  border-radius: $radius-xl;
+  margin-top: 28rpx;
+  padding: 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
 
 .config-title {
-  padding-bottom: $space-6;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 28rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 .option-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $space-4;
+  gap: 20rpx;
 }
 
 .option-grid.four {
@@ -213,14 +213,14 @@ const goNext = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $space-2;
+  gap: 12rpx;
   min-height: 150rpx;
-  padding: $space-4;
+  padding: 20rpx;
   border: 1rpx solid rgba(0, 0, 0, 0.08);
-  border-radius: $radius-md;
+  border-radius: 16rpx;
   background: linear-gradient(135deg, #fcfcfa 0%, #fafbf9 100%);
   color: $color-ink;
-  font-size: $font-size-body-lg;
+  font-size: 30rpx;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -231,10 +231,10 @@ const goNext = () => {
   justify-content: center;
   width: 64rpx;
   height: 64rpx;
-  border-radius: $radius-sm;
-  background: $color-primary-light;
+  border-radius: 12rpx;
+  background: #f7edde;
   color: $color-primary;
-  font-size: $font-size-body-lg;
+  font-size: 30rpx;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -256,17 +256,17 @@ const goNext = () => {
 
 .option-card.is-style-4 .option-icon {
   background: #eceaf6;
-  color: $color-accent-violet;
+  color: #595bdc;
 }
 
 .option-name {
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 }
 
 .option-card.selected {
   /* 用阴影描边替代加粗边框，避免选中时卡片抖动 */
   border-color: $color-primary;
-  background: linear-gradient(135deg, $color-primary-light 0%, #f7faf8 100%);
+  background: linear-gradient(135deg, #f7edde 0%, #f7faf8 100%);
   color: $color-primary;
   box-shadow: 0 0 0 1rpx $color-primary inset;
 }
@@ -279,8 +279,8 @@ const goNext = () => {
 /* 画幅磁贴：字形 + 比例值 + 小类目标签 */
 .option-card.compact {
   min-height: 150rpx;
-  padding: $space-3 $space-1 $space-2;
-  gap: $space-1;
+  padding: 16rpx 8rpx 12rpx;
+  gap: 8rpx;
   line-height: 1.3;
 }
 
@@ -319,12 +319,12 @@ const goNext = () => {
 }
 
 .ratio-value {
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 }
 
 .ratio-label {
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .next-card {
@@ -340,11 +340,11 @@ const goNext = () => {
   height: $tap-size;
   padding: 0;
   border: 0;
-  border-radius: $radius-xl;
-  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #8a6840 0%, #9c6e38 100%);
   color: #fff;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .next-card button[disabled] {
@@ -356,7 +356,7 @@ const goNext = () => {
 }
 
 .next-icon {
-  margin-left: $space-1;
-  font-size: $font-size-aux;
+  margin-left: 8rpx;
+  font-size: 26rpx;
 }
 </style>

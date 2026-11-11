@@ -249,13 +249,13 @@ const handleSubmit = async () => {
 .auth-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .top-bar {
   height: calc(96rpx + var(--status-bar-height, 0px));
-  padding: var(--status-bar-height, 0px) $space-7 0;
+  padding: var(--status-bar-height, 0px) 32rpx 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -275,7 +275,7 @@ const handleSubmit = async () => {
   text-align: center;
   color: #142a40;
   font-size: 32rpx;
-  font-weight: $font-weight-semibold;
+  font-weight: 600;
 }
 
 .profile-icon {
@@ -292,7 +292,7 @@ const handleSubmit = async () => {
 
 .auth-scroll {
   height: calc(100vh - 96rpx - var(--status-bar-height, 0px));
-  padding: $space-5 $space-5 calc($space-8 + env(safe-area-inset-bottom));
+  padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -351,13 +351,13 @@ const handleSubmit = async () => {
 
 .red-seal {
   position: absolute;
-  top: $space-5;
-  right: $space-8;
-  padding: $space-2;
-  border-radius: $radius-xs;
+  top: 24rpx;
+  right: 40rpx;
+  padding: 12rpx;
+  border-radius: 8rpx;
   background: #c93f39;
   color: #fff;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   line-height: 1.2;
 }
 
@@ -372,7 +372,7 @@ const handleSubmit = async () => {
   justify-content: center;
   flex-direction: column;
   border: 1rpx solid rgba(90, 123, 112, 0.14);
-  border-radius: $radius-lg $radius-lg 0 0;
+  border-radius: 20rpx 20rpx 0 0;
   background: rgba(255, 255, 255, 0.65);
   box-shadow: 0 8rpx 24rpx rgba(40, 70, 60, 0.08);
 }
@@ -394,7 +394,7 @@ const handleSubmit = async () => {
   margin-top: 10rpx;
   color: #183830;
   font-size: 46rpx;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -402,28 +402,28 @@ const handleSubmit = async () => {
   display: block;
   margin-top: 10rpx;
   color: #64778a;
-  font-size: $font-size-body;
+  font-size: 28rpx;
 }
 
 .form-heading {
-  margin: $space-8 $space-3 $space-5;
-  padding: $space-4;
+  margin: 40rpx 16rpx 24rpx;
+  padding: 20rpx;
   border: 1rpx solid #e5eaf6;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: #eef2ff;
   color: #173148;
   text-align: center;
-  font-size: $font-size-body;
+  font-size: 28rpx;
 }
 
 .form-card {
-  padding: $space-7;
-  border-radius: $radius-xl;
+  padding: 32rpx;
+  border-radius: 24rpx;
   background: #fff;
 }
 
 .auth-form-item {
-  margin-bottom: $space-4;
+  margin-bottom: 20rpx;
 
   :deep(.el-form-item__content) {
     line-height: normal;
@@ -431,15 +431,15 @@ const handleSubmit = async () => {
 
   :deep(.el-input__wrapper) {
     min-height: 80rpx;
-    padding: 0 $space-5;
-    border-radius: $radius-lg;
+    padding: 0 24rpx;
+    border-radius: 20rpx;
     background: #eff3ff;
     box-shadow: none;
   }
 
   :deep(.el-input__inner) {
     color: #233d52;
-    font-size: $font-size-body;
+    font-size: 28rpx;
 
     &::placeholder {
       color: #aab9c6;
@@ -448,24 +448,24 @@ const handleSubmit = async () => {
 
   :deep(.el-form-item__error) {
     position: static;
-    padding-top: $space-1;
-    font-size: $font-size-caption;
+    padding-top: 8rpx;
+    font-size: 24rpx;
   }
 }
 
 .field-label {
   display: block;
-  margin-bottom: $space-3;
+  margin-bottom: 16rpx;
   color: #203c50;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $space-3;
+  margin-bottom: 16rpx;
 
   .field-label {
     margin-bottom: 0;
@@ -474,8 +474,8 @@ const handleSubmit = async () => {
 
 .link-text {
   color: #007d7b;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .eye-toggle {
@@ -488,14 +488,14 @@ const handleSubmit = async () => {
 .agreement-row {
   display: flex;
   align-items: flex-start;
-  margin: $space-2 0 $space-7;
+  margin: 12rpx 0 32rpx;
 }
 
 .checkbox {
   width: 34rpx;
   height: 34rpx;
   flex-shrink: 0;
-  margin: 2rpx $space-3 0 0;
+  margin: 2rpx 16rpx 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -513,8 +513,8 @@ const handleSubmit = async () => {
 .agreement-text {
   flex: 1;
   color: #28475a;
-  font-size: $font-size-caption;
-  line-height: $line-height-relaxed;
+  font-size: 24rpx;
+  line-height: 1.8;
 }
 
 .submit-button {
@@ -524,14 +524,14 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $space-3;
+  gap: 16rpx;
   border: 0;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
   background: $color-primary;
   box-shadow: 0 8rpx 14rpx rgba(156, 110, 56, 0.22);
   color: #fff;
-  font-size: $font-size-body-lg;
-  font-weight: $font-weight-bold;
+  font-size: 30rpx;
+  font-weight: 700;
   line-height: 1;
 
   &::after {
@@ -548,7 +548,7 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
 }
 
 .help-icon {
@@ -564,9 +564,9 @@ const handleSubmit = async () => {
 }
 
 .switch-copy {
-  margin-left: $space-5;
+  margin-left: 24rpx;
   color: #007d7b;
-  font-size: $font-size-body;
-  font-weight: $font-weight-semibold;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 </style>

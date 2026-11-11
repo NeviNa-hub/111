@@ -48,9 +48,7 @@
         </view>
         <view class="task-tags">
           <text v-for="tag in data.tags" :key="tag">{{ tag }}</text>
-          <text class="task-cost"
-            >{{ data.cost === null ? "—" : data.cost }} 灵感点</text
-          >
+          <text class="task-cost">{{ data.cost === null ? "—" : data.cost }} 灵感点</text>
         </view>
         <view class="task-footer"
           >{{ data.description }}<text>{{ data.estimatedTime }}</text></view
@@ -59,9 +57,7 @@
       <view class="cloud-tip">{{ data.tip }}</view>
     </scroll-view>
     <view class="generation-actions">
-      <button class="primary-action" @tap="goLibrary">
-        前往作品库查看进度
-      </button>
+      <button class="primary-action" @tap="goLibrary">前往作品库查看进度</button>
       <button class="secondary-action" @tap="goWorkbench">返回工作台</button>
     </view>
   </view>
@@ -100,14 +96,14 @@ const goWorkbench = () => {
 .generation-progress {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .generation-content {
-  height: calc(100vh - #{$header-height} - var(--status-bar-height, 0px));
+  height: calc(100vh - #{100rpx} - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-6 $space-7 calc(250rpx + constant(safe-area-inset-bottom));
+  padding: 28rpx 32rpx calc(250rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(250rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
@@ -137,8 +133,8 @@ const goWorkbench = () => {
   left: 200rpx;
   overflow: hidden;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -155,18 +151,18 @@ const goWorkbench = () => {
 .progress-label {
   top: 40rpx;
   left: 48rpx;
-  padding: $space-2 $space-3;
-  border-radius: $radius-lg;
+  padding: 12rpx 16rpx;
+  border-radius: 20rpx;
   background: rgba(255, 255, 255, 0.82);
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  color: #4e665e;
+  font-size: 24rpx;
 }
 
 .progress-type {
   top: 48rpx;
   right: 48rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .progress-ring {
@@ -187,21 +183,21 @@ const goWorkbench = () => {
   display: block;
   margin-top: 62rpx;
   color: $color-ink;
-  font-size: $font-size-metric;
-  font-weight: $font-weight-bold;
+  font-size: 68rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .progress-ring text small {
   color: $color-primary;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 .progress-ring label {
   display: block;
-  margin-top: $space-1;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  margin-top: 8rpx;
+  color: #4e665e;
+  font-size: 24rpx;
 }
 
 .progress-status {
@@ -210,9 +206,9 @@ const goWorkbench = () => {
   left: 44rpx;
   display: flex;
   justify-content: space-between;
-  gap: $space-3;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  gap: 16rpx;
+  color: #8a6840;
+  font-size: 24rpx;
   @include numeric;
 }
 
@@ -233,9 +229,9 @@ const goWorkbench = () => {
 }
 
 .result-card {
-  margin-top: $space-5;
-  padding: $space-4;
-  border-radius: $radius-xl;
+  margin-top: 24rpx;
+  padding: 20rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   text-align: center;
 }
@@ -247,15 +243,15 @@ const goWorkbench = () => {
 
 .result-hint {
   display: block;
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .task-card {
-  margin-top: $space-5;
-  padding: $space-5 $space-6;
-  border-radius: $radius-xl;
+  margin-top: 24rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 6rpx 18rpx rgba(47, 75, 90, 0.06);
 }
@@ -270,10 +266,10 @@ const goWorkbench = () => {
   flex-shrink: 0;
   width: 36rpx;
   height: 36rpx;
-  margin-right: $space-3;
-  background: $color-accent-cinnabar;
+  margin-right: 16rpx;
+  background: #c84b31;
   color: #fff;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
   text-align: center;
   line-height: 36rpx;
 }
@@ -281,29 +277,29 @@ const goWorkbench = () => {
 .task-title strong {
   flex: 1;
   min-width: 0;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
   @include text-ellipsis;
 }
 
 .task-title small {
   flex-shrink: 0;
   margin-left: auto;
-  color: $color-faint;
-  font-size: $font-size-badge;
+  color: #a3b1ab;
+  font-size: 22rpx;
 }
 
 .task-tags {
   flex-wrap: wrap;
-  gap: $space-2;
-  margin-top: $space-4;
+  gap: 12rpx;
+  margin-top: 20rpx;
 }
 
 .task-tags text {
-  padding: $space-1 $space-2;
+  padding: 8rpx 12rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-lg;
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
+  border-radius: 20rpx;
+  color: #4e665e;
+  font-size: 22rpx;
 }
 
 .task-tags .task-cost {
@@ -317,30 +313,30 @@ const goWorkbench = () => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: $space-3;
-  margin-top: $space-4;
-  padding-top: $space-3;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
   border-top: 1rpx solid #edf0f0;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 .task-footer text {
   flex-shrink: 0;
-  color: $color-faint;
+  color: #a3b1ab;
   @include numeric;
 }
 
 .cloud-tip {
-  margin-top: $space-4;
-  padding: $space-3;
+  margin-top: 20rpx;
+  padding: 16rpx;
   border: 1rpx solid #b8e3d7;
-  border-radius: $radius-xl;
-  background: $color-surface-muted;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  border-radius: 24rpx;
+  background: #f8faf7;
+  color: #8a6840;
+  font-size: 24rpx;
+  line-height: 1.6;
   text-align: center;
 }
 
@@ -352,9 +348,9 @@ const goWorkbench = () => {
   width: 100%;
   height: $tap-size;
   border: 0;
-  border-radius: $radius-3xl;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -368,9 +364,9 @@ const goWorkbench = () => {
 }
 
 .secondary-action {
-  margin-top: $space-3;
+  margin-top: 16rpx;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
   box-shadow: 0 2rpx 12rpx rgba(30, 58, 70, 0.06);
 }
 

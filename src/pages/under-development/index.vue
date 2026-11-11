@@ -54,31 +54,31 @@ const goBack = () => {
   height: 100vh;
   box-sizing: border-box;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .content-area {
   height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 0 $space-7 calc(140rpx + env(safe-area-inset-bottom));
+  padding: 0 32rpx calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .content-card {
   width: 100%;
-  margin-top: $space-6;
-  padding: $space-10 $space-8;
+  margin-top: 28rpx;
+  padding: 64rpx 40rpx;
   box-sizing: border-box;
   border: 1rpx solid $color-line;
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: $color-surface;
-  box-shadow: $shadow-card;
+  box-shadow: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
   text-align: center;
 }
 
 .workshop-section {
-  margin-bottom: $space-6;
+  margin-bottom: 28rpx;
 }
 
 .icon {
@@ -86,9 +86,9 @@ const goBack = () => {
   height: 112rpx;
   margin: 0 auto;
   border-radius: 50%;
-  background: $color-primary-light;
+  background: #f7edde;
   color: $color-primary;
-  font-size: $font-size-display;
+  font-size: 56rpx;
   line-height: 112rpx;
 }
 
@@ -98,18 +98,18 @@ const goBack = () => {
 }
 
 .title {
-  margin-top: $space-7;
+  margin-top: 32rpx;
   color: $color-primary;
-  font-size: $font-size-page-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .description {
-  margin: $space-4 0 $space-8;
+  margin: 20rpx 0 40rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-relaxed;
+  font-size: 24rpx;
+  line-height: 1.8;
 }
 
 .primary-button,
@@ -121,9 +121,9 @@ const goBack = () => {
   height: $tap-size;
   padding: 0;
   box-sizing: border-box;
-  border-radius: $radius-lg;
-  font-size: $font-size-body;
-  line-height: $line-height-tight;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  line-height: 1.3;
 }
 
 .primary-button:after,
@@ -135,13 +135,13 @@ const goBack = () => {
   border: 0;
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-semibold;
+  font-weight: 600;
 }
 
 .secondary-button {
-  margin-top: $space-3;
+  margin-top: 16rpx;
   border: 1rpx solid $color-line;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
 }
 </style>

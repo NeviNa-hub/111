@@ -378,7 +378,7 @@ onShow(() => {
 .video-render-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 
   --el-color-primary: #{$color-primary};
@@ -386,20 +386,20 @@ onShow(() => {
   --el-color-primary-light-5: #d6b689;
   --el-color-primary-light-7: #e4d0ad;
   --el-color-primary-light-9: #f7edde;
-  --el-border-radius-base: #{$radius-sm};
+  --el-border-radius-base: #{12rpx};
   --el-font-family: #{$font-family-base};
-  --el-font-size-base: #{$font-size-body};
+  --el-font-size-base: #{28rpx};
 }
 
 .content {
   height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 35rpx $space-7 $space-9;
+  padding: 35rpx 32rpx 48rpx;
   box-sizing: border-box;
 }
 
 .render-state {
-  margin: $space-3 0;
+  margin: 16rpx 0;
 }
 
 .render-form {
@@ -409,23 +409,23 @@ onShow(() => {
 /* 步骤条：与文字生图页统一样式 */
 .step-bar {
   height: 82rpx;
-  margin: $space-3 $space-7 0;
-  padding: $space-1;
+  margin: 16rpx 32rpx 0;
+  padding: 8rpx;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 0;
-  border-radius: $radius-md;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
   color: $color-muted;
   text-align: center;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
@@ -435,26 +435,26 @@ onShow(() => {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: $space-1;
+  margin-right: 8rpx;
   border-radius: 50%;
   background: #dfdfd5;
   color: $color-muted;
   font-style: normal;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 $space-3;
-  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+  margin: 0 16rpx;
+  background: linear-gradient(90deg, #8a6840, #dfdfd5);
 }
 
 .step.done {
-  color: $color-primary-soft;
+  color: #8a6840;
 
   i {
-    background: $color-primary-light;
+    background: #f7edde;
     color: $color-primary;
   }
 }
@@ -462,7 +462,7 @@ onShow(() => {
 .step.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 
   i {
     /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
@@ -473,9 +473,9 @@ onShow(() => {
 
 /* 卡片与区块标题：与文字生图页统一样式 */
 .config-card {
-  margin-top: $space-6;
-  padding: $space-6;
-  border-radius: $radius-xl;
+  margin-top: 28rpx;
+  padding: 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
@@ -485,20 +485,20 @@ onShow(() => {
 }
 
 .config-title {
-  padding-bottom: $space-6;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 28rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 /* 动卷预览 */
 .preview-body {
   display: flex;
-  gap: $space-4;
+  gap: 20rpx;
 }
 
 .preview-thumb {
@@ -507,7 +507,7 @@ onShow(() => {
   width: 180rpx;
   height: 140rpx;
   overflow: hidden;
-  border-radius: $radius-sm;
+  border-radius: 12rpx;
   background: #eef2ef;
 }
 
@@ -520,11 +520,11 @@ onShow(() => {
   position: absolute;
   bottom: 8rpx;
   left: 8rpx;
-  padding: 4rpx $space-1;
+  padding: 4rpx 8rpx;
   border-radius: 6rpx;
   background: rgba(20, 45, 38, 0.72);
   color: #fff;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .preview-info {
@@ -536,38 +536,38 @@ onShow(() => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: $space-2;
+  gap: 12rpx;
 }
 
 .preview-title {
   flex: 1;
   min-width: 0;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 1.3;
   @include line-clamp(2);
 }
 
 .preview-state {
   flex-shrink: 0;
-  color: $color-primary-soft;
-  font-size: $font-size-badge;
+  color: #8a6840;
+  font-size: 22rpx;
 }
 
 .preview-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-1;
-  margin-top: $space-2;
+  gap: 8rpx;
+  margin-top: 12rpx;
 }
 
 .preview-tag {
-  padding: 4rpx $space-2;
-  border-radius: $radius-sm;
-  background: $color-surface-muted;
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  background: #f8faf7;
+  color: #4e665e;
+  font-size: 22rpx;
 
   &.is-accent {
     background: #f3e4cd;
@@ -576,10 +576,10 @@ onShow(() => {
 }
 
 .preview-desc {
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-normal;
+  font-size: 22rpx;
+  line-height: 1.6;
   @include line-clamp(2);
 }
 
@@ -593,14 +593,14 @@ onShow(() => {
 
   :deep(.el-form-item__error) {
     position: static;
-    padding-top: $space-2;
+    padding-top: 12rpx;
   }
 }
 
 .fps-list {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: 16rpx;
   width: 100%;
 }
 
@@ -610,9 +610,9 @@ onShow(() => {
   height: auto;
   min-height: 100rpx;
   margin: 0;
-  padding: $space-4 76rpx $space-4 $space-5;
+  padding: 20rpx 76rpx 20rpx 24rpx;
   border: 2rpx solid $color-line;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: $color-surface;
   box-sizing: border-box;
 
@@ -646,7 +646,7 @@ onShow(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: $space-1;
+  gap: 8rpx;
 }
 
 .fps-dot {
@@ -661,9 +661,9 @@ onShow(() => {
 }
 
 .fps-name {
-  color: $color-ink-soft;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  color: #4e665e;
+  font-size: 26rpx;
+  font-weight: 700;
 }
 
 .fps-card.is-selected .fps-name {
@@ -671,12 +671,12 @@ onShow(() => {
 }
 
 .fps-tag {
-  padding: 4rpx $space-2;
-  border-radius: $radius-xs;
-  background: $color-surface-muted;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: #f8faf7;
   color: $color-muted;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-regular;
+  font-size: 22rpx;
+  font-weight: 400;
 }
 
 .fps-card.is-selected .fps-tag {
@@ -686,16 +686,16 @@ onShow(() => {
 
 .fps-desc {
   display: block;
-  margin-top: $space-1;
+  margin-top: 8rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-normal;
+  font-size: 22rpx;
+  line-height: 1.6;
 }
 
 .fps-radio {
   position: absolute;
   top: 50%;
-  right: $space-5;
+  right: 24rpx;
   width: 32rpx;
   height: 32rpx;
   margin-top: -16rpx;
@@ -706,14 +706,14 @@ onShow(() => {
 .fps-check {
   position: absolute;
   top: 50%;
-  right: $space-5;
+  right: 24rpx;
   width: 36rpx;
   height: 36rpx;
   margin-top: -18rpx;
   border-radius: 50%;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 /* 资源结算 */
@@ -721,7 +721,7 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .boost-button {
@@ -729,31 +729,31 @@ onShow(() => {
   flex-shrink: 0;
   height: 64rpx;
   margin: 0;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
   border: 1rpx solid #bfe0d1;
-  border-radius: $radius-sm;
+  border-radius: 12rpx;
   background: $color-surface;
-  color: $color-primary-soft;
-  font-size: $font-size-badge;
+  color: #8a6840;
+  font-size: 22rpx;
 
   &:hover {
     border-color: $color-primary;
-    background: $color-primary-light;
+    background: #f7edde;
     color: $color-primary;
   }
 
   :deep(.el-icon) {
     margin-right: 6rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
 .resource-grid {
   display: flex;
-  margin-top: $space-4;
-  padding: $space-4 $space-2;
-  border-radius: $radius-md;
-  background: $color-surface-muted;
+  margin-top: 20rpx;
+  padding: 20rpx 12rpx;
+  border-radius: 16rpx;
+  background: #f8faf7;
 }
 
 .resource-item {
@@ -769,44 +769,44 @@ onShow(() => {
 .resource-label {
   display: block;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .resource-value {
-  margin-top: $space-2;
-  color: $color-primary-soft;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  margin-top: 12rpx;
+  color: #8a6840;
+  font-size: 28rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .resource-unit {
   margin-left: 4rpx;
-  color: $color-ink-soft;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-regular;
+  color: #4e665e;
+  font-size: 22rpx;
+  font-weight: 400;
 }
 
 .resource-tip {
   display: flex;
-  gap: $space-2;
-  margin-top: $space-3;
+  gap: 12rpx;
+  margin-top: 16rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
-  line-height: $line-height-normal;
+  font-size: 22rpx;
+  line-height: 1.6;
 }
 
 .tip-icon {
   flex-shrink: 0;
-  color: $color-primary-soft;
-  font-size: $font-size-badge;
+  color: #8a6840;
+  font-size: 22rpx;
 }
 
 /* 底部操作 */
 .bottom-bar {
   @include action-bar;
   display: flex;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .previous-button {
@@ -815,20 +815,20 @@ onShow(() => {
   height: $tap-size;
   margin: 0;
   border: 1rpx solid $color-line;
-  border-radius: $radius-md;
+  border-radius: 16rpx;
   background: $color-surface;
-  color: $color-ink-soft;
-  font-size: $font-size-body;
+  color: #4e665e;
+  font-size: 28rpx;
 
   &:hover {
     border-color: #bfd8ce;
-    background: $color-surface-muted;
+    background: #f8faf7;
     color: $color-primary;
   }
 
   :deep(.el-icon) {
     margin-right: 4rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 
   &.is-disabled {
@@ -841,22 +841,22 @@ onShow(() => {
   min-width: 0;
   height: $tap-size;
   margin: 0;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
   border: 0;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
 
   &:hover {
-    background: $color-primary-dark;
+    background: #9c6e38;
     color: #fff;
   }
 
   :deep(.el-icon) {
     margin-right: 6rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 
   &.is-disabled {
@@ -871,15 +871,15 @@ onShow(() => {
 
 .platform-unavailable {
   min-height: 100vh;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
 }
 
 .platform-tip {
   display: block;
-  padding: 80rpx $space-9;
-  color: $color-ink-soft;
-  font-size: $font-size-body;
-  line-height: $line-height-relaxed;
+  padding: 80rpx 48rpx;
+  color: #4e665e;
+  font-size: 28rpx;
+  line-height: 1.8;
   text-align: center;
 }
 </style>

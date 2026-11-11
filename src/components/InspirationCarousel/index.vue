@@ -179,22 +179,22 @@ const handleTouchEnd = (event) => {
 
 /* 区块标题：与首页“壹 ·/贰 ·”序号样式统一 */
 .config-title {
-  padding-bottom: $space-5;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 24rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 .workshop-title {
-  margin-top: $space-7;
+  margin-top: 32rpx;
 }
 
 .carousel-state {
-  margin-top: $space-6;
+  margin-top: 28rpx;
 }
 
 /* 灵感工坊轮播 */
@@ -203,7 +203,7 @@ const handleTouchEnd = (event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: $space-6 0;
+  margin: 28rpx 0;
   overflow: hidden;
   perspective: 1200px;
 }
@@ -221,7 +221,7 @@ const handleTouchEnd = (event) => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: $space-6;
+  padding: 28rpx;
   box-sizing: border-box;
   border: 1rpx solid rgba(255, 255, 255, 0.9);
   border-radius: 48rpx;
@@ -266,17 +266,17 @@ const handleTouchEnd = (event) => {
 
 .creation-title {
   display: block;
-  margin-top: $space-1;
-  color: $color-art-ink;
-  font-size: $font-size-body-lg;
-  font-weight: $font-weight-bold;
+  margin-top: 8rpx;
+  color: #202022;
+  font-size: 30rpx;
+  font-weight: 700;
 }
 
 .card-label {
   display: block;
   color: rgba(32, 32, 34, 0.38);
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
+  font-size: 24rpx;
+  font-weight: 600;
   letter-spacing: 2rpx;
 }
 
@@ -284,17 +284,17 @@ const handleTouchEnd = (event) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: $space-5;
-  padding: $space-3 $space-4;
+  margin-top: 24rpx;
+  padding: 16rpx 20rpx;
   border-top: 1rpx solid rgba(212, 189, 150, 0.3);
   border-bottom: 1rpx solid rgba(212, 189, 150, 0.3);
   background: #faf9f5;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .input-prefix {
   flex-shrink: 0;
-  color: $color-art-muted;
+  color: #9b999f;
 }
 
 .input-value {
@@ -306,18 +306,18 @@ const handleTouchEnd = (event) => {
 
 .input-icon {
   flex-shrink: 0;
-  margin-left: $space-3;
-  color: $color-accent-cinnabar;
+  margin-left: 16rpx;
+  color: #c84b31;
 }
 
 .card-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  padding-top: $space-3;
+  gap: 16rpx;
+  padding-top: 16rpx;
   border-top: 1rpx solid rgba(32, 32, 34, 0.07);
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .footer-note {
@@ -330,15 +330,15 @@ const handleTouchEnd = (event) => {
   @include tap-area(72rpx);
   flex-shrink: 0;
   width: 132rpx;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
 }
 
 .pagination-dots {
-  padding: $space-1 0 $space-3;
+  padding: 8rpx 0 16rpx;
   text-align: center;
 }
 
@@ -347,23 +347,23 @@ const handleTouchEnd = (event) => {
   display: inline-block;
   width: 10rpx;
   height: 10rpx;
-  margin: 0 $space-3;
+  margin: 0 16rpx;
   border-radius: 50%;
   background: #d1d5d4;
 }
 
 .pagination-dots text::before {
   position: absolute;
-  top: (-$space-3);
-  right: (-$space-2);
-  bottom: (-$space-3);
-  left: (-$space-2);
+  top: (-16rpx);
+  right: (-12rpx);
+  bottom: (-16rpx);
+  left: (-12rpx);
   content: "";
 }
 
 .pagination-dots .active-dot {
   width: 40rpx;
-  border-radius: $radius-xs;
-  background: $color-primary-soft;
+  border-radius: 8rpx;
+  background: #8a6840;
 }
 </style>

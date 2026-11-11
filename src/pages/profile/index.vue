@@ -182,84 +182,82 @@ onMounted(() => {
 .profile-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .content {
-  height: calc(
-    100vh - #{$header-height} - #{$nav-height} - 120rpx - var(--status-bar-height, 0px)
-  );
+  height: calc(100vh - #{100rpx} - #{102rpx} - 120rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-6 $space-7;
+  padding: 28rpx 32rpx;
   box-sizing: border-box;
 }
 
 .profile-card {
-  @include card-surface($radius-xl, $space-6);
+  @include card-surface(24rpx, 28rpx);
 }
 
 .identity {
-  padding-bottom: $space-5;
+  padding-bottom: 24rpx;
   border-bottom: 1rpx solid $color-line;
 }
 
 .username {
   display: block;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .account {
   display: block;
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .points-entry {
   display: flex;
   align-items: center;
-  gap: $space-2;
-  margin-top: $space-5;
-  padding: $space-5;
-  border-radius: $radius-lg;
-  background: $color-primary-light;
+  gap: 12rpx;
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background: #f7edde;
 }
 
 .points-label {
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  color: #8a6840;
+  font-size: 24rpx;
 }
 
 .points-value {
   color: $color-primary;
-  font-size: $font-size-display-sm;
-  font-weight: $font-weight-bold;
+  font-size: 44rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .points-action {
   margin-left: auto;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  color: #8a6840;
+  font-size: 24rpx;
 }
 
 .logout-bar {
   position: fixed;
   z-index: 10;
   right: 0;
-  bottom: calc(#{$nav-height} + constant(safe-area-inset-bottom));
-  bottom: calc(#{$nav-height} + env(safe-area-inset-bottom));
+  bottom: calc(#{102rpx} + constant(safe-area-inset-bottom));
+  bottom: calc(#{102rpx} + env(safe-area-inset-bottom));
   left: 0;
-  padding: $space-3 $space-7;
+  padding: 16rpx 32rpx;
 
   @media (min-width: 768px) {
     right: auto;
     left: 50%;
-    width: $desktop-content-width;
+    width: 750px;
     transform: translateX(-50%);
   }
 }
@@ -268,11 +266,11 @@ onMounted(() => {
   @include tap-area($tap-size);
   margin: 0;
   padding: 0;
-  border: 1rpx solid $color-line-strong;
-  border-radius: $radius-lg;
+  border: 1rpx solid #d2ddd6;
+  border-radius: 20rpx;
   background: $color-surface;
   color: $color-danger;
-  font-size: $font-size-body;
+  font-size: 28rpx;
   line-height: 1;
 
   &::after {
@@ -292,9 +290,9 @@ onMounted(() => {
 .points-sheet {
   width: 100%;
   max-height: 80vh;
-  padding: $space-7 $space-6;
-  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
-  border-radius: $radius-3xl $radius-3xl 0 0;
+  padding: 32rpx 28rpx;
+  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
+  border-radius: 32rpx 32rpx 0 0;
   background: $color-surface;
   box-sizing: border-box;
 }
@@ -303,83 +301,83 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: $space-4;
+  padding-bottom: 20rpx;
   border-bottom: 1rpx solid $color-line;
 }
 
 .points-title {
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .points-close {
   @include tap-area(72rpx);
   color: $color-muted;
-  font-size: $font-size-title;
+  font-size: 34rpx;
   line-height: 1;
 }
 
 .points-summary {
   display: flex;
-  gap: $space-3;
-  margin-top: $space-5;
+  gap: 16rpx;
+  margin-top: 24rpx;
 }
 
 .summary-item {
   flex: 1;
-  padding: $space-4;
-  border-radius: $radius-lg;
-  background: $color-surface-muted;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  background: #f8faf7;
 }
 
 .summary-label {
   display: block;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .summary-value {
   display: block;
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-primary;
-  font-size: $font-size-body-lg;
-  font-weight: $font-weight-bold;
+  font-size: 30rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .points-state {
-  margin-top: $space-5;
+  margin-top: 24rpx;
 }
 
 .points-list {
   height: 46vh;
-  margin-top: $space-3;
+  margin-top: 16rpx;
 }
 
 .points-item {
   display: flex;
   align-items: center;
-  padding: $space-4 0;
+  padding: 20rpx 0;
   border-bottom: 1rpx solid $color-line;
 }
 
 .points-item-time {
   flex: 1;
   min-width: 0;
-  color: $color-ink-soft;
-  font-size: $font-size-body;
-  line-height: $line-height-normal;
+  color: #4e665e;
+  font-size: 28rpx;
+  line-height: 1.6;
   @include text-ellipsis;
 }
 
 .points-item-value {
   flex-shrink: 0;
-  margin-left: $space-3;
+  margin-left: 16rpx;
   color: $color-primary;
-  font-size: $font-size-body-lg;
-  font-weight: $font-weight-bold;
+  font-size: 30rpx;
+  font-weight: 700;
   @include numeric;
 
   &.is-used {

@@ -72,7 +72,7 @@ const navigateTo = (item) => {
   right: 0;
   bottom: 0;
   left: 0;
-  height: $nav-height;
+  height: 102rpx;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
   display: flex;
@@ -84,7 +84,7 @@ const navigateTo = (item) => {
   @media (min-width: 768px) {
     right: auto;
     left: 50%;
-    width: $desktop-content-width;
+    width: 750px;
     transform: translateX(-50%);
   }
 }
@@ -97,8 +97,8 @@ const navigateTo = (item) => {
   justify-content: center;
   gap: 4rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-tight;
+  font-size: 24rpx;
+  line-height: 1.3;
 }
 
 .nav-icon {
@@ -107,7 +107,7 @@ const navigateTo = (item) => {
 
 .nav-item.is-active {
   color: #ec8302;
-  font-weight: $font-weight-semibold;
+  font-weight: 600;
   text-shadow: 0 0 14rpx rgba(236, 131, 2, 0.45);
 }
 

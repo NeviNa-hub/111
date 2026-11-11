@@ -29,11 +29,7 @@ export default {
     const pages = getCurrentPages();
     const currentRoute = pages[pages.length - 1]?.route as string | undefined;
 
-    if (
-      !getToken() ||
-      !currentRoute ||
-      `/${currentRoute}` === PAGE_PATHS.AUTH
-    ) {
+    if (!getToken() || !currentRoute || `/${currentRoute}` === PAGE_PATHS.AUTH) {
       return;
     }
 
@@ -58,10 +54,10 @@ picker {
 page {
   height: 100%;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
-  font-size: $font-size-body;
-  line-height: $line-height-normal;
+  font-size: 28rpx;
+  line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -70,7 +66,7 @@ page {
 /* #ifdef H5 */
 :root {
   --el-font-family: #{$font-family-base};
-  --el-font-size-base: #{$font-size-body};
+  --el-font-size-base: #{28rpx};
 }
 /* #endif */
 
@@ -78,13 +74,13 @@ page {
 /* 宽屏下限制内容宽度并居中，配合 rpxCalcMaxDeviceWidth 避免 rpx 被无限放大 */
 @media (min-width: 768px) {
   body {
-    background: $color-bg-page;
+    background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   }
 
   uni-page-body {
-    max-width: $desktop-content-width;
+    max-width: 750px;
     margin: 0 auto;
-    background: $color-bg-page;
+    background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   }
 }
 /* #endif */

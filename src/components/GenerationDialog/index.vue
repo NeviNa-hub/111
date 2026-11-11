@@ -33,9 +33,7 @@
       <!-- #ifndef H5 -->
       <view class="dialog-actions">
         <button class="back-button" @click="$emit('back')">返回工作台</button>
-        <button class="confirm-button" @click="$emit('library')">
-          前往作品库查看
-        </button>
+        <button class="confirm-button" @click="$emit('library')">前往作品库查看</button>
       </view>
       <!-- #endif -->
     </view>
@@ -74,8 +72,7 @@ const props = defineProps({
 defineEmits(["back", "library"]);
 
 const dialogTitle = computed(
-  () =>
-    props.title || (props.type === "optimization" ? "淬炼重绘" : "研墨成画"),
+  () => props.title || (props.type === "optimization" ? "淬炼重绘" : "研墨成画")
 );
 
 // 预览生成结果大图
@@ -100,25 +97,25 @@ const previewResult = () => {
 
 .dialog-sheet {
   width: 100%;
-  padding: $space-7 $space-6;
-  padding-bottom: calc(#{$space-5} + constant(safe-area-inset-bottom));
-  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
-  border-radius: $radius-3xl $radius-3xl 0 0;
+  padding: 32rpx 28rpx;
+  padding-bottom: calc(#{24rpx} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
+  border-radius: 32rpx 32rpx 0 0;
   background: $color-surface;
   box-sizing: border-box;
 
   --el-color-primary: #{$color-primary};
-  --el-border-radius-base: #{$radius-lg};
+  --el-border-radius-base: #{20rpx};
   --el-font-family: #{$font-family-base};
 }
 
 .dialog-title {
-  padding-bottom: $space-4;
+  padding-bottom: 20rpx;
   border-bottom: 1rpx solid $color-line;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .progress-sheet {
@@ -128,42 +125,42 @@ const previewResult = () => {
 .progress-circle {
   width: 150rpx;
   height: 150rpx;
-  margin: $space-5 auto $space-4;
+  margin: 24rpx auto 20rpx;
   border: 6rpx solid $color-primary;
   border-radius: 50%;
   color: $color-ink;
-  font-size: $font-size-display;
-  font-weight: $font-weight-bold;
+  font-size: 56rpx;
+  font-weight: 700;
   line-height: 150rpx;
   @include numeric;
 }
 
 .progress-circle small {
-  font-size: $font-size-caption;
-  font-weight: $font-weight-regular;
+  font-size: 24rpx;
+  font-weight: 400;
 }
 
 .progress-label {
   display: block;
   color: $color-primary;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-bold;
+  font-size: 24rpx;
+  font-weight: 700;
 }
 
 .progress-note {
   display: block;
-  margin: $space-5 0;
+  margin: 24rpx 0;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 .result-preview {
   height: 480rpx;
-  margin: $space-5 0 $space-2;
-  border-radius: $radius-xl;
+  margin: 24rpx 0 12rpx;
+  border-radius: 24rpx;
   overflow: hidden;
-  background: $color-surface-muted;
+  background: #f8faf7;
 }
 
 .result-image {
@@ -174,24 +171,24 @@ const previewResult = () => {
 .result-hint {
   display: block;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .dialog-actions {
   display: flex;
-  gap: $space-3;
+  gap: 16rpx;
 
   :deep(.el-button) {
     flex: 1;
     height: $tap-size;
     margin: 0;
-    border-radius: $radius-lg;
-    font-size: $font-size-caption;
+    border-radius: 20rpx;
+    font-size: 24rpx;
   }
 
   :deep(.el-icon) {
     margin-right: 4rpx;
-    font-size: $font-size-badge;
+    font-size: 22rpx;
   }
 }
 
@@ -201,8 +198,8 @@ const previewResult = () => {
   height: $tap-size;
   margin: 0;
   padding: 0;
-  border-radius: $radius-lg;
-  font-size: $font-size-caption;
+  border-radius: 20rpx;
+  font-size: 24rpx;
   line-height: $tap-size;
 
   &::after {
@@ -214,11 +211,11 @@ const previewResult = () => {
 .back-button {
   border: 1rpx solid $color-line;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
 
   &:hover {
     border-color: #bfd8ce;
-    background: $color-surface-muted;
+    background: #f8faf7;
     color: $color-primary;
   }
 }
@@ -229,7 +226,7 @@ const previewResult = () => {
   color: #fff;
 
   &:hover {
-    background: $color-primary-dark;
+    background: #9c6e38;
     color: #fff;
   }
 }

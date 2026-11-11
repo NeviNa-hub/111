@@ -53,9 +53,7 @@
           title="暂无画卷"
           description="完成一次生图任务后，作品会自动归档到这里"
         />
-        <view v-else-if="isLoadingMore" class="load-more"
-          >正在载入更多作品…</view
-        >
+        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />
@@ -192,15 +190,15 @@ onMounted(() => {
 .library-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .content {
   height: calc(100vh - 214rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: $space-6 $space-7;
-  padding-bottom: calc(#{$space-5} + env(safe-area-inset-bottom));
+  padding: 28rpx 32rpx;
+  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -211,11 +209,11 @@ onMounted(() => {
 }
 
 .summary {
-  padding: $space-1 $space-3;
-  border-radius: $radius-pill;
-  background: $color-primary-light;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #f7edde;
+  color: #4e665e;
+  font-size: 24rpx;
   @include numeric;
 }
 
@@ -226,17 +224,17 @@ onMounted(() => {
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-2;
-  margin-top: $space-5;
+  gap: 12rpx;
+  margin-top: 24rpx;
 }
 
 .tabs text {
   @include tap-area(64rpx);
-  padding: 0 $space-5;
-  border-radius: $radius-lg;
+  padding: 0 24rpx;
+  border-radius: 20rpx;
   background: $color-surface;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
+  color: #4e665e;
+  font-size: 24rpx;
   line-height: 1;
   box-shadow: 0 3rpx 10rpx rgba(38, 70, 88, 0.04);
   @include numeric;
@@ -245,17 +243,17 @@ onMounted(() => {
 .tabs text.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-semibold;
+  font-weight: 600;
 }
 
 .library-state {
-  margin-top: $space-6;
+  margin-top: 28rpx;
 }
 
 .load-more {
-  margin-top: $space-5;
+  margin-top: 24rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   text-align: center;
 }
 
@@ -264,10 +262,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   min-height: 120rpx;
-  margin-top: $space-6;
-  padding: $space-4 $space-5 $space-4 $space-3;
+  margin-top: 28rpx;
+  padding: 20rpx 24rpx 20rpx 16rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
   background: $color-surface;
   box-shadow: 0 5rpx 14rpx rgba(39, 76, 96, 0.08);
 }
@@ -275,12 +273,12 @@ onMounted(() => {
 .generating-label {
   flex-shrink: 0;
   width: 64rpx;
-  padding: $space-1 4rpx;
-  border-radius: $radius-xs;
+  padding: 8rpx 4rpx;
+  border-radius: 8rpx;
   background: #fdf0ef;
-  color: $color-accent-cinnabar;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-bold;
+  color: #c84b31;
+  font-size: 22rpx;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
 }
@@ -288,26 +286,26 @@ onMounted(() => {
 .generating-body {
   flex: 1;
   min-width: 0;
-  margin-left: $space-3;
+  margin-left: 16rpx;
 }
 
 .generating-body > text {
   display: block;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
   @include text-ellipsis;
 }
 
 .generating-body > text:first-child {
   color: $color-ink;
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 .generating-body .status {
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-primary;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-semibold;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .close {
@@ -316,7 +314,7 @@ onMounted(() => {
   right: 0;
   @include tap-area(64rpx);
   color: $color-muted;
-  font-size: $font-size-title;
+  font-size: 34rpx;
   line-height: 1;
 }
 
@@ -324,39 +322,39 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  margin: $space-7 0 $space-3;
+  gap: 16rpx;
+  margin: 32rpx 0 16rpx;
   color: $color-ink;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .section-title text {
   color: $color-muted;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-regular;
+  font-size: 24rpx;
+  font-weight: 400;
 }
 
 .work-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .work-card {
   position: relative;
   overflow: hidden;
-  border-radius: $radius-lg;
+  border-radius: 20rpx;
   background: $color-surface;
   box-shadow: 0 2rpx 8rpx rgba(30, 55, 70, 0.06);
 }
 
 .art {
   height: 300rpx;
-  padding: $space-3;
+  padding: 16rpx;
   box-sizing: border-box;
   color: #435e61;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .river-work {
@@ -384,17 +382,17 @@ onMounted(() => {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.88);
   color: #425761;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   text-align: center;
   line-height: 40rpx;
 }
 
 .work-title {
   display: block;
-  padding: $space-4 $space-3;
+  padding: 20rpx 16rpx;
   color: $color-ink;
-  font-size: $font-size-aux;
-  line-height: $line-height-normal;
+  font-size: 26rpx;
+  line-height: 1.6;
   @include text-ellipsis;
 }
 </style>

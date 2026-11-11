@@ -46,7 +46,7 @@ const handleError = () => {
 .app-image {
   display: block;
   overflow: hidden;
-  background: $color-surface-muted;
+  background: #f8faf7;
 }
 
 .app-image-media {
@@ -61,13 +61,13 @@ const handleError = () => {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: $color-primary-light;
-  color: $color-primary-soft;
+  background: #f7edde;
+  color: #8a6840;
 }
 
 .fallback-mark {
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 </style>

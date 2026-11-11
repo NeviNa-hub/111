@@ -148,29 +148,29 @@ onShow(() => {
 .canvas-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .step-bar {
   height: 82rpx;
-  margin: $space-3 $space-7 0;
-  padding: $space-1;
+  margin: 16rpx 32rpx 0;
+  padding: 8rpx;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 0;
-  border-radius: $radius-md;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
   color: $color-muted;
   text-align: center;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
@@ -180,26 +180,26 @@ onShow(() => {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: $space-1;
+  margin-right: 8rpx;
   border-radius: 50%;
   background: #dfdfd5;
   color: $color-muted;
   font-style: normal;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 $space-3;
-  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+  margin: 0 16rpx;
+  background: linear-gradient(90deg, #8a6840, #dfdfd5);
 }
 
 .step.done {
-  color: $color-primary-soft;
+  color: #8a6840;
 
   i {
-    background: $color-primary-light;
+    background: #f7edde;
     color: $color-primary;
   }
 }
@@ -207,7 +207,7 @@ onShow(() => {
 .step.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 
   i {
     /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
@@ -219,98 +219,98 @@ onShow(() => {
 .content {
   height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 34rpx $space-7 170rpx;
+  padding: 34rpx 32rpx 170rpx;
   box-sizing: border-box;
 }
 
 .step-count {
   display: block;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .page-title {
   display: block;
-  margin-top: $space-1;
+  margin-top: 8rpx;
   color: $color-ink;
-  font-size: $font-size-page-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .content-state {
-  margin-top: $space-6;
+  margin-top: 28rpx;
 }
 
 .page-desc {
   display: block;
-  margin-top: $space-1;
+  margin-top: 8rpx;
   color: $color-muted;
-  font-size: $font-size-aux;
-  line-height: $line-height-normal;
+  font-size: 26rpx;
+  line-height: 1.6;
 }
 
 .summary-card {
-  margin-top: $space-5;
-  padding: $space-5;
+  margin-top: 24rpx;
+  padding: 24rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: $color-surface;
 }
 
 .summary-title {
-  padding-bottom: $space-3;
+  padding-bottom: 16rpx;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
 }
 
 .summary-title text {
   float: right;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-regular;
+  color: #8a6840;
+  font-size: 24rpx;
+  font-weight: 400;
 }
 
 .summary-row {
-  margin-top: $space-2;
-  padding: $space-4;
-  border-radius: $radius-sm;
-  background: $color-surface-muted;
-  color: $color-ink-soft;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  margin-top: 12rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  background: #f8faf7;
+  color: #4e665e;
+  font-size: 24rpx;
+  line-height: 1.6;
   word-break: break-all;
 }
 
 .section-title {
   display: flex;
   justify-content: space-between;
-  margin-top: $space-5;
+  margin-top: 24rpx;
   color: $color-ink;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .section-title text {
   color: $color-muted;
-  font-size: $font-size-badge;
-  font-weight: $font-weight-regular;
+  font-size: 22rpx;
+  font-weight: 400;
 }
 
 .ratio-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $space-3;
-  margin-top: $space-3;
+  gap: 16rpx;
+  margin-top: 16rpx;
 }
 
 .ratio-card {
   position: relative;
   min-height: 120rpx;
-  padding: $space-5;
+  padding: 24rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-xl;
+  border-radius: 24rpx;
   background: $color-surface;
   box-sizing: border-box;
 }
@@ -322,7 +322,7 @@ onShow(() => {
 .ratio-icon {
   width: 38rpx;
   height: 38rpx;
-  margin-bottom: $space-3;
+  margin-bottom: 16rpx;
   color: $color-muted;
   line-height: 38rpx;
 }
@@ -334,37 +334,37 @@ onShow(() => {
 .ratio-name {
   display: block;
   color: $color-ink;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
 }
 
 .ratio-desc {
   display: block;
-  margin-top: $space-1;
+  margin-top: 8rpx;
   color: $color-muted;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .chosen {
   position: absolute;
   top: 14rpx;
   right: 14rpx;
-  padding: $space-1 $space-2;
-  border-radius: $radius-sm;
+  padding: 8rpx 12rpx;
+  border-radius: 12rpx;
   background: $color-primary;
   color: #fff;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .cost-card {
-  margin-top: $space-5;
-  padding: $space-5 $space-4;
-  border: 1rpx solid $color-warning-line;
-  border-radius: $radius-lg;
-  background: $color-warning-bg;
+  margin-top: 24rpx;
+  padding: 24rpx 20rpx;
+  border: 1rpx solid #f0e0bd;
+  border-radius: 20rpx;
+  background: #fdf6e8;
   color: $color-warning;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 .cost-card b {
@@ -380,7 +380,7 @@ onShow(() => {
 .bottom-actions {
   @include action-bar;
   display: flex;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .bottom-actions button {
@@ -390,8 +390,8 @@ onShow(() => {
   justify-content: center;
   height: $tap-size;
   padding: 0;
-  border-radius: $radius-md;
-  font-size: $font-size-body;
+  border-radius: 16rpx;
+  font-size: 28rpx;
   line-height: 1;
 }
 
@@ -404,7 +404,7 @@ onShow(() => {
   flex-shrink: 0;
   border: 1rpx solid $color-line;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
 }
 
 .generate {
@@ -412,6 +412,6 @@ onShow(() => {
   border: 0;
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 }
 </style>

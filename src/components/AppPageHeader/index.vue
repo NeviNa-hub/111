@@ -26,15 +26,14 @@ defineProps({
 const pointsBalance = ref(null);
 const canGoBack = ref(false);
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value,
+  pointsBalance.value === null ? "—" : pointsBalance.value
 );
 
 // 根据当前页面栈与浏览器历史决定是否显示返回箭头。
 // H5 刷新后页面栈会重置为 1，但浏览器历史里仍保留上一个路由，此时按历史判断。
 const updateBackState = () => {
   // #ifdef H5
-  canGoBack.value =
-    getCurrentPages().length > 1 || Boolean(window.history.state?.back);
+  canGoBack.value = getCurrentPages().length > 1 || Boolean(window.history.state?.back);
   // #endif
   // #ifndef H5
   canGoBack.value = getCurrentPages().length > 1;
@@ -73,8 +72,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .app-page-header {
-  height: calc(#{$header-height} + var(--status-bar-height, 0px));
-  padding: var(--status-bar-height, 0px) $space-7 0;
+  height: calc(#{100rpx} + var(--status-bar-height, 0px));
+  padding: var(--status-bar-height, 0px) 32rpx 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -89,18 +88,18 @@ onMounted(() => {
   flex: 1;
   min-width: 0;
   color: #ec8302;
-  font-size: $font-size-page-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.3;
   @include text-ellipsis;
 }
 
 .header-back {
   @include tap-area(72rpx);
   flex-shrink: 0;
-  margin: 0 $space-1 0 (-$space-4);
+  margin: 0 8rpx 0 (-20rpx);
   color: #ec8302;
-  font-size: $font-size-display-sm;
+  font-size: 44rpx;
   line-height: 1;
 }
 
@@ -108,20 +107,20 @@ onMounted(() => {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  margin-left: $space-3;
-  padding: $space-1 $space-3;
+  margin-left: 16rpx;
+  padding: 8rpx 16rpx;
   border: 1rpx solid rgba(236, 131, 2, 0.22);
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: #fffaf3;
   color: #b3712a;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
 .points-icon {
-  margin-right: $space-1;
+  margin-right: 8rpx;
   color: #ff0000;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .points-label {
@@ -129,18 +128,18 @@ onMounted(() => {
 }
 
 .points-value {
-  margin-left: $space-1;
+  margin-left: 8rpx;
   color: #ec0202;
-  font-size: $font-size-aux;
-  font-weight: $font-weight-bold;
+  font-size: 26rpx;
+  font-weight: 700;
   @include numeric;
 }
 
 .points-detail {
-  margin-left: $space-2;
-  padding-left: $space-2;
+  margin-left: 12rpx;
+  padding-left: 12rpx;
   border-left: 1rpx solid rgba(236, 131, 2, 0.25);
   color: #b3712a;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 </style>

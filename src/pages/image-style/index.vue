@@ -329,29 +329,29 @@ onShow(() => {
 .style-page {
   height: 100vh;
   overflow: hidden;
-  background: $color-bg-page;
+  background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
 .step-bar {
   height: 82rpx;
-  margin: $space-3 $space-7 0;
-  padding: $space-1;
+  margin: 16rpx 32rpx 0;
+  padding: 8rpx;
   display: flex;
   align-items: center;
   border: 1rpx solid rgba(63, 102, 86, 0.12);
-  border-radius: $radius-2xl;
+  border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 8rpx 22rpx rgba(19, 76, 68, 0.06);
 }
 
 .step {
   flex: 1;
-  padding: $space-2 0;
-  border-radius: $radius-md;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
   color: $color-muted;
   text-align: center;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
@@ -361,26 +361,26 @@ onShow(() => {
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  margin-right: $space-1;
+  margin-right: 8rpx;
   border-radius: 50%;
   background: #dfdfd5;
   color: $color-muted;
   font-style: normal;
-  font-size: $font-size-badge;
+  font-size: 22rpx;
 }
 
 .step-connector {
   flex: 1;
   height: 2rpx;
-  margin: 0 $space-3;
-  background: linear-gradient(90deg, $color-primary-soft, #dfdfd5);
+  margin: 0 16rpx;
+  background: linear-gradient(90deg, #8a6840, #dfdfd5);
 }
 
 .step.done {
-  color: $color-primary-soft;
+  color: #8a6840;
 
   i {
-    background: $color-primary-light;
+    background: #f7edde;
     color: $color-primary;
   }
 }
@@ -388,7 +388,7 @@ onShow(() => {
 .step.active {
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 
   i {
     /* 徽章底色与步骤底色一致时改为半透明白底，避免圆形徽章融进背景 */
@@ -398,14 +398,14 @@ onShow(() => {
 }
 
 .content-state {
-  margin-top: $space-6;
+  margin-top: 28rpx;
 }
 
 .content {
   --content-bottom-pad: 160rpx;
   height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 35rpx $space-7 var(--content-bottom-pad);
+  padding: 35rpx 32rpx var(--content-bottom-pad);
   box-sizing: border-box;
 }
 
@@ -415,9 +415,9 @@ onShow(() => {
 
 /* 卡片与区块标题：与构思页统一样式 */
 .config-card {
-  margin-top: $space-6;
-  padding: $space-6;
-  border-radius: $radius-xl;
+  margin-top: 28rpx;
+  padding: 28rpx;
+  border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
 }
@@ -427,14 +427,14 @@ onShow(() => {
 }
 
 .config-title {
-  padding-bottom: $space-6;
-  color: $color-primary-soft;
-  font-size: $font-size-title;
-  font-weight: $font-weight-bold;
+  padding-bottom: 28rpx;
+  color: #8a6840;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
 .config-title em {
-  color: $color-accent-clay;
+  color: #d9be9b;
 }
 
 .prompt-head {
@@ -442,36 +442,36 @@ onShow(() => {
   align-items: center;
   justify-content: flex-end;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .prompt-input {
   width: 100%;
   height: 250rpx;
-  margin-top: $space-2;
-  font-size: $font-size-body;
-  line-height: $line-height-normal;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
 }
 
 .prompt-tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: $space-2;
-  margin-top: $space-3;
+  gap: 12rpx;
+  margin-top: 16rpx;
 }
 
 .prompt-tools button,
 .suggestions button {
   @include tap-area(64rpx);
-  gap: $space-1;
+  gap: 8rpx;
   margin: 0;
-  padding: 0 $space-3;
+  padding: 0 16rpx;
   border: 1rpx solid $color-line;
-  border-radius: $radius-sm;
+  border-radius: 12rpx;
   background: $color-surface;
-  color: $color-primary-soft;
-  font-size: $font-size-caption;
+  color: #8a6840;
+  font-size: 24rpx;
   line-height: 1;
 }
 
@@ -481,50 +481,50 @@ onShow(() => {
 }
 
 .tool-icon {
-  font-size: $font-size-aux;
+  font-size: 26rpx;
 }
 
 .prompt-tools text {
   margin-left: auto;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .suggestions {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-2;
+  gap: 12rpx;
 }
 
 .suggestions button {
-  color: $color-ink-soft;
+  color: #4e665e;
 }
 
 .tuning-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-3;
-  padding: $space-3 0;
+  gap: 16rpx;
+  padding: 16rpx 0;
   border-top: 1rpx solid $color-line;
 }
 
 .tuning-label {
   flex-shrink: 0;
   color: $color-ink;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .tuning-value {
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
 }
 
 .bottom-actions {
   @include action-bar;
   display: flex;
-  gap: $space-3;
+  gap: 16rpx;
 }
 
 .bottom-actions button {
@@ -534,8 +534,8 @@ onShow(() => {
   justify-content: center;
   height: $tap-size;
   padding: 0;
-  border-radius: $radius-md;
-  font-size: $font-size-body;
+  border-radius: 16rpx;
+  font-size: 28rpx;
   line-height: 1;
 }
 
@@ -548,7 +548,7 @@ onShow(() => {
   flex-shrink: 0;
   border: 1rpx solid $color-line;
   background: $color-surface;
-  color: $color-ink-soft;
+  color: #4e665e;
 }
 
 .next {
@@ -556,7 +556,7 @@ onShow(() => {
   border: 0;
   background: $color-primary;
   color: #fff;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
 }
 
 .bottom-actions button[disabled] {

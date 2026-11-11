@@ -35,22 +35,22 @@ const handleAction = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $space-9 $space-7;
-  border: 1rpx dashed $color-line-strong;
-  border-radius: $radius-xl;
-  background: $color-surface-muted;
+  padding: 48rpx 32rpx;
+  border: 1rpx dashed #d2ddd6;
+  border-radius: 24rpx;
+  background: #f8faf7;
   text-align: center;
 }
 
 .state-hint.is-error {
   border-color: rgba(185, 58, 47, 0.24);
-  background: $color-danger-bg;
+  background: #fdf3f1;
 }
 
 .state-spinner {
   width: 40rpx;
   height: 40rpx;
-  margin-bottom: $space-3;
+  margin-bottom: 16rpx;
   border: 4rpx solid rgba(5, 96, 76, 0.16);
   border-top-color: $color-primary;
   border-radius: 50%;
@@ -64,28 +64,28 @@ const handleAction = () => {
 }
 
 .state-title {
-  color: $color-ink-soft;
-  font-size: $font-size-body;
-  font-weight: $font-weight-semibold;
-  line-height: $line-height-normal;
+  color: #4e665e;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 .state-desc {
-  margin-top: $space-2;
+  margin-top: 12rpx;
   color: $color-muted;
-  font-size: $font-size-caption;
-  line-height: $line-height-normal;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
 
 .state-action {
   @include tap-area(72rpx);
-  margin: $space-5 0 0;
-  padding: 0 $space-7;
+  margin: 24rpx 0 0;
+  padding: 0 32rpx;
   border: 1rpx solid $color-primary;
-  border-radius: $radius-pill;
+  border-radius: 999rpx;
   background: $color-surface;
   color: $color-primary;
-  font-size: $font-size-caption;
+  font-size: 24rpx;
   line-height: 1;
 }
 
