@@ -2,54 +2,72 @@
   <view class="page">
     <app-page-header title="图片优化" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <view class="file">
-        <text v-if="selectedImage"> {{ selectedImage.name }}</text>
-        <text v-else>请先导入需要优化的图片</text>
-        <button @click="chooseImage">
-          {{ selectedImage ? "更换图片" : "导入图片" }}
-        </button>
+      <view class="config-card">
+        <view class="config-title"><em>壹 ·</em> 导入原图</view>
+        <view class="file">
+          <text v-if="selectedImage">{{ selectedImage.name }}</text>
+          <text v-else>请先导入需要优化的图片</text>
+          <button @click="chooseImage">
+            <!-- #ifdef H5 -->
+            <el-icon class="file-icon"><Upload /></el-icon>
+            <!-- #endif -->
+            {{ selectedImage ? "更换图片" : "导入图片" }}
+          </button>
+        </view>
+        <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
+          <app-image
+            v-if="selectedImage"
+            class="preview-media"
+            :src="selectedImage.url || selectedImage.path"
+            mode="aspectFit"
+          />
+          <view v-else class="empty-tip">
+            <!-- #ifdef H5 -->
+            <el-icon class="empty-icon"><Plus /></el-icon>
+            <!-- #endif -->
+            <text>从相册选择或拍摄图片</text>
+          </view>
+          <text v-if="selectedImage" class="cover">已选封面</text>
+          <view v-if="selectedImage" class="zoom">
+            <!-- #ifdef H5 -->
+            <el-icon><ZoomIn /></el-icon>
+            <!-- #endif -->
+          </view>
+        </view>
+        <text class="hint">点击预览可从系统相册重新导入或拍摄</text>
       </view>
-      <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
-        <app-image
-          v-if="selectedImage"
-          class="preview-media"
-          :src="selectedImage.url || selectedImage.path"
-          mode="aspectFit"
-        />
-        <text v-else class="empty-tip"> ＋<small>从相册选择或拍摄图片</small> </text>
-        <text v-if="selectedImage" class="cover"> 已选封面</text>
-        <text v-if="selectedImage" class="ready"> 原图解析就绪 · 4K重绘待命</text>
-        <text v-if="selectedImage" class="zoom">⌕</text>
-      </view>
-      <view class="hint" @click="chooseImage">　点击重新从系统相册导入或拍摄</view>
-      <view class="heading">
-        优化提示词 <small>{{ prompt.length }} / {{ promptLimit }} 字</small>
-      </view>
-      <view class="prompt-card">
+
+      <view class="config-card">
+        <view class="config-title prompt-head">
+          <view><em>贰 ·</em> 优化提示词</view>
+          <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
+        </view>
         <textarea
           v-model="prompt"
           :maxlength="promptLimit"
           class="prompt-input"
           placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
         />
+        <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
       </view>
-      <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
     </scroll-view>
     <view class="actions">
-      <view class="cost">
-        <text>预计消耗 {{ costText }} 灵感点</text>
-        <text>账户结余以实际扣减为准</text>
-      </view>
       <button :disabled="!selectedImage || isSubmitting" @click="startOptimization">
+        <!-- #ifdef H5 -->
+        <el-icon class="action-icon"><MagicStick /></el-icon>
+        <!-- #endif -->
         {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
       </button>
-      <text>云端蒸馏级处理 · 支持高清直存至作品库</text>
     </view>
   </view>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
+
+// #ifdef H5
+import { MagicStick, Plus, Upload, ZoomIn } from "@element-plus/icons-vue";
+// #endif
 
 import { createImageOptimization } from "@/apis/image-optimization";
 import AppImage from "@/components/AppImage/index.vue";
@@ -138,7 +156,7 @@ const startOptimization = async () => {
 .content {
   height: calc(100vh - 220rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 34rpx $space-8 220rpx;
+  padding: 35rpx $space-7 260rpx;
   box-sizing: border-box;
 }
 
@@ -146,11 +164,37 @@ const startOptimization = async () => {
   margin-bottom: $space-5;
 }
 
+/* 卡片与区块标题：与创作页统一样式 */
+.config-card {
+  margin-top: $space-6;
+  padding: $space-6;
+  border-radius: $radius-xl;
+  background: $color-surface;
+  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
+}
+
+.config-card:first-child {
+  margin-top: 0;
+}
+
+.config-title {
+  padding-bottom: $space-6;
+  color: $color-primary-soft;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+}
+
+.config-title em {
+  color: $color-accent-clay;
+}
+
+/* 导入区 */
 .file {
   display: flex;
   align-items: center;
   gap: $space-3;
   min-width: 0;
+  color: $color-ink;
   font-size: $font-size-aux;
   font-weight: $font-weight-bold;
 }
@@ -164,7 +208,8 @@ const startOptimization = async () => {
 .file button {
   @include tap-area(64rpx);
   flex-shrink: 0;
-  margin: 0 0 0 auto;
+  gap: $space-1;
+  margin: 0;
   padding: 0 $space-4;
   border: 0;
   border-radius: $radius-pill;
@@ -178,13 +223,17 @@ const startOptimization = async () => {
   border: 0;
 }
 
+.file-icon {
+  font-size: $font-size-aux;
+}
+
 .preview {
   position: relative;
-  height: 520rpx;
+  height: 320rpx;
   margin-top: $space-4;
   overflow: hidden;
-  border-radius: $radius-md;
-  background: #d8dce4;
+  border-radius: $radius-lg;
+  background: $color-surface-muted;
 }
 
 .preview-media {
@@ -197,52 +246,53 @@ const startOptimization = async () => {
   align-items: center;
   justify-content: center;
   border: 2rpx dashed $color-line-strong;
-  background: $color-surface-muted;
 }
 
 .empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
   color: $color-muted;
-  font-size: $font-size-display;
-  text-align: center;
+  font-size: $font-size-caption;
 }
 
-.empty-tip small {
-  display: block;
-  margin-top: $space-3;
-  font-size: $font-size-caption;
+.empty-icon {
+  color: $color-faint;
+  font-size: $font-size-display-sm;
 }
 
 .cover,
 .ready,
 .zoom {
   position: absolute;
-  background: rgba(45, 64, 78, 0.88);
+  background: rgba(22, 53, 47, 0.82);
   color: #fff;
 }
 
 .cover,
 .ready {
   padding: $space-1 $space-3;
-  border-radius: $radius-xl;
+  border-radius: $radius-pill;
   font-size: $font-size-caption;
 }
 
 .cover {
-  top: 18rpx;
-  left: 18rpx;
+  top: $space-3;
+  left: $space-3;
 }
 
 .ready {
-  bottom: 20rpx;
-  left: 18rpx;
-  max-width: calc(100% - 100rpx);
+  bottom: $space-3;
+  left: $space-3;
+  max-width: calc(100% - 110rpx);
   @include text-ellipsis;
 }
 
 .zoom {
   @include tap-area(56rpx);
-  right: 18rpx;
-  bottom: 20rpx;
+  right: $space-3;
+  bottom: $space-3;
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
@@ -251,36 +301,25 @@ const startOptimization = async () => {
 }
 
 .hint {
+  display: block;
   margin-top: $space-3;
-  padding: $space-4;
-  border: 1rpx dashed $color-line-strong;
-  border-radius: $radius-md;
   color: $color-muted;
-  font-size: $font-size-caption;
+  font-size: $font-size-badge;
   text-align: center;
 }
 
-.heading {
+/* 提示词区 */
+.prompt-head {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  margin-top: $space-6;
-  color: $color-ink;
-  font-size: $font-size-body;
-  font-weight: $font-weight-bold;
+  gap: $space-3;
 }
 
-.heading small {
+.prompt-head text {
   color: $color-muted;
   font-size: $font-size-caption;
   font-weight: $font-weight-regular;
-}
-
-.prompt-card {
-  margin-top: $space-3;
-  padding: $space-4;
-  border: 1rpx solid $color-line;
-  border-radius: $radius-md;
-  background: $color-surface;
 }
 
 .prompt-input {
@@ -299,6 +338,7 @@ const startOptimization = async () => {
   font-size: $font-size-badge;
 }
 
+/* 底部操作 */
 .cost {
   display: flex;
   align-items: center;
@@ -318,12 +358,13 @@ const startOptimization = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: $space-2;
   width: 100%;
   height: $tap-size;
   padding: 0;
   border: 0;
   border-radius: $radius-xl;
-  background: $color-primary;
+  background: linear-gradient(135deg, $color-primary-soft 0%, $color-primary-dark 100%);
   color: #fff;
   font-size: $font-size-body;
   font-weight: $font-weight-bold;
@@ -338,7 +379,11 @@ const startOptimization = async () => {
   color: #f4f6f5;
 }
 
-.actions text {
+.action-icon {
+  font-size: $font-size-aux;
+}
+
+.actions > text {
   display: block;
   margin-top: $space-3;
   color: $color-muted;
