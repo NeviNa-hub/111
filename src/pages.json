@@ -52,13 +52,13 @@
     {
       "path": "pages/video-creation/index",
       "style": {
-        "navigationBarTitleText": "规制与意境"
+        "navigationBarTitleText": "生成视频"
       }
     },
     {
       "path": "pages/video-render/index",
       "style": {
-        "navigationBarTitleText": "画质与渲染"
+        "navigationBarTitleText": "生成视频"
       }
     },
     {
