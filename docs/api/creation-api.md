@@ -151,26 +151,27 @@
 
 ```json
 {
-  "summary": "共 12 幅典藏 · 1 幅研墨中",
+  "summary": "共 3 幅典藏 · 1 幅研墨中",
   "tabs": [
-    { "status": "all", "name": "全部", "count": 12 },
-    { "status": "completed", "name": "已完成", "count": 7 },
+    { "status": "all", "name": "全部", "count": 3 },
+    { "status": "completed", "name": "已完成", "count": 1 },
     { "status": "creating", "name": "创作中", "count": 1 },
-    { "status": "draft", "name": "草稿", "count": 4 }
+    { "status": "draft", "name": "草稿", "count": 1 }
   ],
-  "page_info": { "page": 1, "page_size": 10, "total": 12 },
+  "page_info": { "page": 1, "page_size": 10, "total": 3 },
   "lists": [
     {
       "work_id": 1,
       "title": "《寒江独钓图》",
       "status": "completed",
       "class_name": "river-work",
+      "type_name": "文字生图",
       "image_url": ""
     }
   ],
   "generating": {
-    "work_id": 3,
-    "title": "《烟渚微茫图》",
+    "work_id": 2,
+    "title": "《空山新雨》运镜短片",
     "status_text": "生成中 · 墨骨勾勒"
   }
 }
@@ -181,6 +182,7 @@
 - `summary` 必须与 `tabs` 中 `all.count` 口径一致，前端已在 Mock 中按同一数据源计算，避免出现“摘要 18 / 全部 19”。
 - `generating` 为可选对象，没有进行中的任务时返回 `null`。
 - `image_url` 为空时页面使用 `class_name` 对应的渐变底纹占位。
+- `type_name` 为创作类型名称（文字生图 / 视频创作 / 图片优化），展示在卡片左上角。
 - 待定：作品创建时间、导出状态、缩略图尺寸等字段。
 
 ## 7. 文字生图
@@ -240,7 +242,12 @@
 请求体：
 
 ```json
-{ "prompt": "宋式青绿水墨远山", "style": "宋式水墨", "ratio": "1:1", "count": "双张" }
+{
+  "prompt": "宋式青绿水墨远山",
+  "style": "宋式水墨",
+  "ratio": "1:1",
+  "count": "双张"
+}
 ```
 
 响应 `data`：

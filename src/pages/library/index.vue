@@ -17,7 +17,7 @@
           :class="{ active: activeStatus === tab.status }"
           @click="handleTabChange(tab.status)"
         >
-          {{ tab.name }}　{{ tabCount(tab.status) }}
+          {{ tab.name }}　{{ tab.count }}
         </text>
       </view>
       <app-state-hint
@@ -40,7 +40,7 @@
         <view class="work-grid">
           <view v-for="work in works" :key="work.workId" class="work-card">
             <view class="art">
-              <text>逸才意境</text>
+              <text>{{ work.typeName }}</text>
             </view>
             <text class="more">•••</text>
             <text class="work-title">{{ work.title }}</text>
@@ -53,7 +53,9 @@
           title="暂无画卷"
           description="完成一次生图任务后，作品会自动归档到这里"
         />
-        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
+        <view v-else-if="isLoadingMore" class="load-more"
+          >正在载入更多作品…</view
+        >
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />
@@ -73,12 +75,12 @@ const PAGE_SIZE = 10;
 
 const activeStatus = ref("all");
 const works = ref([]);
-const tabs = [
-  { status: "all", name: "全部" },
-  { status: "completed", name: "已完成" },
-  { status: "creating", name: "创作中" },
-  { status: "draft", name: "草稿" },
-];
+const tabs = ref([
+  { status: "all", name: "全部", count: 0 },
+  { status: "completed", name: "已完成", count: 0 },
+  { status: "creating", name: "创作中", count: 0 },
+  { status: "draft", name: "草稿", count: 0 },
+]);
 const librarySummary = computed(() => `共 ${pageInfo.value.total} 幅典藏`);
 const pageInfo = ref({ page: 1, pageSize: PAGE_SIZE, total: 0 });
 const isLoading = ref(true);
@@ -88,14 +90,6 @@ const loadError = ref(false);
 let requestToken = 0;
 
 const hasMore = computed(() => works.value.length < pageInfo.value.total);
-
-const tabCount = (status) => {
-  if (status === activeStatus.value) {
-    return pageInfo.value.total;
-  }
-
-  return "";
-};
 
 /**
  * 加载作品库数据，并丢弃过期响应避免切换筛选时旧数据覆盖新状态。
@@ -124,6 +118,9 @@ const loadLibraryData = async (reset = false) => {
       return;
     }
 
+    if (Array.isArray(data.tabs)) {
+      tabs.value = data.tabs;
+    }
     pageInfo.value = {
       page: Number(data.page_info?.page) || page,
       pageSize: Number(data.page_info?.page_size) || PAGE_SIZE,
@@ -133,6 +130,7 @@ const loadLibraryData = async (reset = false) => {
       ? data.lists.map((item) => ({
           workId: item.work_id,
           title: item.title || "",
+          typeName: item.type_name || "",
         }))
       : [];
     works.value = reset ? pageWorks : works.value.concat(pageWorks);
