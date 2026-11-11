@@ -3,16 +3,60 @@
     <app-page-header title="我的" />
 
     <scroll-view scroll-y :show-scrollbar="false" class="content">
+      <!-- 用户信息卡 -->
       <view class="profile-card">
         <view class="identity">
-          <text class="username">用户名：{{ usernameText }}</text>
-          <text class="account">账号：{{ accountText }}</text>
+          <view class="avatar">
+            <!-- #ifdef H5 -->
+            <el-icon><User /></el-icon>
+            <!-- #endif -->
+          </view>
+          <view class="identity-copy">
+            <view class="identity-name">
+              <text class="username">{{ usernameText }}</text>
+              <text class="identity-tag">灵感创作者</text>
+            </view>
+            <text class="account">账号 {{ accountText }}</text>
+          </view>
         </view>
 
         <view class="points-entry" @tap="openPointsDialog">
-          <text class="points-label">可用积分</text>
-          <text class="points-value">{{ pointsText }}</text>
-          <text class="points-action">积分流水 ›</text>
+          <view class="points-badge">
+            <!-- #ifdef H5 -->
+            <el-icon><Coin /></el-icon>
+            <!-- #endif -->
+          </view>
+          <view class="points-copy">
+            <text class="points-label">灵感点</text>
+            <text class="points-value">{{ pointsText }}</text>
+          </view>
+          <view class="points-action">
+            <text>积分流水</text>
+            <!-- #ifdef H5 -->
+            <el-icon class="points-action-icon"><ArrowRight /></el-icon>
+            <!-- #endif -->
+          </view>
+        </view>
+      </view>
+
+      <!-- 常用功能 -->
+      <view class="menu-card">
+        <view class="menu-title">常用功能</view>
+        <view
+          v-for="item in menuItems"
+          :key="item.key"
+          class="menu-row"
+          @tap="openMenu(item)"
+        >
+          <view class="menu-icon" :class="`is-${item.key}`">
+            <!-- #ifdef H5 -->
+            <el-icon><component :is="item.icon" /></el-icon>
+            <!-- #endif -->
+          </view>
+          <text class="menu-label">{{ item.label }}</text>
+          <!-- #ifdef H5 -->
+          <el-icon class="menu-arrow"><ArrowRight /></el-icon>
+          <!-- #endif -->
         </view>
       </view>
     </scroll-view>
@@ -26,7 +70,7 @@
     <view v-if="isPointsDialogVisible" class="points-mask" @tap="closePointsDialog">
       <view class="points-sheet" @tap.stop>
         <view class="points-header">
-          <text class="points-title">灵感点流水</text>
+          <text class="points-title">积分使用流水</text>
           <text class="points-close" @tap="closePointsDialog">×</text>
         </view>
 
@@ -38,10 +82,6 @@
           <view class="summary-item">
             <text class="summary-label">已使用</text>
             <text class="summary-value">{{ usedPointsText }}</text>
-          </view>
-          <view class="summary-item">
-            <text class="summary-label">流水条数</text>
-            <text class="summary-value">{{ totalText }}</text>
           </view>
         </view>
 
@@ -90,6 +130,18 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 
+// #ifdef H5
+import {
+  ArrowRight,
+  Brush,
+  Coin,
+  Grid,
+  PictureFilled,
+  Setting,
+  User,
+} from "@element-plus/icons-vue";
+// #endif
+
 import { logoutUser } from "@/apis/auth";
 import { PAGE_PATHS } from "@/apis/constants";
 import { getPointsInfo } from "@/apis/points";
@@ -99,6 +151,37 @@ import AppStateHint from "@/components/AppStateHint/index.vue";
 import { clearSession, sessionState } from "@/stores";
 
 const POINTS_PAGE_SIZE = 20;
+
+const menuItems = [
+  {
+    key: "creation",
+    label: "创作台",
+    icon: Brush,
+    url: "/pages/workbench/index",
+    relaunch: true,
+  },
+  {
+    key: "works",
+    label: "作品库",
+    icon: PictureFilled,
+    url: "/pages/library/index",
+    relaunch: true,
+  },
+  {
+    key: "workshop",
+    label: "工作坊",
+    icon: Grid,
+    url: "/pages/under-development/index?title=工作坊",
+    relaunch: false,
+  },
+  {
+    key: "setting",
+    label: "设置",
+    icon: Setting,
+    url: "/pages/under-development/index?title=设置",
+    relaunch: false,
+  },
+];
 
 const pointsBalance = ref(null);
 const usedPoints = ref(null);
@@ -153,6 +236,22 @@ const closePointsDialog = () => {
 };
 
 /**
+ * 打开常用功能页面；主页面与底部导航一致用 reLaunch，次级页保留返回路径。
+ *
+ * @param {{url: string, relaunch: boolean}} item 菜单配置。
+ * @returns {void}
+ */
+const openMenu = (item) => {
+  if (item.relaunch) {
+    uni.reLaunch({ url: item.url });
+
+    return;
+  }
+
+  uni.navigateTo({ url: item.url });
+};
+
+/**
  * 退出登录：调用登出接口并清理本地会话。
  * @returns {Promise<void>}
  */
@@ -198,21 +297,54 @@ onMounted(() => {
 }
 
 .identity {
-  padding-bottom: 24rpx;
-  border-bottom: 1rpx solid $color-line;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d9a86b 0%, #b8864e 100%);
+  color: #fff;
+  font-size: 44rpx;
+  box-shadow: 0 8rpx 20rpx rgba(184, 134, 78, 0.3);
+}
+
+.identity-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.identity-name {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .username {
-  display: block;
   color: $color-ink;
   font-size: 34rpx;
   font-weight: 700;
   line-height: 1.3;
 }
 
+.identity-tag {
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: 20rpx;
+}
+
 .account {
   display: block;
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   color: $color-muted;
   font-size: 24rpx;
 }
@@ -220,11 +352,31 @@ onMounted(() => {
 .points-entry {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  margin-top: 24rpx;
+  gap: 20rpx;
+  margin-top: 28rpx;
   padding: 24rpx;
+  border: 1rpx solid #efdfc2;
   border-radius: 20rpx;
-  background: #f7edde;
+  background: linear-gradient(135deg, #faf0df 0%, #f5e6cd 100%);
+}
+
+.points-badge {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: $color-primary;
+  color: #fff;
+  font-size: 32rpx;
+  box-shadow: 0 6rpx 16rpx rgba(184, 134, 78, 0.32);
+}
+
+.points-copy {
+  display: flex;
+  flex-direction: column;
 }
 
 .points-label {
@@ -234,15 +386,86 @@ onMounted(() => {
 
 .points-value {
   color: $color-primary;
-  font-size: 44rpx;
+  font-size: 40rpx;
   font-weight: 700;
+  line-height: 1.2;
   @include numeric;
 }
 
 .points-action {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
   margin-left: auto;
   color: #8a6840;
   font-size: 24rpx;
+}
+
+.points-action-icon {
+  font-size: 24rpx;
+}
+
+/* 常用功能 */
+.menu-card {
+  @include card-surface(24rpx, 16rpx 28rpx);
+  margin-top: 24rpx;
+}
+
+.menu-title {
+  padding: 8rpx 0 4rpx;
+  color: $color-ink;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+}
+
+.menu-row + .menu-row {
+  border-top: 1rpx solid #f0e9df;
+}
+
+.menu-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 16rpx;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: 32rpx;
+}
+
+.menu-icon.is-works {
+  background: #f1f0fd;
+  color: #595bdc;
+}
+
+.menu-icon.is-workshop {
+  background: #fdf6e8;
+  color: $color-warning;
+}
+
+.menu-icon.is-setting {
+  background: #f8faf7;
+  color: $color-muted;
+}
+
+.menu-label {
+  flex: 1;
+  color: $color-ink;
+  font-size: 28rpx;
+}
+
+.menu-arrow {
+  color: #c9b79b;
+  font-size: 26rpx;
 }
 
 .logout-bar {
@@ -352,7 +575,7 @@ onMounted(() => {
 }
 
 .points-list {
-  height: 46vh;
+  max-height: 46vh;
   margin-top: 16rpx;
 }
 

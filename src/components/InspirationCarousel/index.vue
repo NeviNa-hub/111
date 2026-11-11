@@ -1,6 +1,5 @@
 <template>
   <view class="inspiration-carousel">
-    <view class="config-title workshop-title"><em>贰 ·</em> 灵感工坊</view>
     <view
       v-if="creations.length"
       class="carousel-stage"

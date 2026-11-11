@@ -2,15 +2,18 @@
   <view class="development-page">
     <app-page-header :title="title" />
     <scroll-view scroll-y :show-scrollbar="false" class="content-area">
-      <view class="content-card">
-        <view class="icon"></view>
-        <text class="title">{{ title }}正在建设中</text>
-        <text class="description">该功能暂未开放，我们正在持续完善创作体验。</text>
-        <button class="primary-button" @tap="goWorkbench">返回创作台</button>
-        <button class="secondary-button" @tap="goBack">返回上一页</button>
+      <view class="content-inner">
+        <view class="content-card">
+          <text class="title">{{ title }}正在建设中</text>
+          <text class="description">
+            该功能暂未开放，正在持续完善中。去试试其他功能吧！</text
+          >
+
+          <!-- 灵感工坊：功能未开放时同样提供创作入口 -->
+          <inspiration-carousel class="workshop-carousel" />
+          <button class="secondary-button" @tap="goBack">返回上一页</button>
+        </view>
       </view>
-      <!-- 灵感工坊：功能未开放时同样提供创作入口 -->
-      <inspiration-carousel class="workshop-section" />
     </scroll-view>
     <app-bottom-nav active="workshop" />
   </view>
@@ -36,11 +39,6 @@ onLoad((query) => {
   uni.setNavigationBarTitle({ title: `${title.value}建设中` });
 });
 
-// 返回创作台。
-const goWorkbench = () => {
-  uni.reLaunch({ url: "/pages/workbench/index" });
-};
-
 // 返回上一页。
 const goBack = () => {
   uni.navigateBack();
@@ -61,13 +59,21 @@ const goBack = () => {
 .content-area {
   height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 内容整体垂直居中；内容超高时随内容增高并可滚动 */
+.content-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   padding: 0 32rpx calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 .content-card {
   width: 100%;
-  margin-top: 28rpx;
   padding: 64rpx 40rpx;
   box-sizing: border-box;
   border: 1rpx solid $color-line;
@@ -77,19 +83,9 @@ const goBack = () => {
   text-align: center;
 }
 
-.workshop-section {
-  margin-bottom: 28rpx;
-}
-
-.icon {
-  width: 112rpx;
-  height: 112rpx;
-  margin: 0 auto;
-  border-radius: 50%;
-  background: #f7edde;
-  color: $color-primary;
-  font-size: 56rpx;
-  line-height: 112rpx;
+.workshop-carousel {
+  margin-bottom: 24rpx;
+  text-align: left;
 }
 
 .title,
@@ -112,36 +108,24 @@ const goBack = () => {
   line-height: 1.8;
 }
 
-.primary-button,
 .secondary-button {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: $tap-size;
+  margin-top: 16rpx;
   padding: 0;
   box-sizing: border-box;
+  border: 1rpx solid $color-line;
   border-radius: 20rpx;
+  background: $color-surface;
+  color: #4e665e;
   font-size: 28rpx;
   line-height: 1.3;
 }
 
-.primary-button:after,
 .secondary-button:after {
   border: 0;
-}
-
-.primary-button {
-  border: 0;
-  background: $color-primary;
-  color: #fff;
-  font-weight: 600;
-}
-
-.secondary-button {
-  margin-top: 16rpx;
-  border: 1rpx solid $color-line;
-  background: $color-surface;
-  color: #4e665e;
 }
 </style>
