@@ -2,15 +2,13 @@
 
 基于 uni-app（Vue 3）的 AI 创作应用前端，覆盖「文字生图 / 视频创作 / 图片优化」三条创作链路，支持 H5 与微信小程序等多端编译。整体采用茶金 + 暖杏的国风暖色视觉。
 
-> 当前为前端演示阶段：除登录外，业务数据由内置 Mock 提供（`src/mock`），可一键切换真实后端。
-
 ## 功能概览
 
 | 模块 | 说明 |
 | --- | --- |
 | 登录 / 注册 | 账号密码登录、注册、协议勾选，会话令牌持久化 |
-| 首页 · 文稿库 | 今日推荐轮播、灵感工坊创作入口、积分展示 |
-| 创作台 | 创作流程概览、分镜与草稿管理 |
+| 首页 · 文稿库 | 灵感工坊创作入口 |
+| 创作台 | 创作类型选择 |
 | 文字生图 | 提示词编辑 → 挑选画风 → 设定画幅 → 画卷生成 |
 | 视频创作 | 画幅 / 创作模式 / 意境构想 → 规格画质 → 渲染预览 |
 | 图片优化 | 上传原图、优化项选择、效果对比 |
@@ -35,7 +33,7 @@ npm run dev:mp-weixin   # 微信小程序，开发者工具导入 dist/dev/mp-we
 npm run build:mp-weixin # 小程序生产产物
 ```
 
-Mock 开关：`.env.development` 中 `VITE_USE_MOCK=true` 走内置假数据，改为 `false` 走真实后端（基地址由 `VITE_API_BASE_URL` 配置）。
+Mock 开关：`.env.development` 中 `VITE_USE_MOCK=true` 走内置模拟数据，改为 `false` 走真实后端（基地址由 `VITE_API_BASE_URL` 配置）。
 
 ## 目录结构
 
@@ -56,36 +54,34 @@ src/
 
 ### 登录 / 注册
 
-![登录](docs/screenshots/auth.png)
 
 ### 首页 · 文稿库
 
-![首页](docs/screenshots/home.png)
 
 ### 创作台
 
-![创作台](docs/screenshots/workbench.png)
+
 
 ### 文字生图
 
-![文字生图](docs/screenshots/image-creation.png)
+
 
 ### 视频创作
 
-![视频创作](docs/screenshots/video-creation.png)
+
 
 ### 图片优化
 
-![图片优化](docs/screenshots/image-optimization.png)
+
 
 ### 作品库
 
-![作品库](docs/screenshots/library.png)
+
 
 ### 我的
 
-![我的](docs/screenshots/profile.png)
+
 
 ### 工作坊
 
-![工作坊](docs/screenshots/workshop.png)
+
