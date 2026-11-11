@@ -1,39 +1,29 @@
 <template>
   <view class="profile-page">
-    <view class="page-header">
-      <text class="page-title">我的</text>
-    </view>
+    <app-page-header title="我的" />
 
     <scroll-view scroll-y :show-scrollbar="false" class="content">
       <view class="profile-card">
         <view class="identity">
-          <text class="username">{{ usernameText }}</text>
-          <text class="account">账号 {{ accountText }}</text>
+          <text class="username">用户名：{{ usernameText }}</text>
+          <text class="account">账号：{{ accountText }}</text>
         </view>
 
         <view class="points-entry" @tap="openPointsDialog">
-          <text class="points-label">灵感点</text>
+          <text class="points-label">可用积分</text>
           <text class="points-value">{{ pointsText }}</text>
-          <text class="points-action">流水 ›</text>
+          <text class="points-action">积分流水 ›</text>
         </view>
       </view>
     </scroll-view>
 
     <view class="logout-bar">
-      <button
-        class="logout-button"
-        :disabled="isLoggingOut"
-        @tap="handleLogout"
-      >
+      <button class="logout-button" :disabled="isLoggingOut" @tap="handleLogout">
         退出登录
       </button>
     </view>
 
-    <view
-      v-if="isPointsDialogVisible"
-      class="points-mask"
-      @tap="closePointsDialog"
-    >
+    <view v-if="isPointsDialogVisible" class="points-mask" @tap="closePointsDialog">
       <view class="points-sheet" @tap.stop>
         <view class="points-header">
           <text class="points-title">灵感点流水</text>
@@ -76,16 +66,9 @@
           :show-scrollbar="false"
           class="points-list"
         >
-          <view
-            v-for="item in pointsItems"
-            :key="item.ledger_id"
-            class="points-item"
-          >
+          <view v-for="item in pointsItems" :key="item.ledger_id" class="points-item">
             <text class="points-item-time">{{ item.created_at }}</text>
-            <text
-              class="points-item-value"
-              :class="{ 'is-used': item.delta < 0 }"
-            >
+            <text class="points-item-value" :class="{ 'is-used': item.delta < 0 }">
               {{ item.delta }}
             </text>
           </view>
@@ -111,6 +94,7 @@ import { logoutUser } from "@/apis/auth";
 import { PAGE_PATHS } from "@/apis/constants";
 import { getPointsInfo } from "@/apis/points";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
+import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
 import { clearSession, sessionState } from "@/stores";
 
@@ -128,10 +112,10 @@ const isLoggingOut = ref(false);
 const usernameText = computed(() => sessionState.user?.username || "—");
 const accountText = computed(() => sessionState.user?.account || "—");
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value,
+  pointsBalance.value === null ? "—" : pointsBalance.value
 );
 const usedPointsText = computed(() =>
-  usedPoints.value === null ? "—" : usedPoints.value,
+  usedPoints.value === null ? "—" : usedPoints.value
 );
 const totalText = computed(() => (total.value === null ? "—" : total.value));
 
@@ -202,27 +186,9 @@ onMounted(() => {
   color: $color-ink;
 }
 
-.page-header {
-  height: calc(#{$header-height} + var(--status-bar-height, 0px));
-  padding: var(--status-bar-height, 0px) $space-7 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  border-bottom: 1rpx solid $color-line;
-  background: $color-surface;
-}
-
-.page-title {
-  color: $color-primary;
-  font-size: $font-size-page-title;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
-}
-
 .content {
   height: calc(
-    100vh - #{$header-height} - #{$nav-height} -
-      120rpx - var(--status-bar-height, 0px)
+    100vh - #{$header-height} - #{$nav-height} - 120rpx - var(--status-bar-height, 0px)
   );
   overflow-x: hidden;
   padding: $space-6 $space-7;
@@ -289,8 +255,6 @@ onMounted(() => {
   bottom: calc(#{$nav-height} + env(safe-area-inset-bottom));
   left: 0;
   padding: $space-3 $space-7;
-  border-top: 1rpx solid $color-line;
-  background: rgba(255, 255, 255, 0.97);
 
   @media (min-width: 768px) {
     right: auto;

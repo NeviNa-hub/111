@@ -26,14 +26,15 @@ defineProps({
 const pointsBalance = ref(null);
 const canGoBack = ref(false);
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value
+  pointsBalance.value === null ? "—" : pointsBalance.value,
 );
 
 // 根据当前页面栈与浏览器历史决定是否显示返回箭头。
 // H5 刷新后页面栈会重置为 1，但浏览器历史里仍保留上一个路由，此时按历史判断。
 const updateBackState = () => {
   // #ifdef H5
-  canGoBack.value = getCurrentPages().length > 1 || Boolean(window.history.state?.back);
+  canGoBack.value =
+    getCurrentPages().length > 1 || Boolean(window.history.state?.back);
   // #endif
   // #ifndef H5
   canGoBack.value = getCurrentPages().length > 1;
@@ -77,15 +78,17 @@ onMounted(() => {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-bottom: 1rpx solid $color-line;
-  background: $color-surface;
-  color: $color-ink;
+  border-bottom: 1rpx solid rgba(190, 140, 70, 0.18);
+  background: #ffecd2;
+  // background: #ffdaa6f8;
+  // color: #b3712a;
+  color: #b3712a;
 }
 
 .header-title {
   flex: 1;
   min-width: 0;
-  color: $color-primary;
+  color: #ec8302;
   font-size: $font-size-page-title;
   font-weight: $font-weight-bold;
   line-height: $line-height-tight;
@@ -96,7 +99,7 @@ onMounted(() => {
   @include tap-area(72rpx);
   flex-shrink: 0;
   margin: 0 $space-1 0 (-$space-4);
-  color: $color-ink;
+  color: #ec8302;
   font-size: $font-size-display-sm;
   line-height: 1;
 }
@@ -107,17 +110,17 @@ onMounted(() => {
   align-items: center;
   margin-left: $space-3;
   padding: $space-1 $space-3;
-  border: 1rpx solid rgba(95, 133, 117, 0.16);
+  border: 1rpx solid rgba(236, 131, 2, 0.22);
   border-radius: $radius-pill;
-  background: $color-primary-light;
-  color: $color-primary-soft;
+  background: #fffaf3;
+  color: #b3712a;
   font-size: $font-size-caption;
   white-space: nowrap;
 }
 
 .points-icon {
   margin-right: $space-1;
-  color: $color-accent-clay;
+  color: #ff0000;
   font-size: $font-size-badge;
 }
 
@@ -127,7 +130,7 @@ onMounted(() => {
 
 .points-value {
   margin-left: $space-1;
-  color: $color-primary;
+  color: #ec0202;
   font-size: $font-size-aux;
   font-weight: $font-weight-bold;
   @include numeric;
@@ -136,8 +139,8 @@ onMounted(() => {
 .points-detail {
   margin-left: $space-2;
   padding-left: $space-2;
-  border-left: 1rpx solid rgba(95, 133, 117, 0.22);
-  color: $color-primary-soft;
+  border-left: 1rpx solid rgba(236, 131, 2, 0.25);
+  color: #b3712a;
   font-size: $font-size-badge;
 }
 </style>

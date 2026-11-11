@@ -249,7 +249,7 @@ const handleSubmit = async () => {
 .auth-page {
   height: 100vh;
   overflow: hidden;
-  background: #f7f8ff;
+  background: $color-bg-page;
   color: $color-ink;
 }
 

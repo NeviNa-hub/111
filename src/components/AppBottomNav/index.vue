@@ -7,22 +7,42 @@
       :class="{ 'is-active': active === item.key }"
       @tap="navigateTo(item)"
     >
+      <!-- #ifdef H5 -->
+      <el-icon class="nav-icon">
+        <component :is="item.icon" />
+      </el-icon>
+      <!-- #endif -->
       <text>{{ item.label }}</text>
     </view>
   </view>
 </template>
 
 <script setup>
+// #ifdef H5
+import { Brush, Document, Grid, PictureFilled, User } from "@element-plus/icons-vue";
+// #endif
+
 const NAV_ITEMS = [
-  { key: "drafts", label: "文稿库", url: "/pages/index/index" },
-  { key: "creation", label: "创作台", url: "/pages/workbench/index" },
-  { key: "works", label: "作品库", url: "/pages/library/index" },
+  { key: "drafts", label: "文稿库", icon: Document, url: "/pages/index/index" },
+  {
+    key: "creation",
+    label: "创作台",
+    icon: Brush,
+    url: "/pages/workbench/index",
+  },
+  {
+    key: "works",
+    label: "作品库",
+    icon: PictureFilled,
+    url: "/pages/library/index",
+  },
   {
     key: "workshop",
     label: "工作坊",
+    icon: Grid,
     url: "/pages/under-development/index?title=工作坊",
   },
-  { key: "profile", label: "我的", url: "/pages/profile/index" },
+  { key: "profile", label: "我的", icon: User, url: "/pages/profile/index" },
 ];
 
 /**
@@ -75,13 +95,23 @@ const navigateTo = (item) => {
   align-items: center;
   flex-direction: column;
   justify-content: center;
+  gap: 4rpx;
   color: $color-muted;
   font-size: $font-size-caption;
   line-height: $line-height-tight;
 }
 
+.nav-icon {
+  font-size: 40rpx;
+}
+
 .nav-item.is-active {
-  color: $color-primary;
+  color: #ec8302;
   font-weight: $font-weight-semibold;
+  text-shadow: 0 0 14rpx rgba(236, 131, 2, 0.45);
+}
+
+.nav-item.is-active .nav-icon {
+  filter: drop-shadow(0 0 8rpx rgba(236, 131, 2, 0.5));
 }
 </style>

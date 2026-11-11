@@ -65,7 +65,8 @@ $color-warning: #a9761c;
 $color-warning-bg: #fdf6e8;
 $color-warning-line: #f0e0bd;
 $color-danger: #b93a2f;
-$color-bg-page: #f6f7f3;
+/* 全局页面背景：暖杏渐变，自上而下逐步变淡 */
+$color-bg-page: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
 $color-surface: #ffffff;
 $color-surface-muted: #f8faf7;
 $color-line: #e3e9e5;

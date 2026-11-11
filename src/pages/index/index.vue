@@ -10,24 +10,15 @@
       scroll-with-animation
     >
       <view class="page-body">
-        <!-- 问候语 -->
-        <!-- <view class="greeting-row">
-          <view class="greeting-left">
-            <text class="greeting-title">东方意象美学</text>
-            <text class="greeting-desc">以笔为引，以意生花 · 极简智能多模态创作</text>
-          </view>
-          <text class="weather">{{ weatherText }}</text>
-        </view> -->
-
         <!-- 主视觉 -->
         <view class="hero">
-          <text class="hero-title">把灵感变成作品</text>
-          <text class="hero-subtitle">AI 帮你快速生成图片、视频并优化画面效果</text>
+          <text class="hero-title">妙笔生花 一念成画</text>
+          <text class="hero-subtitle">AI 帮你把灵感变成作品</text>
           <view class="hero-art">
             <app-image class="hero-image" src="/static/home/home.jpg" mode="aspectFill" />
             <view class="hero-label">今日推荐</view>
             <view class="hero-caption">AI 大模型</view>
-            <view class="hero-hint">提示词：水墨淋漓，青绿设色，微风拂动 ...</view>
+            <view class="hero-hint">提示词：温馨治愈，青绿设色，微风拂动 ...</view>
           </view>
           <view class="hero-meta"> </view>
           <view class="hero-actions">
@@ -43,35 +34,36 @@
 
         <!-- 灵感工坊 -->
         <view id="workshop-anchor" class="workshop">
-          <view class="workshop-head">
-            <text class="workshop-title">灵感工坊</text>
-            <text class="workshop-subtitle">选择一种创作方式，把想法变成作品</text>
-          </view>
-          <view
-            v-for="(mode, index) in creationModes"
-            :key="mode.key"
-            class="mode-row"
-            :class="`mode-row-${index + 1}`"
-            @click="openMode(mode.url)"
-          >
-            <view class="mode-icon">
+          <view class="workshop-card">
+            <view class="workshop-head">
+              <text class="workshop-title">灵感工坊</text>
+              <text class="workshop-subtitle">选择一种创作方式，把想法变成作品</text>
+            </view>
+            <view
+              v-for="(mode, index) in creationModes"
+              :key="mode.key"
+              class="mode-row"
+              :class="`mode-row-${index + 1}`"
+              @click="openMode(mode.url)"
+            >
+              <view class="mode-icon">
+                <!-- #ifdef H5 -->
+                <el-icon><component :is="mode.icon" /></el-icon>
+                <!-- #endif -->
+              </view>
+              <view class="mode-copy">
+                <text class="mode-name">{{ mode.name }}</text>
+                <text class="mode-note">{{ mode.note }}</text>
+              </view>
               <!-- #ifdef H5 -->
-              <el-icon><component :is="mode.icon" /></el-icon>
+              <el-icon class="mode-arrow"><ArrowRight /></el-icon>
               <!-- #endif -->
             </view>
-            <view class="mode-copy">
-              <text class="mode-name">{{ mode.name }}</text>
-              <text class="mode-desc">{{ mode.input }}</text>
-              <text class="mode-note">{{ mode.note }}</text>
-            </view>
-            <!-- #ifdef H5 -->
-            <el-icon class="mode-arrow"><ArrowRight /></el-icon>
-            <!-- #endif -->
           </view>
         </view>
 
-        <!-- 创作想法入口 -->
-        <view class="prompt-bar" @click="goCreation">
+        <!-- 创作想法入口：仅展示，不提供点击交互 -->
+        <view class="prompt-bar">
           <text class="prompt-placeholder">输入你的创作想法</text>
           <view class="prompt-button">
             <!-- #ifdef H5 -->
@@ -116,7 +108,6 @@ const creationModes = [
   {
     key: "image",
     name: "文字生图",
-    input: "意境：宋式青绿水墨...",
     note: "字句勾勒意境",
     icon: Brush,
     url: "/pages/image-creation/index",
@@ -124,7 +115,6 @@ const creationModes = [
   {
     key: "video",
     name: "视频创作",
-    input: "镜头：微风荡起波澜...",
     note: "融汇静止为流动",
     icon: VideoPlay,
     url: "/pages/video-creation/index",
@@ -132,7 +122,6 @@ const creationModes = [
   {
     key: "optimization",
     name: "图片优化",
-    input: "优化：超高清晰画质",
     note: "一键唤醒纤毫纹理",
     icon: MagicStick,
     url: "/pages/image-optimization/index",
@@ -174,18 +163,13 @@ const openMode = (url) => {
 
   uni.navigateTo({ url });
 };
-
-// 进入文字生图流程
-const goCreation = () => {
-  uni.navigateTo({ url: "/pages/image-creation/index" });
-};
 </script>
 
 <style scoped lang="scss">
 .home-page {
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(180deg, #fff9f0 0%, #fbeeda 100%);
+  background: $color-bg-page;
   color: $color-ink;
 }
 
@@ -244,28 +228,26 @@ const goCreation = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: $space-4;
 }
 
 .hero-title {
-  color: #8a5a1f;
+  color: #ec8302;
   font-size: 56rpx;
   font-weight: $font-weight-bold;
   letter-spacing: 4rpx;
 }
 
 .hero-subtitle {
-  margin-top: $space-2;
-  color: #b08d5f;
+  color: #9e7239;
   font-size: $font-size-caption;
 }
 
 .hero-art {
   position: relative;
-  width: 100%;
+  width: 90%;
   height: 300rpx;
   margin-top: $space-5;
-  padding: 10rpx;
+  padding: 8rpx;
   border-radius: 36rpx;
   background: #fff;
   box-shadow: 0 16rpx 40rpx rgba(190, 140, 70, 0.12);
@@ -365,8 +347,7 @@ const goCreation = () => {
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: $space-4;
-  margin-top: $space-5;
+  gap: $space-8;
 }
 
 .action-primary {
@@ -412,7 +393,17 @@ const goCreation = () => {
 
 /* 灵感工坊 */
 .workshop {
-  margin-top: $space-8;
+  margin-top: $space-7;
+}
+
+/* 白色整体底卡：衬托在页面渐变背景上 */
+.workshop-card {
+  padding: $space-5;
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 32rpx;
+  background: #fff;
+  box-shadow: 0 16rpx 40rpx rgba(190, 140, 70, 0.1),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.9);
 }
 
 .workshop-head {
@@ -433,20 +424,38 @@ const goCreation = () => {
   font-size: $font-size-caption;
 }
 
+/* 功能行通用结构；配色由各行类名区分 */
 .mode-row {
   display: flex;
   align-items: center;
   gap: $space-3;
   margin-top: $space-3;
   padding: $space-4;
-  border: 1rpx solid #f4e4c6;
+  border: 1rpx solid transparent;
   border-radius: $radius-lg;
-  background: #fdf3e2;
+  transition: transform 0.15s ease;
+}
+
+.mode-row:active {
+  transform: scale(0.98);
+}
+
+.mode-row-1 {
+  border-color: #fffefc;
+  background: linear-gradient(150deg, #ffebeb 0%, #fffefc 100%);
+  box-shadow: 0 8rpx 22rpx rgba(226, 158, 66, 0.16);
+}
+
+.mode-row-2 {
+  border-color: #fffefc;
+  background: linear-gradient(150deg, #fbffed 0%, #fffefc 100%);
+  box-shadow: 0 8rpx 22rpx rgba(96, 98, 200, 0.14);
 }
 
 .mode-row-3 {
-  border-color: #eee4d2;
-  background: #fffdf8;
+  border-color: #f9fffc;
+  background: linear-gradient(150deg, #f4fdf8 0%, #f3fff9 100%);
+  box-shadow: 0 8rpx 22rpx rgba(5, 96, 76, 0.12);
 }
 
 .mode-icon {
@@ -456,11 +465,12 @@ const goCreation = () => {
   justify-content: center;
   width: 72rpx;
   height: 72rpx;
-  border-radius: $radius-md;
-  background: #fff;
-  color: #e8942f;
-  font-size: $font-size-body-lg;
-  box-shadow: 0 4rpx 12rpx rgba(190, 140, 70, 0.1);
+  color: #d97c1e;
+  font-size: 44rpx;
+}
+
+.mode-row-2 .mode-icon {
+  color: $color-accent-violet;
 }
 
 .mode-row-3 .mode-icon {
@@ -493,6 +503,43 @@ const goCreation = () => {
   color: #b3a08a;
   font-size: $font-size-badge;
   @include text-ellipsis;
+}
+
+/* 各行文字随模块配色 */
+.mode-row-1 .mode-name {
+  color: #c26a10;
+}
+
+.mode-row-1 .mode-desc {
+  color: #d18a3a;
+}
+
+.mode-row-1 .mode-note {
+  color: #e0aa6b;
+}
+
+.mode-row-2 .mode-name {
+  color: #5c5ecf;
+}
+
+.mode-row-2 .mode-desc {
+  color: #8889d6;
+}
+
+.mode-row-2 .mode-note {
+  color: #a9aae4;
+}
+
+.mode-row-3 .mode-name {
+  color: #0c4f3e;
+}
+
+.mode-row-3 .mode-desc {
+  color: #3f7263;
+}
+
+.mode-row-3 .mode-note {
+  color: #6f9789;
 }
 
 .mode-arrow {
