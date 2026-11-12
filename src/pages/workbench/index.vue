@@ -187,11 +187,12 @@ const startTool = (name) => {
 
 /* ========== 工具卡片通用结构 ========== */
 .tool-card {
-  margin-bottom: 28rpx;
+  /* 左右留 margin：阴影画在 margin 区域内，避免被 scroll-view 内部容器裁剪 */
+  margin: 0 4rpx 28rpx;
   padding: 24rpx;
   border-radius: 28rpx;
   background: $color-surface;
-  box-shadow: 0 6rpx 20rpx rgba(150, 100, 40, 0.14);
+  box-shadow: 0 6rpx 18rpx rgba(150, 100, 40, 0.14);
 }
 
 /* 卡片标题行 */

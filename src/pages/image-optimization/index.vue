@@ -248,11 +248,11 @@ const goLibrary = () => {
 
 /* 卡片与区块标题：与创作页统一样式 */
 .config-card {
-  margin-top: 28rpx;
+  margin: 0 6rpx 28rpx;
   padding: 28rpx;
   border-radius: 24rpx;
   background: $color-surface;
-  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.04);
+  box-shadow: 0 6rpx 20rpx rgba(150, 100, 40, 0.14);
 }
 
 .config-card:first-child {
