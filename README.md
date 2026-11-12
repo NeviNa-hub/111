@@ -50,7 +50,7 @@ src/
 └─ utils/       # 请求、鉴权等工具
 ```
 
-## 实现效果预览。
+## APP端 实现效果预览。
 
 ### 登录 / 注册
 <img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/784b4055-d5ea-45bf-bf31-45d7ce3df7e5" />
@@ -100,5 +100,10 @@ src/
 
 ### 工作坊
 <img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/2a5e88a4-4bf5-4e38-93fc-85d964dbbcac" />
+
+
+
+## PC端 实现效果预览。
+<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/3254bf13-01ca-4044-a4b2-9d4a2a373a48" />
 
 
