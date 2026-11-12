@@ -62,8 +62,7 @@ src/
 
 
 ### 创作台
-<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/54831963-e3dc-4f8c-bd6b-cfdd31806c85" />
-<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/187da5c2-0c1d-4e57-9c6a-bd968de786c5" />
+<img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/54be160d-e951-40f1-9add-b41ff51ee2a1" />
 
 
 
