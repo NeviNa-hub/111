@@ -56,6 +56,12 @@
                   <el-icon><component :is="mode.icon" /></el-icon>
                   <!-- #endif -->
                 </view>
+                <!-- 功能模块装饰元素 -->
+                <view class="mode-deco">
+                  <view class="deco-item deco-a"></view>
+                  <view class="deco-item deco-b"></view>
+                  <view class="deco-item deco-c"></view>
+                </view>
               </view>
             </view>
           </view>
@@ -432,6 +438,7 @@ const openMode = (url) => {
   padding: 24rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .is-optimization {
@@ -483,7 +490,7 @@ const openMode = (url) => {
   color: #5d8879;
 }
 
-/* 右上角白色圆底图标 */
+/* 右上角图标 */
 .mode-icon {
   position: absolute;
   top: 24rpx;
@@ -491,11 +498,7 @@ const openMode = (url) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.75);
-  font-size: 40rpx;
+  font-size: 80rpx;
 }
 
 .is-image .mode-icon {
@@ -508,6 +511,117 @@ const openMode = (url) => {
 
 .is-optimization .mode-icon {
   color: #d98a3e;
+}
+
+/* 卡片角落装饰：默认隐藏，按模块覆写 */
+.mode-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.deco-item {
+  position: absolute;
+  opacity: 0.5;
+}
+
+/* 文字生图 · 右下墨竹枝：细枝 + 三片竹叶 */
+.is-image .deco-a {
+  right: 40rpx;
+  bottom: 30rpx;
+  width: 3rpx;
+  height: 70rpx;
+  border-radius: 3rpx;
+  background: #9a7434;
+  transform: rotate(38deg);
+  transform-origin: bottom center;
+}
+
+.is-image .deco-b {
+  right: 58rpx;
+  bottom: 72rpx;
+  width: 26rpx;
+  height: 8rpx;
+  border-radius: 8rpx 100% 100% 8rpx;
+  background: #9a7434;
+  transform: rotate(-24deg);
+}
+
+.is-image .deco-c {
+  right: 44rpx;
+  bottom: 96rpx;
+  width: 22rpx;
+  height: 7rpx;
+  border-radius: 7rpx 100% 100% 7rpx;
+  background: #9a7434;
+  transform: rotate(30deg);
+}
+
+/* 视频创作 · 左下胶片条：带齿孔的小段胶片 */
+.is-video .deco-a {
+  left: 20rpx;
+  bottom: 22rpx;
+  width: 84rpx;
+  height: 26rpx;
+  border: 3rpx solid #4e8f7b;
+  border-radius: 6rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 8rpx,
+    rgba(78, 143, 123, 0.55) 8rpx,
+    rgba(78, 143, 123, 0.55) 16rpx
+  );
+  transform: rotate(-12deg);
+}
+
+.is-video .deco-b {
+  right: 36rpx;
+  bottom: 30rpx;
+  width: 22rpx;
+  height: 22rpx;
+  border: 3rpx solid #4e8f7b;
+  border-radius: 50%;
+}
+
+.is-video .deco-c {
+  right: 110rpx;
+  bottom: 20rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #4e8f7b;
+}
+
+/* 图片优化 · 右下放大镜：镜框 + 手柄 + 高光点 */
+.is-optimization .deco-a {
+  right: 120rpx;
+  bottom: 34rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border: 4rpx solid #d98a3e;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.is-optimization .deco-b {
+  right: 106rpx;
+  bottom: 24rpx;
+  width: 30rpx;
+  height: 6rpx;
+  border-radius: 6rpx;
+  background: #d98a3e;
+  transform: rotate(45deg);
+  transform-origin: right center;
+}
+
+.is-optimization .deco-c {
+  right: 190rpx;
+  bottom: 60rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #d98a3e;
 }
 
 /* 创作想法入口 */
