@@ -83,10 +83,11 @@ export const WORKBENCH_OVERVIEW = {
 const LIBRARY_WORKS = [
   {
     work_id: 1,
-    title: "《寒江独钓图》",
+    title: "《水墨画：寒江独钓图》",
     status: "completed",
     class_name: "river-work",
     type_name: "文字生图",
+    created_at: "2026-06-06 14:32",
   },
   {
     work_id: 2,
@@ -94,6 +95,7 @@ const LIBRARY_WORKS = [
     status: "creating",
     class_name: "bamboo-work",
     type_name: "视频创作",
+    created_at: "2026-11-11 09:05",
   },
   {
     work_id: 3,
@@ -101,6 +103,7 @@ const LIBRARY_WORKS = [
     status: "draft",
     class_name: "tea-work",
     type_name: "图片优化",
+    created_at: "2026-11-12 20:18",
   },
 ];
 

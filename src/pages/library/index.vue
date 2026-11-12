@@ -37,13 +37,13 @@
       />
       <view v-else class="library-body">
         <view class="section-title">历史画卷 <text>长按可批量导出</text></view>
-        <view class="work-grid">
+        <view class="work-list">
           <view v-for="work in works" :key="work.workId" class="work-card">
-            <view class="art">
-              <text>{{ work.typeName }}</text>
+            <text class="work-type">{{ work.typeName }}</text>
+            <view class="work-info">
+              <text class="work-title">{{ work.title }}</text>
+              <text class="work-time">{{ work.time }}</text>
             </view>
-            <text class="more">•••</text>
-            <text class="work-title">{{ work.title }}</text>
           </view>
         </view>
         <app-state-hint
@@ -53,9 +53,7 @@
           title="暂无画卷"
           description="完成一次生图任务后，作品会自动归档到这里"
         />
-        <view v-else-if="isLoadingMore" class="load-more"
-          >正在载入更多作品…</view
-        >
+        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />
@@ -131,6 +129,7 @@ const loadLibraryData = async (reset = false) => {
           workId: item.work_id,
           title: item.title || "",
           typeName: item.type_name || "",
+          time: item.created_at || "",
         }))
       : [];
     works.value = reset ? pageWorks : works.value.concat(pageWorks);
@@ -333,64 +332,54 @@ onMounted(() => {
   font-weight: 400;
 }
 
-.work-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.work-list {
+  display: flex;
+  flex-direction: column;
   gap: 16rpx;
 }
 
 .work-card {
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 28rpx;
   border-radius: 20rpx;
   background: $color-surface;
   box-shadow: 0 2rpx 8rpx rgba(30, 55, 70, 0.06);
 }
 
-.art {
-  height: 300rpx;
-  padding: 16rpx;
-  box-sizing: border-box;
-  color: #435e61;
-  font-size: 24rpx;
+.work-type {
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  background: linear-gradient(150deg, #d9a86b 0%, #b8864e 100%);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.6;
+  box-shadow: 0 4rpx 10rpx rgba(184, 134, 78, 0.28);
 }
 
-.river-work {
-  background: linear-gradient(145deg, #e7e5d8 5%, #aebbb2 55%, #657c7b);
-}
-
-.bamboo-work {
-  background: linear-gradient(145deg, #f2eee1 15%, #b1cdbb 55%, #6c947b);
-}
-
-.tea-work {
-  background: linear-gradient(145deg, #8b684c 0 12%, #f0e7d9 13% 68%, #c5a47b);
-}
-
-.mist-work {
-  background: linear-gradient(145deg, #f0eee1, #b3c4be 52%, #576f71);
-}
-
-.more {
-  position: absolute;
-  top: 12rpx;
-  right: 12rpx;
-  width: 46rpx;
-  height: 46rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
-  color: #425761;
-  font-size: 24rpx;
-  text-align: center;
-  line-height: 40rpx;
+.work-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6rpx;
+  min-width: 0;
 }
 
 .work-title {
-  display: block;
-  padding: 20rpx 16rpx;
   color: $color-ink;
-  font-size: 26rpx;
-  line-height: 1.6;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.4;
   @include text-ellipsis;
+}
+
+.work-time {
+  color: $color-muted;
+  font-size: 22rpx;
+  line-height: 1.4;
+  @include numeric;
 }
 </style>

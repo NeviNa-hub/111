@@ -37,27 +37,26 @@
           <view class="workshop-card">
             <view class="workshop-head">
               <text class="workshop-title">灵感工坊</text>
-              <text class="workshop-subtitle">选择一种创作方式，把想法变成作品</text>
+              <text class="workshop-subtitle">换一种方式打开灵感</text>
             </view>
-            <view
-              v-for="(mode, index) in creationModes"
-              :key="mode.key"
-              class="mode-row"
-              :class="`mode-row-${index + 1}`"
-              @click="openMode(mode.url)"
-            >
-              <view class="mode-icon">
-                <!-- #ifdef H5 -->
-                <el-icon><component :is="mode.icon" /></el-icon>
-                <!-- #endif -->
+            <view class="mode-grid">
+              <view
+                v-for="mode in creationModes"
+                :key="mode.key"
+                class="mode-card"
+                :class="`is-${mode.key}`"
+                @click="openMode(mode.url)"
+              >
+                <view class="mode-copy">
+                  <text class="mode-name">{{ mode.name }}</text>
+                  <text class="mode-desc">{{ mode.desc }}</text>
+                </view>
+                <view class="mode-icon">
+                  <!-- #ifdef H5 -->
+                  <el-icon><component :is="mode.icon" /></el-icon>
+                  <!-- #endif -->
+                </view>
               </view>
-              <view class="mode-copy">
-                <text class="mode-name">{{ mode.name }}</text>
-                <text class="mode-note">{{ mode.note }}</text>
-              </view>
-              <!-- #ifdef H5 -->
-              <el-icon class="mode-arrow"><ArrowRight /></el-icon>
-              <!-- #endif -->
             </view>
           </view>
         </view>
@@ -85,14 +84,7 @@
 import { computed, ref } from "vue";
 
 // #ifdef H5
-import {
-  ArrowRight,
-  Brush,
-  EditPen,
-  MagicStick,
-  Star,
-  VideoPlay,
-} from "@element-plus/icons-vue";
+import { Brush, EditPen, MagicStick, Star, VideoPlay } from "@element-plus/icons-vue";
 // #endif
 
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
@@ -108,21 +100,21 @@ const creationModes = [
   {
     key: "image",
     name: "文字生图",
-    note: "字句勾勒意境",
+    desc: "落笔成画",
     icon: Brush,
     url: "/pages/image-creation/index",
   },
   {
     key: "video",
     name: "视频创作",
-    note: "融汇静止为流动",
+    desc: "让画面动起来",
     icon: VideoPlay,
     url: "/pages/video-creation/index",
   },
   {
     key: "optimization",
     name: "图片优化",
-    note: "一键唤醒纤毫纹理",
+    desc: "焕新细节",
     icon: MagicStick,
     url: "/pages/image-optimization/index",
   },
@@ -424,128 +416,98 @@ const openMode = (url) => {
   font-size: 24rpx;
 }
 
-/* 功能行通用结构；配色由各行类名区分 */
-.mode-row {
+/* 功能宫格：前两张半宽并排，第三张通栏 */
+.mode-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.mode-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-top: 16rpx;
-  padding: 20rpx;
-  border: 1rpx solid transparent;
-  border-radius: 20rpx;
-  transition: transform 0.15s ease;
+  width: calc(50% - 10rpx);
+  min-height: 190rpx;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  box-sizing: border-box;
 }
 
-.mode-row:active {
-  transform: scale(0.98);
+.is-optimization {
+  width: 100%;
 }
 
-.mode-row-1 {
-  border-color: #fffefc;
-  background: linear-gradient(150deg, #ffebeb 0%, #fffefc 100%);
-  box-shadow: 0 8rpx 22rpx rgba(226, 158, 66, 0.16);
+/* 文字生图 · 暖黄 */
+.is-image {
+  background: linear-gradient(150deg, #f8e7c3 0%, #f2d59b 100%);
+  box-shadow: 0 10rpx 24rpx rgba(200, 150, 60, 0.22);
 }
 
-.mode-row-2 {
-  border-color: #fffefc;
-  background: linear-gradient(150deg, #fbffed 0%, #fffefc 100%);
-  box-shadow: 0 8rpx 22rpx rgba(200, 75, 49, 0.14);
+/* 视频创作 · 青绿 */
+.is-video {
+  background: linear-gradient(150deg, #d9eee6 0%, #b9ddcf 100%);
+  box-shadow: 0 10rpx 24rpx rgba(90, 150, 125, 0.22);
 }
 
-.mode-row-3 {
-  border-color: #f9fffc;
-  background: linear-gradient(150deg, #f4fdf8 0%, #f3fff9 100%);
-  box-shadow: 0 8rpx 22rpx rgba(5, 96, 76, 0.12);
-}
-
-.mode-icon {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 72rpx;
-  height: 72rpx;
-  color: #c26108;
-  font-size: 44rpx;
-}
-
-.mode-row-2 .mode-icon {
-  color: #b8402a;
-}
-
-.mode-row-3 .mode-icon {
-  color: $color-primary;
+/* 图片优化 · 暖橙 */
+.is-optimization {
+  background: linear-gradient(150deg, #fdeeda 0%, #f8ddba 100%);
+  box-shadow: 0 10rpx 24rpx rgba(210, 150, 80, 0.22);
 }
 
 .mode-copy {
-  flex: 1;
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
 }
 
 .mode-name {
-  display: block;
   color: #6b4423;
-  font-size: 28rpx;
+  font-size: 32rpx;
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .mode-desc {
-  display: block;
-  margin-top: 4rpx;
-  color: #8d7657;
+  color: #a9803f;
   font-size: 24rpx;
-  @include text-ellipsis;
+  line-height: 1.4;
 }
 
-.mode-note {
-  display: block;
-  margin-top: 2rpx;
-  color: #b3a08a;
-  font-size: 22rpx;
-  @include text-ellipsis;
+.is-video .mode-name {
+  color: #2f5d50;
 }
 
-/* 各行文字随模块配色 */
-.mode-row-1 .mode-name {
-  color: #a34a08;
+.is-video .mode-desc {
+  color: #5d8879;
 }
 
-.mode-row-1 .mode-desc {
-  color: #bc6215;
+/* 右上角白色圆底图标 */
+.mode-icon {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 40rpx;
 }
 
-.mode-row-1 .mode-note {
-  color: #d68d4a;
+.is-image .mode-icon {
+  color: #c08a2e;
 }
 
-.mode-row-2 .mode-name {
-  color: #b03a20;
+.is-video .mode-icon {
+  color: #4e8f7b;
 }
 
-.mode-row-2 .mode-desc {
-  color: #c25136;
-}
-
-.mode-row-2 .mode-note {
-  color: #d69a86;
-}
-
-.mode-row-3 .mode-name {
-  color: #0c4f3e;
-}
-
-.mode-row-3 .mode-desc {
-  color: #3f7263;
-}
-
-.mode-row-3 .mode-note {
-  color: #6f9789;
-}
-
-.mode-arrow {
-  flex-shrink: 0;
-  color: #d8c3a5;
-  font-size: 26rpx;
+.is-optimization .mode-icon {
+  color: #d98a3e;
 }
 
 /* 创作想法入口 */
