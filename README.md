@@ -106,4 +106,5 @@ src/
 ## PC端 实现效果预览。
 <img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/3254bf13-01ca-4044-a4b2-9d4a2a373a48" />
 
+<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/077dce46-1d4b-4c8c-8f7a-d1227387bb8e" />
 
