@@ -203,7 +203,7 @@ const startTool = (name) => {
 
 .card-title {
   flex-shrink: 0;
-  color: $color-ink;
+  color: $color-primary;
   font-size: 34rpx;
   font-weight: 700;
 }
@@ -211,9 +211,10 @@ const startTool = (name) => {
 .card-tag {
   flex-shrink: 0;
   padding: 8rpx 12rpx;
-  border: 1rpx solid rgba(5, 96, 76, 0.24);
+  border: 1rpx solid rgba(232, 106, 74, 0.3);
   border-radius: 8rpx;
-  color: $color-primary;
+  background: #fdeee9;
+  color: #e86a4a;
   font-size: 22rpx;
 }
 
