@@ -8,7 +8,7 @@
         <text class="brand-subtitle">
           {{
             isRegister
-              ? "创建账号，收藏你的第一份灵感。"
+              ? "创建账号，实现你的第一份灵感。"
               : "登录后继续创作，查看你的作品。"
           }}
         </text>
