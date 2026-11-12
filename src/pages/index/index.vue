@@ -68,7 +68,10 @@
 
         <!-- 创作想法入口：仅展示，不提供点击交互 -->
         <view class="prompt-bar">
-          <text class="prompt-placeholder">输入你的创作想法</text>
+          <text class="prompt-placeholder">
+            {{ typedPrompt }}
+            <text class="prompt-caret"></text>
+          </text>
           <view class="prompt-button">
             <!-- #ifdef H5 -->
             <el-icon class="prompt-edit"><EditPen /></el-icon>
@@ -86,7 +89,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 
 // #ifdef H5
 import { Brush, EditPen, MagicStick, Star, VideoPlay } from "@element-plus/icons-vue";
@@ -124,6 +127,20 @@ const creationModes = [
 ];
 const scrollIntoId = ref("");
 
+/* 打字机循环展示的创作想法 */
+const PROMPT_IDEAS = [
+  "我想创作出一幅青绿山水…",
+  "帮我画一只慵懒的橘猫…",
+  "创作一段治愈的画面…",
+];
+const TYPE_SPEED = 140;
+const ERASE_SPEED = 60;
+const HOLD_FULL = 1800;
+const HOLD_EMPTY = 500;
+
+const typedPrompt = ref("");
+let typeTimer = null;
+
 const quote = computed(() => homeData.quote);
 
 // 进入创作台开始创作
@@ -140,6 +157,53 @@ const browseIdeas = () => {
     scrollIntoId.value = "workshop-anchor";
   }, 50);
 };
+
+/**
+ * 打字机效果：逐字敲出创作想法，停留后删除并切换下一条，循环播放。
+ *
+ * @param {number} ideaIndex 当前展示的想法下标。
+ * @param {number} charIndex 已处理的字符数。
+ * @param {boolean} isErasing 是否处于删除阶段。
+ * @returns {void}
+ */
+const runTypewriter = (ideaIndex = 0, charIndex = 0, isErasing = false) => {
+  const idea = PROMPT_IDEAS[ideaIndex];
+
+  if (!isErasing) {
+    typedPrompt.value = idea.slice(0, charIndex + 1);
+
+    if (charIndex + 1 >= idea.length) {
+      typeTimer = setTimeout(() => runTypewriter(ideaIndex, charIndex, true), HOLD_FULL);
+      return;
+    }
+
+    typeTimer = setTimeout(
+      () => runTypewriter(ideaIndex, charIndex + 1, false),
+      TYPE_SPEED
+    );
+    return;
+  }
+
+  typedPrompt.value = idea.slice(0, charIndex);
+
+  if (charIndex <= 0) {
+    const nextIndex = (ideaIndex + 1) % PROMPT_IDEAS.length;
+    typeTimer = setTimeout(() => runTypewriter(nextIndex, 0, false), HOLD_EMPTY);
+    return;
+  }
+
+  typeTimer = setTimeout(
+    () => runTypewriter(ideaIndex, charIndex - 1, true),
+    ERASE_SPEED
+  );
+};
+
+// 页面进入即开始打字机动画
+runTypewriter();
+
+onUnmounted(() => {
+  clearTimeout(typeTimer);
+});
 
 /**
  * 打开对应创作方式页面。
@@ -610,6 +674,29 @@ const openMode = (url) => {
   min-width: 0;
   color: #c4ad8d;
   font-size: 24rpx;
+}
+
+/* 打字机光标：跟随文案闪烁 */
+.prompt-caret {
+  display: inline-block;
+  width: 2rpx;
+  height: 24rpx;
+  margin-left: 4rpx;
+  background: #e07f23;
+  vertical-align: -2rpx;
+  animation: caret-blink 0.9s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  60% {
+    opacity: 1;
+  }
+
+  61%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .prompt-button {
