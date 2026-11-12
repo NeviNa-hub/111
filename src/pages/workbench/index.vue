@@ -2,113 +2,115 @@
   <view class="workbench-page">
     <app-page-header title="创作台" />
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <!-- 01 文字生图 -->
-      <view class="tool-card tool-teal">
-        <view class="card-heading">
-          <text class="card-title">文字生图</text>
-          <text class="card-tag">墨韵·宣</text>
-          <text class="card-ready">向导就绪</text>
+      <view class="content-grid">
+        <!-- 01 文字生图 -->
+        <view class="tool-card tool-teal">
+          <view class="card-heading">
+            <text class="card-title">文字生图</text>
+            <text class="card-tag">墨韵·宣</text>
+            <text class="card-ready">向导就绪</text>
+          </view>
+          <text class="card-desc">三步流式构思，从画风择定到纸墨挥毫。</text>
+          <view class="card-art">
+            <app-image
+              class="art-image"
+              src="/static/theme/theme-images.jpg"
+              mode="aspectFill"
+            />
+            <text class="art-chip chip-left">留白神韵</text>
+            <text class="art-chip chip-right">青绿工笔</text>
+          </view>
+          <view class="card-footer">
+            <text class="footer-note">支持宣纸留白与精细排版</text>
+            <button class="footer-button" @click="startTool('文字生图')">研墨生图</button>
+          </view>
         </view>
-        <text class="card-desc">三步流式构思，从画风择定到纸墨挥毫。</text>
-        <view class="card-art">
-          <app-image
-            class="art-image"
-            src="/static/theme/theme-images.jpg"
-            mode="aspectFill"
-          />
-          <text class="art-chip chip-left">留白神韵</text>
-          <text class="art-chip chip-right">青绿工笔</text>
-        </view>
-        <view class="card-footer">
-          <text class="footer-note">支持宣纸留白与精细排版</text>
-          <button class="footer-button" @click="startTool('文字生图')">研墨生图</button>
-        </view>
-      </view>
 
-      <!-- 02 视频创作 -->
-      <view class="tool-card tool-blue">
-        <view class="card-heading">
-          <text class="card-title">视频创作</text>
-          <text class="card-tag tag-blue">流光·镜</text>
-          <text class="card-ready ready-blue">多镜连贯</text>
-        </view>
-        <text class="card-desc">精准掌控光影轨迹与运镜调度，独立成片。</text>
-        <view class="film-art">
-          <view class="film-title">
-            <text class="film-name">水墨分镜胶卷轨道</text>
-            <view class="film-marquee">
-              <view class="film-marquee-track">
-                <view v-for="copy in 2" :key="copy" class="film-marquee-group">
-                  <text v-for="chip in filmChips" :key="chip" class="film-chip">
-                    {{ chip }}
-                  </text>
+        <!-- 02 视频创作 -->
+        <view class="tool-card tool-blue">
+          <view class="card-heading">
+            <text class="card-title">视频创作</text>
+            <text class="card-tag tag-blue">流光·镜</text>
+            <text class="card-ready ready-blue">多镜连贯</text>
+          </view>
+          <text class="card-desc">精准掌控光影轨迹与运镜调度，独立成片。</text>
+          <view class="film-art">
+            <view class="film-title">
+              <text class="film-name">水墨分镜胶卷轨道</text>
+              <view class="film-marquee">
+                <view class="film-marquee-track">
+                  <view v-for="copy in 2" :key="copy" class="film-marquee-group">
+                    <text v-for="chip in filmChips" :key="chip" class="film-chip">
+                      {{ chip }}
+                    </text>
+                  </view>
                 </view>
               </view>
             </view>
-          </view>
-          <view class="film-frames">
-            <view v-for="frame in frames" :key="frame.frameId" class="film-frame">
-              <i class="frame-thumb"></i>
-              <small class="frame-label">{{ frame.name }}</small>
+            <view class="film-frames">
+              <view v-for="frame in frames" :key="frame.frameId" class="film-frame">
+                <i class="frame-thumb"></i>
+                <small class="frame-label">{{ frame.name }}</small>
+              </view>
+              <text v-if="!frames.length" class="film-empty">分镜待载入</text>
             </view>
-            <text v-if="!frames.length" class="film-empty">分镜待载入</text>
+          </view>
+          <view class="card-footer">
+            <text class="footer-note">四镜连贯 · 独立成片</text>
+            <button class="footer-button button-blue" @click="startTool('视频创作')">
+              逐帧调度
+            </button>
           </view>
         </view>
-        <view class="card-footer">
-          <text class="footer-note">四镜连贯 · 独立成片</text>
-          <button class="footer-button button-blue" @click="startTool('视频创作')">
-            逐帧调度
-          </button>
-        </view>
-      </view>
 
-      <!-- 03 图片优化 -->
-      <view class="tool-card tool-purple">
-        <view class="card-heading">
-          <text class="card-title">图片优化</text>
-          <text class="card-tag tag-purple">净辞·重塑</text>
-          <text class="card-ready ready-purple">无损超分</text>
+        <!-- 03 图片优化 -->
+        <view class="tool-card tool-purple">
+          <view class="card-heading">
+            <text class="card-title">图片优化</text>
+            <text class="card-tag tag-purple">净辞·重塑</text>
+            <text class="card-ready ready-purple">无损超分</text>
+          </view>
+          <text class="card-desc">还原本真质感，微米级去噪与旧照色彩修复。</text>
+          <view class="compare-art">
+            <app-image
+              class="art-image compare-before"
+              src="/static/theme/theme-optimization-before.jpg"
+              mode="aspectFill"
+            />
+            <app-image
+              class="art-image compare-after"
+              src="/static/theme/theme-optimization-after.jpg"
+              mode="aspectFill"
+            />
+            <text class="compare-handle">↔</text>
+            <text class="compare-tag tag-original">旧影修复</text>
+            <text class="compare-tag tag-upscaled">纤毫毕现</text>
+          </view>
+          <view class="card-footer">
+            <text class="footer-note">最大支持五千万像素解析</text>
+            <button class="footer-button button-purple" @click="startTool('图片优化')">
+              净炼重绘
+            </button>
+          </view>
         </view>
-        <text class="card-desc">还原本真质感，微米级去噪与旧照色彩修复。</text>
-        <view class="compare-art">
-          <app-image
-            class="art-image compare-before"
-            src="/static/theme/theme-optimization-before.jpg"
-            mode="aspectFill"
-          />
-          <app-image
-            class="art-image compare-after"
-            src="/static/theme/theme-optimization-after.jpg"
-            mode="aspectFill"
-          />
-          <text class="compare-handle">↔</text>
-          <text class="compare-tag tag-original">旧影修复</text>
-          <text class="compare-tag tag-upscaled">纤毫毕现</text>
-        </view>
-        <view class="card-footer">
-          <text class="footer-note">最大支持五千万像素解析</text>
-          <button class="footer-button button-purple" @click="startTool('图片优化')">
-            净炼重绘
-          </button>
-        </view>
-      </view>
 
-      <!-- 草稿与便签库 -->
-      <view class="draft-card">
-        <view class="draft-title">
-          <text>草稿与便签库</text>
-          <text class="draft-subtitle">完整归档</text>
+        <!-- 草稿与便签库 -->
+        <view class="draft-card">
+          <view class="draft-title">
+            <text>草稿与便签库</text>
+            <text class="draft-subtitle">完整归档</text>
+          </view>
+          <view v-for="draft in drafts" :key="draft.draftId" class="draft-row">
+            <text class="draft-name">{{ draft.title }} · {{ draft.time }}</text>
+            <text class="draft-status">{{ draft.status }}</text>
+          </view>
+          <app-state-hint
+            v-if="!drafts.length"
+            type="empty"
+            title="暂无草稿"
+            description="完成一次创作后，草稿会自动归档到这里"
+          />
         </view>
-        <view v-for="draft in drafts" :key="draft.draftId" class="draft-row">
-          <text class="draft-name">{{ draft.title }} · {{ draft.time }}</text>
-          <text class="draft-status">{{ draft.status }}</text>
-        </view>
-        <app-state-hint
-          v-if="!drafts.length"
-          type="empty"
-          title="暂无草稿"
-          description="完成一次创作后，草稿会自动归档到这里"
-        />
       </view>
     </scroll-view>
     <app-bottom-nav active="creation" />
@@ -630,9 +632,9 @@ const startTool = (name) => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上切换为固定像素 + 双列栅格
+ * 桌面 H5 适配：模块按两列排列并自动换行
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
   /* 桌面断点下 rpx 会随视口放大，这里固定一套 px 刻度 */
   /* 与全局 rpx 刻度一致：宽屏下 1rpx ≈ 1px */
   $desktop-micro: 22rpx;
@@ -644,30 +646,24 @@ const startTool = (name) => {
   $desktop-title: 38rpx;
 
   .content {
-    height: calc(100vh - #{100rpx} - #{102rpx} - var(--status-bar-height, 0px));
-    max-width: 750px;
-    margin: 0 auto;
+    height: calc(100vh - #{100rpx} - var(--status-bar-height, 0px));
     padding: 24px 24px 60px;
+  }
+
+  .content-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 680px));
     gap: 20px;
-    align-content: start;
+    justify-content: center;
+    align-items: start;
   }
 
-  /* 前两张工具卡并列，第三张占整行更聚焦 */
-  .tool-card {
-    margin-bottom: 0;
-    padding: 22px;
-    border-radius: 16px;
-  }
-
-  .tool-purple {
-    grid-column: 1 / -1;
-  }
-
+  .tool-card,
   .draft-card {
-    grid-column: 1 / -1;
-    margin-bottom: 0;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
     padding: 22px;
     border-radius: 16px;
   }

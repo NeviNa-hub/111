@@ -71,16 +71,30 @@ page {
 /* #endif */
 
 /* #ifdef H5 */
-/* 宽屏下限制内容宽度并居中，配合 rpxCalcMaxDeviceWidth 避免 rpx 被无限放大 */
 @media (min-width: 768px) {
   body {
     background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   }
+}
 
+@media (min-width: 768px) and (max-width: 1199px) {
   uni-page-body {
     max-width: 750px;
     margin: 0 auto;
     background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
+  }
+}
+
+@media (min-width: 1200px) {
+  uni-page-body {
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
+  }
+
+  uni-page-body:has(.app-bottom-nav) > :first-child {
+    margin-left: 220px;
+    width: calc(100% - 220px);
   }
 }
 /* #endif */

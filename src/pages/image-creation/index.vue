@@ -255,11 +255,11 @@ const goNext = () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上选项区增列，比例区保持四列
+ * 桌面 H5 适配：1200px 以上风格选项四列一行，比例区保持四列
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
   .option-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .option-grid.four {

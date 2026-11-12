@@ -1,5 +1,6 @@
 <template>
   <view class="app-bottom-nav">
+    <view class="nav-brand">妙笔生花</view>
     <view
       v-for="item in NAV_ITEMS"
       :key="item.key"
@@ -80,12 +81,46 @@ const navigateTo = (item) => {
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 -4rpx 16rpx rgba(32, 66, 75, 0.05);
 
-  /* 宽屏 H5 下与内容区同宽并居中 */
-  @media (min-width: 768px) {
+  /* 窄屏 H5 下与内容区同宽并居中 */
+  @media (min-width: $breakpoint-tablet) and (max-width: 1199px) {
     right: auto;
     left: 50%;
     width: 750px;
     transform: translateX(-50%);
+  }
+
+  /* 桌面端改为容器左缘的纵向侧边导航 */
+  @media (min-width: $breakpoint-desktop) {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: $desktop-sidebar;
+    box-sizing: border-box;
+    height: auto;
+    padding: 40rpx 20rpx;
+    flex-direction: column;
+    gap: 12rpx;
+    border-top: 0;
+    border-right: 1rpx solid $color-line;
+    box-shadow: none;
+  }
+}
+
+/* 侧边导航顶部的品牌区，仅桌面端显示 */
+.nav-brand {
+  display: none;
+
+  @media (min-width: $breakpoint-desktop) {
+    display: block;
+    margin-bottom: 32rpx;
+    padding: 0 28rpx 32rpx;
+    border-bottom: 1rpx solid $color-line;
+    color: #ec8302;
+    font-size: 40rpx;
+    font-weight: 700;
+    letter-spacing: 2rpx;
+    white-space: nowrap;
   }
 }
 
@@ -99,6 +134,18 @@ const navigateTo = (item) => {
   color: $color-muted;
   font-size: 24rpx;
   line-height: 1.3;
+
+  /* 桌面端为图标在左、文字在右的横向行项 */
+  @media (min-width: $breakpoint-desktop) {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 20rpx;
+    padding: 26rpx 28rpx;
+    border-radius: 20rpx;
+    font-size: 28rpx;
+    white-space: nowrap;
+  }
 }
 
 .nav-icon {
@@ -109,9 +156,18 @@ const navigateTo = (item) => {
   color: #ec8302;
   font-weight: 600;
   text-shadow: 0 0 14rpx rgba(236, 131, 2, 0.45);
+
+  @media (min-width: $breakpoint-desktop) {
+    background: $color-primary-light;
+    text-shadow: none;
+  }
 }
 
 .nav-item.is-active .nav-icon {
   filter: drop-shadow(0 0 8rpx rgba(236, 131, 2, 0.5));
+
+  @media (min-width: $breakpoint-desktop) {
+    filter: none;
+  }
 }
 </style>

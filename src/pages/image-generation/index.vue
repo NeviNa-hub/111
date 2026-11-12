@@ -98,10 +98,8 @@ const progressData = computed(() => {
     workName: isOptimization ? "图片优化任务" : "新建画卷",
     detail: "云端智能生成",
     tags: [],
-    cost: isOptimization ? 3 : 2,
-    description: isCompleted
-      ? "已完成并归档作品库"
-      : "任务完成后自动保存至作品库",
+    cost: isOptimization ? 1 : 2,
+    description: isCompleted ? "已完成并归档作品库" : "任务完成后自动保存至作品库",
     estimatedTime: "预计稍候完成",
     tip,
     status: task.status,

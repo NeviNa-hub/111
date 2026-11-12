@@ -466,13 +466,21 @@ onMounted(() => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上功能菜单双列排布
+ * 桌面 H5 适配：1200px 以上用户卡与功能菜单左右分栏，菜单双列
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
+  .content {
+    display: grid;
+    grid-template-columns: 420rpx 1fr;
+    gap: 24rpx;
+    align-items: start;
+  }
+
   .menu-card {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 24rpx;
+    margin-top: 0;
   }
 
   .menu-title {
@@ -493,11 +501,22 @@ onMounted(() => {
   left: 0;
   padding: 16rpx 32rpx;
 
-  @media (min-width: 768px) {
+  /* 窄屏过渡：750px 居中 */
+  @media (min-width: $breakpoint-tablet) and (max-width: 1199px) {
     right: auto;
     left: 50%;
     width: 750px;
     transform: translateX(-50%);
+  }
+
+  /* 桌面端对齐侧栏右侧的内容区，且底部不再有导航占用 */
+  @media (min-width: $breakpoint-desktop) {
+    right: 0;
+    bottom: 0;
+    left: $desktop-sidebar;
+    width: auto;
+    box-sizing: border-box;
+    transform: none;
   }
 }
 

@@ -551,17 +551,33 @@ onShow(() => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上调参行双列排布
+ * 桌面 H5 适配：1200px 以上三张配置卡三列并排、调参行双列
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
+  .creation-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24rpx;
+    align-items: start;
+  }
+
+  .config-card {
+    margin-top: 0;
+  }
+
+  .config-card:first-child {
+    margin-top: 0;
+  }
+
   .tuning-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 32rpx;
+    grid-template-columns: 1fr;
+    column-gap: 0;
   }
 
   .tuning-row {
     border-top: 0;
+    flex-wrap: wrap;
   }
 }
 

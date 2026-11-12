@@ -50,11 +50,14 @@
         </view>
         <view class="task-tags">
           <text v-for="tag in data.tags" :key="tag">{{ tag }}</text>
-          <text class="task-cost">{{ data.cost === null ? "—" : data.cost }} 灵感点</text>
+          <text class="task-cost">
+            {{ data.cost === null ? "—" : data.cost }} 灵感点
+          </text>
         </view>
-        <view class="task-footer"
-          >{{ data.description }}<text>{{ data.estimatedTime }}</text></view
-        >
+        <view class="task-footer">
+          {{ data.description }}
+          <text>{{ data.estimatedTime }} </text>
+        </view>
       </view>
       <view class="cloud-tip">{{ data.tip }}</view>
     </scroll-view>
@@ -343,9 +346,9 @@ const goWorkbench = () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上结果图与任务详情左右分栏
+ * 桌面 H5 适配：1200px 以上进度卡与结果图左右分栏，任务详情通栏
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
   .generation-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -353,12 +356,20 @@ const goWorkbench = () => {
     align-content: start;
   }
 
-  .progress-card,
+  .progress-card {
+    height: 440rpx;
+    margin-top: 0;
+  }
+
+  .result-card {
+    margin-top: 0;
+  }
+
+  .task-card,
   .cloud-tip {
     grid-column: 1 / -1;
   }
 
-  .result-card,
   .task-card,
   .cloud-tip {
     margin-top: 0;

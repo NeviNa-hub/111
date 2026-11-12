@@ -2,7 +2,11 @@
   <view class="dialog-mask">
     <view class="dialog-sheet progress-sheet">
       <view class="dialog-title">{{ dialogTitle }}</view>
-      <template v-if="status === 'completed' && resultUrl">
+      <template v-if="status === 'completed' && resultUrl && type === 'video'">
+        <video class="result-image" :src="resultUrl" controls />
+        <text class="result-hint">视频链接可能过期，请及时保存</text>
+      </template>
+      <template v-else-if="status === 'completed' && resultUrl">
         <view class="result-preview">
           <image
             class="result-image"

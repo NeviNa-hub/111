@@ -2,11 +2,11 @@
   <view class="canvas-page">
     <app-page-header title="文字生图" />
     <view class="step-bar">
-      <view class="step done"><i>1</i><text>落墨构想</text></view>
+      <view class="step done"> <i>1</i><text>落墨构想</text></view>
       <view class="step-connector"></view>
-      <view class="step done"><i>2</i><text>甄选画风</text></view>
+      <view class="step done"> <i>2</i><text>甄选画风</text></view>
       <view class="step-connector"></view>
-      <view class="step active"><i>3</i><text>设定画幅</text></view>
+      <view class="step active"> <i>3</i><text>设定画幅</text> </view>
     </view>
     <view class="scroll-window">
       <scroll-view scroll-y :show-scrollbar="false" class="content">
@@ -14,7 +14,7 @@
           <text class="step-count">步骤 3 / 3</text>
           <text class="page-title">第三步：设定画幅并落墨</text>
           <text class="page-desc">厘定画幅比例，即将落笔成卷</text>
-          <view>
+          <view class="canvas-panel">
             <view class="summary-card">
               <view class="summary-title">
                 创作回溯 <text @click="editPrompt">修改内容</text>
@@ -43,7 +43,9 @@
                 本次需量扣除 <b>{{ selectedCost }} 点</b>
               </text>
             </view>
-            <text>提交后扣除积分，生成失败暂不退回；图片链接约 1 小时后失效。</text>
+            <text class="cost-note">
+              提交后扣除积分，生成失败暂不退回；图片链接约 1 小时后失效。
+            </text>
           </view>
         </view>
       </scroll-view>
@@ -363,11 +365,40 @@ onShow(async () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上画幅比例三列排布
+ * 桌面 H5 适配：1200px 以上回溯卡与费用卡左右分栏，比例区自适应增列
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
+  .canvas-panel {
+    display: grid;
+    grid-template-columns: 360rpx 1fr;
+    gap: 8rpx 28rpx;
+    align-items: start;
+  }
+
+  .summary-card {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .section-title {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+  }
+
   .ratio-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: repeat(auto-fill, minmax(220rpx, 1fr));
+  }
+
+  .cost-card {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cost-note {
+    grid-column: 1 / -1;
   }
 }
 

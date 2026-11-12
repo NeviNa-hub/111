@@ -165,7 +165,15 @@ const taskRoutes = [
   {
     method: "GET",
     pattern: /^\/tasks\/([^/]+)$/,
-    handler: (taskId) => resolveTaskStatus(taskId, buildImageTaskStatus, "image"),
+    handler: (taskId) => {
+      const record = readMockTask(taskId);
+      if (!record) return fail(ERROR_CODES.NOT_FOUND, "任务不存在或已过期");
+      if (record.type === "image") return ok(buildImageTaskStatus(record));
+      if (record.type === "optimization")
+        return ok(buildOptimizationTaskStatus(record));
+      if (record.type === "video") return ok(buildVideoTaskStatus(record));
+      return fail(ERROR_CODES.NOT_FOUND, "任务不存在或已过期");
+    },
   },
   {
     method: "GET",

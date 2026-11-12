@@ -2,116 +2,124 @@
   <view class="auth-page">
     <app-page-header title="妙笔生花" :show-points="false" />
 
-    <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
-      <view class="hero-card">
-        <text class="auth-eyebrow">{{ isRegister ? "请注册" : "请登录" }}</text>
-        <text class="brand-subtitle">
-          {{
-            isRegister
-              ? "创建账号，实现你的第一份灵感。"
-              : "登录后继续创作，查看你的作品。"
-          }}
-        </text>
+    <view class="auth-body">
+      <view class="auth-brand">
+        <view class="brand-seal">笔</view>
+        <text class="brand-name">妙笔生花</text>
+        <text class="brand-slogan">落墨成画，凝帧为诗</text>
       </view>
 
-      <el-form
-        ref="formRef"
-        class="form-card"
-        :model="formModel"
-        :rules="formRules"
-        :validate-on-rule-change="false"
-        status-icon
-      >
-        <view class="field-label"> 账号 </view>
-        <el-form-item prop="account" class="auth-form-item">
-          <el-input
-            v-model="formModel.account"
-            class="field-input"
-            :placeholder="isRegister ? '请输入账号' : '请输入登录账号'"
-            maxlength="64"
-            autocomplete="username"
-          >
-            <template #prefix>
-              <view class="field-icon"></view>
-            </template>
-          </el-input>
-        </el-form-item>
-
-        <view v-if="isRegister" class="field-label">用户名</view>
-        <el-form-item v-if="isRegister" prop="username" class="auth-form-item">
-          <el-input
-            v-model="formModel.username"
-            class="field-input"
-            placeholder="请输入用户名"
-            maxlength="64"
-          >
-            <template #prefix>
-              <view class="field-icon"></view>
-            </template>
-          </el-input>
-        </el-form-item>
-
-        <view class="label-row">
-          <text class="field-label">密码</text>
-          <text v-if="!isRegister" class="link-text">忘记密码？</text>
-        </view>
-        <el-form-item prop="password" class="auth-form-item">
-          <el-input
-            v-model="formModel.password"
-            class="field-input"
-            :placeholder="isRegister ? '请设置登录密码' : '请输入登录密码'"
-            maxlength="128"
-            :type="isPasswordVisible ? 'text' : 'password'"
-            autocomplete="current-password"
-          >
-            <template #prefix>
-              <view class="field-icon"></view>
-            </template>
-            <template #suffix>
-              <text class="eye-toggle" @tap="isPasswordVisible = !isPasswordVisible">
-                {{ isPasswordVisible ? "◉" : "◎" }}
-              </text>
-            </template>
-          </el-input>
-        </el-form-item>
-
-        <view v-if="isRegister" class="field-label">确认密码</view>
-        <el-form-item v-if="isRegister" prop="confirmPassword" class="auth-form-item">
-          <el-input
-            v-model="formModel.confirmPassword"
-            class="field-input"
-            placeholder="请再次输入密码"
-            maxlength="128"
-            :type="isConfirmVisible ? 'text' : 'password'"
-            autocomplete="new-password"
-          >
-            <template #prefix>
-              <view class="field-icon"></view>
-            </template>
-          </el-input>
-        </el-form-item>
-        <view class="agreement-row" @tap="hasAgreed = !hasAgreed">
-          <view class="checkbox" :class="{ 'is-checked': hasAgreed }">
-            <text v-if="hasAgreed">✓</text>
-          </view>
-          <text class="agreement-text">
-            {{ isRegister ? "我已阅读并同意" : "已阅读并悉知" }}
-            <text class="link-text">《丹青用户服务协议》</text> 与
-            <text class="link-text">《行卷隐私保护政策》</text>
+      <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
+        <view class="hero-card">
+          <text class="auth-eyebrow"> {{ isRegister ? "请注册" : "请登录" }}</text>
+          <text class="brand-subtitle">
+            {{
+              isRegister
+                ? "创建账号，实现你的第一份灵感。"
+                : "登录后继续创作，查看你的作品。"
+            }}
           </text>
         </view>
-        <button class="submit-button" :disabled="isSubmitting" @tap="handleSubmit">
-          {{ isRegister ? "创建账号" : "登录" }} <text>→</text>
-        </button>
-      </el-form>
 
-      <view class="switch-row">
-        <text class="switch-copy" @tap="toggleMode">
-          {{ isRegister ? "已有账号？立即登录" : "初来乍到 · 新客注册" }}
-          <text>→</text>
-        </text>
-      </view>
-    </scroll-view>
+        <el-form
+          ref="formRef"
+          class="form-card"
+          :model="formModel"
+          :rules="formRules"
+          :validate-on-rule-change="false"
+          status-icon
+        >
+          <view class="field-label"> 账号 </view>
+          <el-form-item prop="account" class="auth-form-item">
+            <el-input
+              v-model="formModel.account"
+              class="field-input"
+              :placeholder="isRegister ? '请输入账号' : '请输入登录账号'"
+              maxlength="64"
+              autocomplete="username"
+            >
+              <template #prefix>
+                <view class="field-icon"></view>
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <view v-if="isRegister" class="field-label">用户名</view>
+          <el-form-item v-if="isRegister" prop="username" class="auth-form-item">
+            <el-input
+              v-model="formModel.username"
+              class="field-input"
+              placeholder="请输入用户名"
+              maxlength="64"
+            >
+              <template #prefix>
+                <view class="field-icon"></view>
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <view class="label-row">
+            <text class="field-label">密码</text>
+            <text v-if="!isRegister" class="link-text">忘记密码？</text>
+          </view>
+          <el-form-item prop="password" class="auth-form-item">
+            <el-input
+              v-model="formModel.password"
+              class="field-input"
+              :placeholder="isRegister ? '请设置登录密码' : '请输入登录密码'"
+              maxlength="128"
+              :type="isPasswordVisible ? 'text' : 'password'"
+              autocomplete="current-password"
+            >
+              <template #prefix>
+                <view class="field-icon"></view>
+              </template>
+              <template #suffix>
+                <text class="eye-toggle" @tap="isPasswordVisible = !isPasswordVisible">
+                  {{ isPasswordVisible ? "◉" : "◎" }}
+                </text>
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <view v-if="isRegister" class="field-label">确认密码</view>
+          <el-form-item v-if="isRegister" prop="confirmPassword" class="auth-form-item">
+            <el-input
+              v-model="formModel.confirmPassword"
+              class="field-input"
+              placeholder="请再次输入密码"
+              maxlength="128"
+              :type="isConfirmVisible ? 'text' : 'password'"
+              autocomplete="new-password"
+            >
+              <template #prefix>
+                <view class="field-icon"></view>
+              </template>
+            </el-input>
+          </el-form-item>
+          <view class="agreement-row" @tap="hasAgreed = !hasAgreed">
+            <view class="checkbox" :class="{ 'is-checked': hasAgreed }">
+              <text v-if="hasAgreed">✓</text>
+            </view>
+            <text class="agreement-text">
+              {{ isRegister ? "我已阅读并同意" : "已阅读并悉知" }}
+              <text class="link-text">《丹青用户服务协议》</text> 与
+              <text class="link-text">《行卷隐私保护政策》</text>
+            </text>
+          </view>
+          <button class="submit-button" :disabled="isSubmitting" @tap="handleSubmit">
+            {{ isRegister ? "创建账号" : "登录" }} <text>→</text>
+          </button>
+        </el-form>
+
+        <view class="switch-row">
+          <text class="switch-copy" @tap="toggleMode">
+            {{ isRegister ? "已有账号？立即登录" : "初来乍到 · 新客注册" }}
+            <text>→</text>
+          </text>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 </template>
 
@@ -256,8 +264,17 @@ const handleSubmit = async () => {
   color: $color-ink;
 }
 
-.auth-scroll {
+.auth-body {
   height: calc(100vh - 100rpx - var(--status-bar-height, 0px));
+}
+
+/* 桌面端左侧品牌区，移动端隐藏 */
+.auth-brand {
+  display: none;
+}
+
+.auth-scroll {
+  height: 100%;
   padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
@@ -560,5 +577,75 @@ const handleSubmit = async () => {
   color: #b3712a;
   font-size: 28rpx;
   font-weight: 600;
+}
+
+/* ============================================================
+ * 桌面 H5 适配：1200px 以上左侧品牌区 + 右侧居中表单
+ * ============================================================ */
+@media (min-width: $breakpoint-desktop) {
+  .auth-body {
+    display: flex;
+  }
+
+  .auth-brand {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 28rpx;
+    padding: 48rpx;
+    border-right: 1rpx solid rgba(190, 140, 70, 0.16);
+  }
+
+  .brand-seal {
+    width: 140rpx;
+    height: 140rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 6rpx double #d9be9b;
+    border-radius: 50%;
+    color: $color-primary;
+    font-size: 64rpx;
+    font-weight: 700;
+  }
+
+  .brand-name {
+    color: #2f2517;
+    font-size: 64rpx;
+    font-weight: 700;
+    letter-spacing: 8rpx;
+  }
+
+  .brand-slogan {
+    color: #8a7a5f;
+    font-size: 28rpx;
+    letter-spacing: 6rpx;
+  }
+
+  .auth-scroll {
+    flex: none;
+    width: 520px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48rpx 56rpx;
+  }
+
+  .hero-card {
+    padding: 0 0 32rpx;
+    text-align: center;
+  }
+
+  .form-card {
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .switch-row {
+    justify-content: center;
+  }
 }
 </style>

@@ -21,6 +21,16 @@ $color-line: #e3e9e5;
 /* 最小点击热区尺寸 */
 $tap-size: 88rpx;
 
+/* 宽屏断点：768px 以下为手机；768-1199px 为窄屏过渡（750px 居中）；
+   1200px 以上为桌面布局（左侧边栏 + 自适应内容区） */
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1200px;
+
+/* 桌面布局尺寸 */
+$desktop-container: 1280px;
+$desktop-sidebar: 220px;
+$desktop-content: $desktop-container - $desktop-sidebar;
+
 /* 单行截断 */
 @mixin text-ellipsis {
   overflow: hidden;
@@ -64,11 +74,20 @@ $tap-size: 88rpx;
   background: rgba(255, 255, 255, 0.97);
 
   /* 宽屏 H5 下与内容区同宽并居中，避免操作栏横跨整屏 */
-  @media (min-width: 768px) {
+  @media (min-width: $breakpoint-tablet) and (max-width: 1199px) {
     right: auto;
     left: 50%;
     width: 750px;
     transform: translateX(-50%);
+  }
+
+  /* 桌面端对齐侧栏右侧的内容区 */
+  @media (min-width: $breakpoint-desktop) {
+    right: 0;
+    left: $desktop-sidebar;
+    width: auto;
+    box-sizing: border-box;
+    transform: none;
   }
 }
 

@@ -11,13 +11,7 @@
     </view>
     <view class="scroll-window">
       <scroll-view scroll-y :show-scrollbar="false" class="content">
-        <el-form
-          ref="formRef"
-          :model="formData"
-          :rules="formRules"
-          label-position="top"
-          class="render-form"
-        >
+        <view class="render-form">
           <view class="config-card">
             <view class="config-title"><em>壹 ·</em> 动卷预览</view>
             <view class="preview-body">
@@ -42,39 +36,8 @@
           </view>
 
           <view class="config-card">
-            <view class="config-title"><em>贰 ·</em> 帧率与渲染画质</view>
-            <el-form-item prop="fps" class="fps-form-item">
-              <el-radio-group v-model="formData.fps" class="fps-list">
-                <el-radio
-                  v-for="option in fpsOptions"
-                  :key="option.fpsId"
-                  :value="option.value"
-                  class="fps-card"
-                  :class="{ 'is-selected': formData.fps === option.value }"
-                >
-                  <view class="fps-content">
-                    <view class="fps-head">
-                      <view
-                        class="fps-dot"
-                        :class="{ 'is-active': formData.fps === option.value }"
-                      ></view>
-                      <text class="fps-name">{{ option.name }}</text>
-                      <text class="fps-tag">{{ option.tag }}</text>
-                    </view>
-                    <text class="fps-desc">{{ option.description }}</text>
-                  </view>
-                  <el-icon v-if="formData.fps === option.value" class="fps-check">
-                    <Check />
-                  </el-icon>
-                  <view v-else class="fps-radio"></view>
-                </el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </view>
-
-          <view class="config-card">
             <view class="config-title resource-title">
-              <view><em>叁 ·</em> 渲染资源结算</view>
+              <view><em>贰 ·</em> 渲染资源结算</view>
               <el-button class="boost-button" @click="showBoostTip">
                 <el-icon><Lightning /></el-icon>
                 尊享加速通道
@@ -103,7 +66,7 @@
               </view>
             </view>
           </view>
-        </el-form>
+        </view>
       </scroll-view>
     </view>
 
@@ -131,7 +94,7 @@
       title="确认挥毫渲染动卷"
       :cost="renderConfig.cost"
       :estimated-time="renderConfig.estimatedTime"
-      note="确认后将扣除本次灵感点，并把动卷送入云端逐帧渲染，期间可随时离开页面。"
+      note="提交后扣除 5 积分，生成失败暂不退款；视频链接可能过期，请及时保存。"
       confirm-text="确认开始渲染"
       @cancel="confirmVisible = false"
       @confirm="confirmRender"
@@ -139,6 +102,9 @@
     <generation-dialog
       v-if="progressVisible"
       title="动卷渲染中"
+      type="video"
+      :status="taskStatus"
+      :result-url="taskResultUrl"
       :progress="taskProgress"
       :progress-label="taskStage"
       :note="taskNote"
@@ -163,17 +129,11 @@ import { computed, reactive, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 // #ifdef H5
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Lightning,
-  VideoPlay,
-} from "@element-plus/icons-vue";
+import { ArrowLeft, ArrowRight, Lightning, VideoPlay } from "@element-plus/icons-vue";
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
-import { createVideoGeneration, getVideoTaskStatus } from "@/apis/video-creation";
+import { getVideoTaskStatus } from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -182,27 +142,12 @@ import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { DRAFT_KEYS, readCreationDraft } from "@/utils/creation-draft";
 import { getErrorMessage } from "@/utils/request";
+import { submitVideoGeneration } from "@/utils/video-generation";
 
 const draft = ref({ ratioName: "", prompt: "", imagePath: "" });
-const fpsOptions = [
-  {
-    fpsId: 1,
-    value: 30,
-    name: "30 FPS · 典雅",
-    tag: "节律省电",
-    description: "传统水墨电影韵味，起承转合自然含蓄",
-  },
-  {
-    fpsId: 2,
-    value: 60,
-    name: "60 FPS · 丝滑 4K 超清",
-    tag: "首推",
-    description: "雪浪微澜，丝缕毕现，水汽流动如真如幻",
-  },
-];
 const renderConfig = reactive({
   power: 800,
-  cost: 8,
+  cost: 5,
   estimatedTime: "约 18 秒",
   previewTitle: "《江雪孤舟 · 动态长卷》",
   cameraMove: "平缓推镜",
@@ -210,10 +155,10 @@ const renderConfig = reactive({
 const confirmVisible = ref(false);
 const progressVisible = ref(false);
 const isSubmitting = ref(false);
-const formRef = ref(null);
-const formData = reactive({ fps: 60 });
 const taskId = ref("");
 const taskProgress = ref(0);
+const taskStatus = ref(TASK_STATUS.PENDING);
+const taskResultUrl = ref("");
 const taskStatusData = ref(null);
 
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
@@ -231,15 +176,20 @@ const { start: startPolling } = useTaskPolling({
   interval: 3000,
   maxAttempts: 60,
   isCompleted: (data) => data.status === TASK_STATUS.COMPLETED,
+  isFailed: (data) => data.status === TASK_STATUS.FAILED,
   onProgress: (data) => {
-    taskProgress.value = data.progress;
+    taskProgress.value = Number(data.progress) || 0;
+    taskStatus.value = data.status || TASK_STATUS.PROCESSING;
+    taskResultUrl.value = data.result_urls?.[0] || "";
     taskStatusData.value = {
       stageLabel: "云端逐帧渲染中",
       note: "已进入云端渲染，离开页面不影响任务进度。",
     };
   },
   onCompleted: (data) => {
-    taskProgress.value = data.progress;
+    taskProgress.value = Number(data.progress) || 0;
+    taskStatus.value = data.status || TASK_STATUS.PROCESSING;
+    taskResultUrl.value = data.result_urls?.[0] || "";
     taskStatusData.value = {
       stageLabel: "动卷已完成",
       note: "任务已完成并归档，可前往作品库查看。",
@@ -263,26 +213,6 @@ const promptText = computed(() => {
   return text.length > 38 ? `${text.slice(0, 38)}…` : text;
 });
 
-/**
- * 校验是否选择了帧率画质。
- * @param {Object} rule 校验规则。
- * @param {number} value 当前帧率值。
- * @param {Function} callback 校验回调。
- * @returns {void}
- */
-const validateFps = (rule, value, callback) => {
-  if (!value) {
-    callback(new Error("请先选择帧率画质"));
-    return;
-  }
-
-  callback();
-};
-
-const formRules = {
-  fps: [{ validator: validateFps, trigger: "change" }],
-};
-
 // 返回第一步，页面栈为空时重新进入规制页
 const goPreviousStep = () => {
   if (getCurrentPages().length > 1) {
@@ -298,15 +228,9 @@ const showBoostTip = () => {
   uni.showToast({ title: "尊享加速通道筹备中", icon: "none" });
 };
 
-// 校验帧率并打开渲染确认弹窗
+// 打开渲染确认弹窗
 const handleRender = async () => {
   if (isSubmitting.value) {
-    return;
-  }
-
-  try {
-    await formRef.value.validate();
-  } catch (error) {
     return;
   }
 
@@ -322,13 +246,10 @@ const confirmRender = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createVideoGeneration({
+    const task = await submitVideoGeneration({
       mode: draft.value.mode,
       ratio: draft.value.ratio,
-      ratio_name: draft.value.ratioName,
       prompt: draft.value.prompt,
-      image_path: draft.value.imagePath,
-      fps: formData.fps,
     });
 
     confirmVisible.value = false;
@@ -521,6 +442,22 @@ onShow(() => {
   margin-top: 0;
 }
 
+/* ============================================================
+ * 桌面 H5 适配：预览卡和结算卡并排
+ * ============================================================ */
+@media (min-width: $breakpoint-desktop) {
+  .render-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24rpx;
+    align-items: start;
+  }
+
+  .config-card {
+    margin-top: 0;
+  }
+}
+
 .config-title {
   padding-bottom: 28rpx;
   color: #8a6840;
@@ -618,139 +555,6 @@ onShow(() => {
   font-size: 22rpx;
   line-height: 1.6;
   @include line-clamp(2);
-}
-
-/* 帧率画质 */
-.fps-form-item {
-  margin-bottom: 0;
-
-  :deep(.el-form-item__content) {
-    display: block;
-  }
-
-  :deep(.el-form-item__error) {
-    position: static;
-    padding-top: 12rpx;
-  }
-}
-
-.fps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-  width: 100%;
-}
-
-.fps-card {
-  position: relative;
-  width: 100%;
-  height: auto;
-  min-height: 100rpx;
-  margin: 0;
-  padding: 20rpx 76rpx 20rpx 24rpx;
-  border: 2rpx solid $color-line;
-  border-radius: 24rpx;
-  background: $color-surface;
-  box-sizing: border-box;
-
-  :deep(.el-radio__input) {
-    display: none;
-  }
-
-  :deep(.el-radio__label) {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    width: 100%;
-    padding: 0;
-    color: inherit;
-    font-size: inherit;
-    white-space: normal;
-  }
-
-  &.is-selected {
-    border-color: $color-primary;
-    box-shadow: 0 8rpx 20rpx rgba(5, 96, 76, 0.08);
-  }
-}
-
-.fps-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.fps-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.fps-dot {
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 50%;
-  background: #cbded7;
-
-  &.is-active {
-    background: $color-primary;
-  }
-}
-
-.fps-name {
-  color: #4e665e;
-  font-size: 26rpx;
-  font-weight: 700;
-}
-
-.fps-card.is-selected .fps-name {
-  color: $color-primary;
-}
-
-.fps-tag {
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  background: #f8faf7;
-  color: $color-muted;
-  font-size: 22rpx;
-  font-weight: 400;
-}
-
-.fps-card.is-selected .fps-tag {
-  background: #f3e4cd;
-  color: $color-primary;
-}
-
-.fps-desc {
-  display: block;
-  margin-top: 8rpx;
-  color: $color-muted;
-  font-size: 22rpx;
-  line-height: 1.6;
-}
-
-.fps-radio {
-  position: absolute;
-  top: 50%;
-  right: 24rpx;
-  width: 32rpx;
-  height: 32rpx;
-  margin-top: -16rpx;
-  border: 2rpx solid #cde0d8;
-  border-radius: 50%;
-}
-
-.fps-check {
-  position: absolute;
-  top: 50%;
-  right: 24rpx;
-  width: 36rpx;
-  height: 36rpx;
-  margin-top: -18rpx;
-  border-radius: 50%;
-  background: $color-primary;
-  color: #fff;
-  font-size: 22rpx;
 }
 
 /* 资源结算 */

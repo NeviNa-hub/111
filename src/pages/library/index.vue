@@ -307,12 +307,12 @@ onShow(() => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上作品列表双列排布
+ * 桌面 H5 适配：1200px 以上作品列表三列排布
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
   .work-list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

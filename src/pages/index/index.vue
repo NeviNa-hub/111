@@ -478,9 +478,27 @@ const openMode = (url) => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上功能宫格三张等宽并列
+ * 桌面 H5 适配：1200px 以上功能宫格三张等宽并列
  * ============================================================ */
-@media (min-width: 992px) {
+@media (min-width: $breakpoint-desktop) {
+  .main-scroll {
+    height: calc(100vh - 100rpx - var(--status-bar-height, 0px));
+  }
+
+  .page-body {
+    width: 100%;
+  }
+
+  .hero-art {
+    width: 100%;
+    max-width: 1000px;
+    height: 260px;
+  }
+
+  .hero-actions {
+    margin-top: 20px;
+  }
+
   .mode-card,
   .is-optimization {
     width: calc((100% - 40rpx) / 3);

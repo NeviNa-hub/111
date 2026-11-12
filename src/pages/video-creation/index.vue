@@ -83,7 +83,7 @@
                 </view>
                 <el-button class="image-pick-button" @click="chooseImage">
                   <el-icon><Upload /></el-icon>
-                  {{ selectedImage ? "更换" : "选图" }}
+                  {{ isUploading ? "上传中…" : selectedImage ? "更换" : "选图" }}
                 </el-button>
               </view>
             </el-form-item>
@@ -178,6 +178,7 @@ import {
 } from "@element-plus/icons-vue";
 // #endif
 
+import { uploadImage } from "@/apis/upload";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
@@ -207,20 +208,17 @@ const ratios = [
     description: "斗方小品",
   },
 ];
-const modes = [
-  { modeId: "text", name: "文字生视频" },
-  { modeId: "image", name: "图卷生动境" },
-];
+const modes = [{ modeId: "text", name: "文字生视频" }];
 const suggestions = ["清溪泛舟", "浮岚暖翠", "寒江雪霁", "竹影摇曳"];
 const promptLimit = 300;
 const polishSuffix = "水波微澜，晨雾轻笼，气韵徐徐流转";
 const selectedImage = ref(null);
 const isSubmitting = ref(false);
+const isUploading = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom:
-    keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
+  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
@@ -236,7 +234,7 @@ const imageTitle = computed(() => selectedImage.value?.name || "传入一张图�
 const imageHint = computed(() =>
   selectedImage.value
     ? "点击更换图卷，将以图卷起点延展运镜"
-    : "从相册选择或拍摄，作为动卷起点",
+    : "从相册选择或拍摄，作为动卷起点"
 );
 
 /**
@@ -304,15 +302,22 @@ const polishPrompt = () => {
   formData.prompt = polishPromptText(
     formData.prompt.trim(),
     suffix,
-    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`,
+    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`
   );
 };
 
 // 从系统相册或相机选择图卷并上传，失败时保留已有图卷
 const chooseImage = async () => {
+  if (isUploading.value || isSubmitting.value) return;
+  isUploading.value = true;
   try {
     const image = await chooseSingleImage();
-    selectedImage.value = { ...image, url: image.path };
+    const uploaded = await uploadImage({
+      file_path: image.path,
+      name: image.name,
+    });
+    if (!uploaded?.upload_id) throw new Error("上传结果无效");
+    selectedImage.value = { ...image, uploadId: uploaded.upload_id };
     formData.imagePath = image.path;
     formRef.value?.clearValidate("imagePath");
   } catch (error) {
@@ -322,12 +327,14 @@ const chooseImage = async () => {
         icon: "none",
       });
     }
+  } finally {
+    isUploading.value = false;
   }
 };
 
 // 校验规制与意境后保存草稿，进入画质与渲染页
 const goNext = async () => {
-  if (isSubmitting.value) {
+  if (isSubmitting.value || isUploading.value) {
     return;
   }
 
@@ -337,9 +344,7 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.find(
-    (ratio) => ratio.value === formData.ratio,
-  );
+  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {
@@ -348,6 +353,7 @@ const goNext = async () => {
     ratioName: selectedRatioItem?.name || formData.ratio,
     prompt: formData.prompt.trim(),
     imagePath: formData.imagePath,
+    uploadId: selectedImage.value?.uploadId || "",
   });
   uni.navigateTo({
     url: "/pages/video-render/index",
@@ -529,11 +535,23 @@ const goNext = async () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：992px 以上画幅比例四列排布
+ * 桌面 H5 适配：1200px 以上画幅卡与模式卡并排，构想卡通栏
  * ============================================================ */
-@media (min-width: 992px) {
-  .ratio-list {
-    grid-template-columns: repeat(4, 1fr);
+@media (min-width: $breakpoint-desktop) {
+  .creation-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24rpx;
+    align-items: start;
+  }
+
+  .config-card {
+    margin: 0 6rpx;
+  }
+
+  /* 意境构想卡内容最多，桌面端占满整行 */
+  .config-card:nth-child(3) {
+    grid-column: 1 / -1;
   }
 }
 

@@ -83,7 +83,7 @@
   "globalStyle": {
     "navigationStyle": "custom",
     "rpxCalcMaxDeviceWidth": 750,
-    "rpxCalcBaseDeviceWidth": 750,
+    "rpxCalcBaseDeviceWidth": 375,
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "妙笔生花",
     "navigationBarBackgroundColor": "#F8F8F8",

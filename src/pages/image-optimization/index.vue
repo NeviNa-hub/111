@@ -13,7 +13,7 @@
                 <!-- #ifdef H5 -->
                 <el-icon class="file-icon"><Upload /></el-icon>
                 <!-- #endif -->
-                {{ selectedImage ? "更换图片" : "导入图片" }}
+                {{ isUploading ? "正在上传…" : selectedImage ? "更换图片" : "导入图片" }}
               </button>
             </view>
             <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
@@ -50,13 +50,18 @@
               class="prompt-input"
               placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
             />
-            <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
+            <text class="fixed-tip"
+              >提交扣除 1 积分，生成失败暂不退还；结果链接约 1 小时后失效。</text
+            >
           </view>
         </view>
       </scroll-view>
     </view>
     <view class="actions">
-      <button :disabled="!selectedImage || isSubmitting" @click="startOptimization">
+      <button
+        :disabled="!selectedImage || isSubmitting || isUploading"
+        @click="startOptimization"
+      >
         <!-- #ifdef H5 -->
         <el-icon class="action-icon"><MagicStick /></el-icon>
         <!-- #endif -->
@@ -84,24 +89,25 @@ import { computed, ref } from "vue";
 import { MagicStick, Plus, Upload, ZoomIn } from "@element-plus/icons-vue";
 // #endif
 
+import { USE_MOCK } from "@/apis/config";
 import { TASK_STATUS } from "@/apis/constants";
-import {
-  createImageOptimization,
-  getImageOptimizationTaskStatus,
-} from "@/apis/image-optimization";
+import { uploadImage } from "@/apis/upload";
+import { getImageOptimizationTaskStatus } from "@/apis/image-optimization";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { chooseSingleImage } from "@/utils/image-picker";
+import { submitImageOptimization } from "@/utils/image-optimization";
 import { getErrorMessage, isApiError } from "@/utils/request";
 
-const cost = 3;
+const cost = 1;
 const promptLimit = 200;
 const progressNote = "已投入云端淬炼池，离开页面不影响任务进度。";
 const prompt = ref("");
 const selectedImage = ref(null);
 const isSubmitting = ref(false);
+const isUploading = ref(false);
 const isProgressVisible = ref(false);
 const taskId = ref("");
 const taskProgress = ref(0);
@@ -146,7 +152,6 @@ const { start: startPolling } = useTaskPolling({
   onFailed: (error) => {
     const isRequestError = isApiError(error);
 
-    taskStatus.value = TASK_STATUS.FAILED;
     taskNote.value = isRequestError
       ? "任务状态查询失败，请稍后在作品库确认结果。"
       : getErrorMessage(error, "任务进度获取失败，请稍后重试");
@@ -159,9 +164,16 @@ const { start: startPolling } = useTaskPolling({
 
 // 从系统相册或相机选择图片并上传，失败时保留已有图片
 const chooseImage = async () => {
+  if (isUploading.value || isSubmitting.value) return;
+  isUploading.value = true;
   try {
     const image = await chooseSingleImage();
-    selectedImage.value = { ...image, url: image.path };
+    const uploaded = await uploadImage({
+      file_path: image.path,
+      name: image.name,
+    });
+    if (!uploaded?.upload_id) throw new Error("上传结果无效");
+    selectedImage.value = { ...image, uploadId: uploaded.upload_id };
   } catch (error) {
     if (!String(error?.errMsg || "").includes("cancel")) {
       uni.showToast({
@@ -169,12 +181,14 @@ const chooseImage = async () => {
         icon: "none",
       });
     }
+  } finally {
+    isUploading.value = false;
   }
 };
 
 // 校验图片后开始优化任务
 const startOptimization = async () => {
-  if (isSubmitting.value) {
+  if (isSubmitting.value || isUploading.value) {
     return;
   }
 
@@ -191,8 +205,10 @@ const startOptimization = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createImageOptimization({
-      image_path: selectedImage.value.url || selectedImage.value.path,
+    const task = await submitImageOptimization({
+      ...(USE_MOCK
+        ? { image_path: selectedImage.value.path }
+        : { upload_id: selectedImage.value.uploadId }),
       prompt: prompt.value.trim(),
     });
 
@@ -296,6 +312,22 @@ const goLibrary = () => {
   border-radius: 24rpx;
   background: $color-surface;
   box-shadow: 0 6rpx 20rpx rgba(150, 100, 40, 0.14);
+}
+
+/* ============================================================
+ * 桌面 H5 适配：1200px 以上原图卡与提示词卡左右并排
+ * ============================================================ */
+@media (min-width: $breakpoint-desktop) {
+  .creation-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24rpx;
+    align-items: start;
+  }
+
+  .config-card {
+    margin: 0 6rpx;
+  }
 }
 
 .config-card:first-child {

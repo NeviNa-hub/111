@@ -83,6 +83,19 @@ const goBack = () => {
   text-align: center;
 }
 
+/* ============================================================
+ * 桌面 H5 适配：1200px 以上内容卡限宽居中
+ * ============================================================ */
+@media (min-width: $breakpoint-desktop) {
+  .content-inner {
+    align-items: center;
+  }
+
+  .content-card {
+    max-width: 640px;
+  }
+}
+
 .workshop-carousel {
   margin-bottom: 24rpx;
   text-align: left;
