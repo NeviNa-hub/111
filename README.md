@@ -58,7 +58,7 @@ src/
 
 
 ### 首页 · 文稿库
-<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/ddd86b69-4b01-46ad-8e8f-dbe8f2e1954b" />
+<img width="374" height="813" alt="image" src="https://github.com/user-attachments/assets/c9c23b41-e923-42ae-ad65-386ce330c90f" />
 
 
 ### 创作台
