@@ -176,7 +176,7 @@ const startTool = (name) => {
 .content {
   height: calc(100vh - 210rpx - var(--status-bar-height, 0px));
   overflow-x: hidden;
-  padding: 28rpx 32rpx;
+  padding: 28rpx 40rpx;
   padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
@@ -187,11 +187,11 @@ const startTool = (name) => {
 
 /* ========== 工具卡片通用结构 ========== */
 .tool-card {
-  margin-bottom: 24rpx;
+  margin-bottom: 28rpx;
   padding: 24rpx;
   border-radius: 28rpx;
   background: $color-surface;
-  box-shadow: 0 8rpx 24rpx rgba(22, 53, 47, 0.06);
+  box-shadow: 0 6rpx 20rpx rgba(150, 100, 40, 0.14);
 }
 
 /* 卡片标题行 */

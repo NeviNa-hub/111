@@ -18,9 +18,9 @@ export const IMAGE_STYLES = [
   },
   {
     style_id: 3,
-    name: "宋瓷青釉",
-    description: "手工釉色肌理，低饱和大地色。",
-    class_name: "ceramic-style",
+    name: "卡通风格",
+    description: "明快色块，圆润线条，童趣生动。",
+    class_name: "cartoon-style",
   },
   {
     style_id: 4,

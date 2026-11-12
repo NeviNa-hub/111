@@ -439,6 +439,60 @@ const openMode = (url) => {
   border-radius: 24rpx;
   box-sizing: border-box;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 一道高光从左上角扫到右下角，循环播放 */
+.mode-card::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -80%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.34) 45%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.34) 55%,
+    transparent 100%
+  );
+  transform: rotate(8deg);
+  animation: card-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* 错开三张卡的扫光时机，避免同步闪烁 */
+.is-video::after {
+  animation-delay: 0.6s;
+}
+
+.is-optimization::after {
+  animation-delay: 1.2s;
+}
+
+@keyframes card-shine {
+  0% {
+    left: -80%;
+  }
+
+  55%,
+  100% {
+    left: 130%;
+  }
+}
+
+/* H5 鼠标悬停：轻微上浮加深阴影 */
+@media (hover: hover) {
+  .mode-card:hover {
+    transform: translateY(-6rpx);
+    box-shadow: 0 18rpx 36rpx rgba(150, 100, 40, 0.28);
+  }
+}
+
+.mode-card:active {
+  transform: scale(0.97);
 }
 
 .is-optimization {

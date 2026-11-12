@@ -64,7 +64,7 @@
 import { computed, ref } from "vue";
 
 // #ifdef H5
-import { ArrowRight, Brush, Camera, Dish, MagicStick } from "@element-plus/icons-vue";
+import { ArrowRight, Brush, Camera, MagicStick, Sunny } from "@element-plus/icons-vue";
 // #endif
 
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
@@ -73,7 +73,7 @@ import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 const styleOptions = [
   { styleId: 1, name: "宋式水墨", icon: Brush },
   { styleId: 2, name: "真实摄影", icon: Camera },
-  { styleId: 3, name: "宋瓷青釉", icon: Dish },
+  { styleId: 3, name: "卡通风格", icon: Sunny },
   { styleId: 4, name: "温润插画", icon: MagicStick },
 ];
 const ratios = [
@@ -250,8 +250,8 @@ const goNext = () => {
 }
 
 .option-card.is-style-3 .option-icon {
-  background: #f7efdd;
-  color: #8a6a3e;
+  background: #fff3d6;
+  color: #f08c1e;
 }
 
 .option-card.is-style-4 .option-icon {
