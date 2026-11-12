@@ -219,7 +219,8 @@ const isSubmitting = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
+  paddingBottom:
+    keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
@@ -235,7 +236,7 @@ const imageTitle = computed(() => selectedImage.value?.name || "传入一张图�
 const imageHint = computed(() =>
   selectedImage.value
     ? "点击更换图卷，将以图卷起点延展运镜"
-    : "从相册选择或拍摄，作为动卷起点"
+    : "从相册选择或拍摄，作为动卷起点",
 );
 
 /**
@@ -303,7 +304,7 @@ const polishPrompt = () => {
   formData.prompt = polishPromptText(
     formData.prompt.trim(),
     suffix,
-    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`
+    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`,
   );
 };
 
@@ -336,7 +337,9 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
+  const selectedRatioItem = ratios.find(
+    (ratio) => ratio.value === formData.ratio,
+  );
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {
@@ -523,6 +526,15 @@ const goNext = async () => {
   grid-template-columns: repeat(3, 1fr);
   gap: 16rpx;
   width: 100%;
+}
+
+/* ============================================================
+ * 桌面 H5 适配：992px 以上画幅比例四列排布
+ * ============================================================ */
+@media (min-width: 992px) {
+  .ratio-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .ratio-card {

@@ -36,7 +36,8 @@ const redirectToAuth = () => {
 };
 
 // 登录态缺失、无效或已过期时统一按会话失效处理。
-const isUnauthorizedCode = (code) => code === ERROR_CODES.UNAUTHORIZED;
+const isUnauthorizedCode = (code) =>
+  code === ERROR_CODES.UNAUTHORIZED || code === 40102;
 
 // 请求异常统一通过全局提示展示，取消请求和会话失效不提示。
 const showRequestError = (error) => {

@@ -43,6 +43,7 @@
                 本次需量扣除 <b>{{ selectedCost }} 点</b>
               </text>
             </view>
+            <text>提交后扣除积分，生成失败暂不退回；图片链接约 1 小时后失效。</text>
           </view>
         </view>
       </scroll-view>
@@ -60,10 +61,11 @@
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
+import { getPointsInfo } from "@/apis/points";
 import { createImageGeneration } from "@/apis/text-to-image";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
-import { getErrorMessage } from "@/utils/request";
+import { getErrorMessage, isApiError } from "@/utils/request";
 
 const options = ref({
   prompt: "",
@@ -76,7 +78,7 @@ const options = ref({
   ],
 });
 const selectedRatio = ref("1:1");
-const pointsBalance = ref(800);
+const pointsBalance = ref(null);
 const isSubmitting = ref(false);
 
 const pointsText = computed(() =>
@@ -122,6 +124,11 @@ const generate = async () => {
       ratio: requestData.ratio,
     });
 
+    if (!task?.task_id) {
+      uni.showToast({ title: "任务创建失败，请重试", icon: "none" });
+      return;
+    }
+
     saveCreationDraft(DRAFT_KEYS.image, requestData);
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
@@ -129,21 +136,30 @@ const generate = async () => {
       )}`,
     });
   } catch (error) {
-    uni.showToast({
-      title: getErrorMessage(error, "创建任务失败，请稍后重试"),
-      icon: "none",
-    });
+    if (!isApiError(error)) {
+      uni.showToast({
+        title: getErrorMessage(error, "创建任务失败，请稍后重试"),
+        icon: "none",
+      });
+    }
   } finally {
     isSubmitting.value = false;
   }
 };
 
-onShow(() => {
+onShow(async () => {
   const draft = readCreationDraft(DRAFT_KEYS.image);
 
   if (!draft?.prompt || !draft?.style) {
     uni.showToast({ title: "请按顺序完成构思和画风选择", icon: "none" });
     uni.redirectTo({ url: "/pages/image-creation/index" });
+    return;
+  }
+  try {
+    const result = await getPointsInfo({ page: 1, page_size: 1 });
+    pointsBalance.value = result.points_balance;
+  } catch {
+    pointsBalance.value = null;
   }
 });
 </script>
@@ -344,6 +360,15 @@ onShow(() => {
   grid-template-columns: 1fr 1fr;
   gap: 16rpx;
   margin-top: 16rpx;
+}
+
+/* ============================================================
+ * 桌面 H5 适配：992px 以上画幅比例三列排布
+ * ============================================================ */
+@media (min-width: 992px) {
+  .ratio-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .ratio-card {

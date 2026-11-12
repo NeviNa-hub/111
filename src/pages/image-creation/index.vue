@@ -254,6 +254,19 @@ const goNext = () => {
   grid-template-columns: repeat(4, 1fr);
 }
 
+/* ============================================================
+ * 桌面 H5 适配：992px 以上选项区增列，比例区保持四列
+ * ============================================================ */
+@media (min-width: 992px) {
+  .option-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .option-grid.four {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .option-card {
   display: flex;
   flex-direction: column;

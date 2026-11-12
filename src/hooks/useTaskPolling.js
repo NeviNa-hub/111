@@ -98,7 +98,7 @@ export default function useTaskPolling(defaultOptions = {}) {
 
       if (isFailed?.(data)) {
         stop();
-        onFailed?.(new Error(data.message || "任务生成失败，请稍后重试"));
+        onFailed?.(new Error(data.error_message || data.message || "任务生成失败，请稍后重试"));
         return;
       }
 

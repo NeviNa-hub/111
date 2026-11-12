@@ -53,13 +53,15 @@
 
           <view class="config-card">
             <view class="config-title"><em>叁 ·</em> 画境点睛</view>
-            <view class="tuning-row">
-              <text class="tuning-label">意境基调</text>
-              <text class="tuning-value">清润淡雅　墨韵沉静</text>
-            </view>
-            <view class="tuning-row">
-              <text class="tuning-label">留白比例</text>
-              <text class="tuning-value">迂阔（60%）　虚实均亭</text>
+            <view class="tuning-grid">
+              <view class="tuning-row">
+                <text class="tuning-label">意境基调</text>
+                <text class="tuning-value">清润淡雅　墨韵沉静</text>
+              </view>
+              <view class="tuning-row">
+                <text class="tuning-label">留白比例</text>
+                <text class="tuning-value">迂阔（60%）　虚实均亭</text>
+              </view>
             </view>
           </view>
         </view>
@@ -76,7 +78,7 @@
       title="确认研墨成画"
       :cost="generationCost"
       :estimated-time="estimatedTime || '待定'"
-      note="确认后将扣除本次灵感点，并把画卷送入云端研磨，期间离开或切换页面均不影响生成。"
+      note="确认后扣除灵感点，生成失败暂不退回；结果链接约 1 小时后失效，请及时保存。"
       confirm-text="确认研墨成画"
       :loading="isSubmitting"
       @cancel="confirmVisible = false"
@@ -545,6 +547,21 @@ onShow(() => {
 .tuning-value {
   color: $color-muted;
   font-size: 24rpx;
+}
+
+/* ============================================================
+ * 桌面 H5 适配：992px 以上调参行双列排布
+ * ============================================================ */
+@media (min-width: 992px) {
+  .tuning-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32rpx;
+  }
+
+  .tuning-row {
+    border-top: 0;
+  }
 }
 
 .bottom-actions {

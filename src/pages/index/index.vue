@@ -477,6 +477,16 @@ const openMode = (url) => {
   width: 100%;
 }
 
+/* ============================================================
+ * 桌面 H5 适配：992px 以上功能宫格三张等宽并列
+ * ============================================================ */
+@media (min-width: 992px) {
+  .mode-card,
+  .is-optimization {
+    width: calc((100% - 40rpx) / 3);
+  }
+}
+
 /* 文字生图 · 暖黄 */
 .is-image {
   background: linear-gradient(150deg, #f8e7c3 0%, #f2d59b 100%);

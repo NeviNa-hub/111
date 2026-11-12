@@ -11,7 +11,9 @@
             @tap="previewResult"
           />
         </view>
-        <text class="result-hint">轻触图片放大查看</text>
+        <text class="result-hint"
+          >轻触图片放大查看；图片链接约 1 小时后失效，请及时保存</text
+        >
       </template>
       <template v-else>
         <view class="progress-circle">{{ progress }}<small>%</small></view>
@@ -103,6 +105,12 @@ const previewResult = () => {
   border-radius: 32rpx 32rpx 0 0;
   background: $color-surface;
   box-sizing: border-box;
+
+  /* 宽屏下与页面内容区同宽居中，避免底部弹板横跨整屏 */
+  @media (min-width: 768px) {
+    max-width: 750px;
+    margin: 0 auto;
+  }
 
   --el-color-primary: #{$color-primary};
   --el-border-radius-base: #{20rpx};

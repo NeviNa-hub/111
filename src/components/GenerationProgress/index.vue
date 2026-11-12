@@ -38,7 +38,9 @@
           mode="aspectFit"
           @tap="previewResult"
         />
-        <text class="result-hint">轻触图片放大查看</text>
+        <text class="result-hint"
+          >轻触图片放大查看；图片链接约 1 小时后失效，请及时保存</text
+        >
       </view>
       <view class="task-card">
         <view class="task-title">
@@ -338,6 +340,29 @@ const goWorkbench = () => {
   font-size: 24rpx;
   line-height: 1.6;
   text-align: center;
+}
+
+/* ============================================================
+ * 桌面 H5 适配：992px 以上结果图与任务详情左右分栏
+ * ============================================================ */
+@media (min-width: 992px) {
+  .generation-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20rpx;
+    align-content: start;
+  }
+
+  .progress-card,
+  .cloud-tip {
+    grid-column: 1 / -1;
+  }
+
+  .result-card,
+  .task-card,
+  .cloud-tip {
+    margin-top: 0;
+  }
 }
 
 .generation-actions {

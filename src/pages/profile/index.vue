@@ -465,6 +465,25 @@ onMounted(() => {
   font-size: 26rpx;
 }
 
+/* ============================================================
+ * 桌面 H5 适配：992px 以上功能菜单双列排布
+ * ============================================================ */
+@media (min-width: 992px) {
+  .menu-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 24rpx;
+  }
+
+  .menu-title {
+    grid-column: 1 / -1;
+  }
+
+  .menu-row + .menu-row {
+    border-top: 0;
+  }
+}
+
 .logout-bar {
   position: fixed;
   z-index: 10;
@@ -515,6 +534,12 @@ onMounted(() => {
   border-radius: 32rpx 32rpx 0 0;
   background: $color-surface;
   box-sizing: border-box;
+
+  /* 宽屏下与页面内容区同宽居中，避免底部弹板横跨整屏 */
+  @media (min-width: 768px) {
+    max-width: 750px;
+    margin: 0 auto;
+  }
 }
 
 .points-header {

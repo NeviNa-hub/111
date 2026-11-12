@@ -100,6 +100,12 @@ defineEmits(["cancel", "confirm"]);
   background: $color-surface;
   box-sizing: border-box;
 
+  /* 宽屏下与页面内容区同宽居中，避免底部弹板横跨整屏 */
+  @media (min-width: 768px) {
+    max-width: 750px;
+    margin: 0 auto;
+  }
+
   --el-color-primary: #{$color-primary};
   --el-border-radius-base: #{20rpx};
   --el-font-family: #{$font-family-base};
