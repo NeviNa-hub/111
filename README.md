@@ -54,7 +54,7 @@ src/
 
 ### 登录 / 注册
 <img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/784b4055-d5ea-45bf-bf31-45d7ce3df7e5" />
-<img width="376" height="810" alt="image" src="https://github.com/user-attachments/assets/b4a2dd3a-58ea-4e9b-a680-3e869d96bf22" />
+<img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/644cd5bb-0eaf-469e-bc39-077db537d41d" />
 
 
 
