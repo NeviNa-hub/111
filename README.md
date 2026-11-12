@@ -53,8 +53,9 @@ src/
 ## 实现效果预览。
 
 ### 登录 / 注册
-<img width="444" height="1011" alt="image" src="https://github.com/user-attachments/assets/a68b2064-6e34-4887-882b-c68954e47ee8" />
-<img width="446" height="1010" alt="image" src="https://github.com/user-attachments/assets/d457bd66-952d-43d2-ba55-4d6b9a401b33" />
+<img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/784b4055-d5ea-45bf-bf31-45d7ce3df7e5" />
+<img width="376" height="810" alt="image" src="https://github.com/user-attachments/assets/b4a2dd3a-58ea-4e9b-a680-3e869d96bf22" />
+
 
 
 ### 首页 · 文稿库
