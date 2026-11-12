@@ -7,134 +7,136 @@
       <view class="step-connector"></view>
       <view class="step inactive"><i>2</i><text>画质与渲染</text></view>
     </view>
-    <scroll-view
-      scroll-y
-      :show-scrollbar="false"
-      class="content"
-      :style="contentKeyboardStyle"
-    >
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-position="top"
-        class="creation-form"
+    <view class="scroll-window">
+      <scroll-view
+        scroll-y
+        :show-scrollbar="false"
+        class="content"
+        :style="contentKeyboardStyle"
       >
-        <view class="config-card">
-          <view class="config-title"><em>壹 ·</em> 规制画幅</view>
-          <el-form-item prop="ratio" class="ratio-form-item">
-            <el-radio-group v-model="formData.ratio" class="ratio-list">
-              <el-radio
-                v-for="(ratio, index) in ratios"
-                :key="ratio.ratioId"
-                :value="ratio.value"
-                class="ratio-card"
-                :class="[
-                  `is-ratio-${index + 1}`,
-                  { 'is-selected': formData.ratio === ratio.value },
-                ]"
-              >
-                <text class="ratio-badge">{{ ratio.value }}</text>
-                <text class="ratio-name">{{ ratio.name }}</text>
-                <text class="ratio-desc">{{ ratio.description }}</text>
-                <text v-if="ratio.recommended" class="recommend">推荐</text>
-              </el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </view>
+        <el-form
+          ref="formRef"
+          :model="formData"
+          :rules="formRules"
+          label-position="top"
+          class="creation-form"
+        >
+          <view class="config-card">
+            <view class="config-title"><em>壹 ·</em> 规制画幅</view>
+            <el-form-item prop="ratio" class="ratio-form-item">
+              <el-radio-group v-model="formData.ratio" class="ratio-list">
+                <el-radio
+                  v-for="(ratio, index) in ratios"
+                  :key="ratio.ratioId"
+                  :value="ratio.value"
+                  class="ratio-card"
+                  :class="[
+                    `is-ratio-${index + 1}`,
+                    { 'is-selected': formData.ratio === ratio.value },
+                  ]"
+                >
+                  <text class="ratio-badge">{{ ratio.value }}</text>
+                  <text class="ratio-name">{{ ratio.name }}</text>
+                  <text class="ratio-desc">{{ ratio.description }}</text>
+                  <text v-if="ratio.recommended" class="recommend">推荐</text>
+                </el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </view>
 
-        <view class="config-card">
-          <view class="config-title"><em>贰 ·</em> 创作模式</view>
-          <el-radio-group
-            v-model="formData.mode"
-            class="mode-switch"
-            @change="handleModeChange"
-          >
-            <el-radio-button
-              v-for="mode in modes"
-              :key="mode.modeId"
-              :value="mode.modeId"
-              class="mode-option"
+          <view class="config-card">
+            <view class="config-title"><em>贰 ·</em> 创作模式</view>
+            <el-radio-group
+              v-model="formData.mode"
+              class="mode-switch"
+              @change="handleModeChange"
             >
-              <el-icon>
-                <VideoCamera v-if="mode.modeId === 'text'" />
-                <PictureFilled v-else />
-              </el-icon>
-              <text>{{ mode.name }}</text>
-            </el-radio-button>
-          </el-radio-group>
+              <el-radio-button
+                v-for="mode in modes"
+                :key="mode.modeId"
+                :value="mode.modeId"
+                class="mode-option"
+              >
+                <el-icon>
+                  <VideoCamera v-if="mode.modeId === 'text'" />
+                  <PictureFilled v-else />
+                </el-icon>
+                <text>{{ mode.name }}</text>
+              </el-radio-button>
+            </el-radio-group>
 
-          <el-form-item
-            v-if="formData.mode === 'image'"
-            prop="imagePath"
-            class="image-form-item"
-          >
-            <view class="image-picker">
-              <app-image
-                v-if="selectedImage"
-                class="image-thumb"
-                :src="selectedImage.url || selectedImage.path"
-                mode="aspectFill"
-              />
-              <view class="image-copy">
-                <text class="image-title">{{ imageTitle }}</text>
-                <text class="image-hint">{{ imageHint }}</text>
+            <el-form-item
+              v-if="formData.mode === 'image'"
+              prop="imagePath"
+              class="image-form-item"
+            >
+              <view class="image-picker">
+                <app-image
+                  v-if="selectedImage"
+                  class="image-thumb"
+                  :src="selectedImage.url || selectedImage.path"
+                  mode="aspectFill"
+                />
+                <view class="image-copy">
+                  <text class="image-title">{{ imageTitle }}</text>
+                  <text class="image-hint">{{ imageHint }}</text>
+                </view>
+                <el-button class="image-pick-button" @click="chooseImage">
+                  <el-icon><Upload /></el-icon>
+                  {{ selectedImage ? "更换" : "选图" }}
+                </el-button>
               </view>
-              <el-button class="image-pick-button" @click="chooseImage">
-                <el-icon><Upload /></el-icon>
-                {{ selectedImage ? "更换" : "选图" }}
+            </el-form-item>
+          </view>
+
+          <view class="config-card">
+            <view class="config-title prompt-title">
+              <view><em>叁 ·</em> 意境构想</view>
+              <el-button link class="prompt-clear" @click="clearPrompt">
+                <el-icon><RefreshLeft /></el-icon>
+                清空辞藻
               </el-button>
             </view>
-          </el-form-item>
-        </view>
+            <el-form-item prop="prompt" class="prompt-form-item">
+              <el-input
+                v-model="formData.prompt"
+                type="textarea"
+                :maxlength="promptLimit"
+                :rows="4"
+                resize="none"
+                class="prompt-input"
+                placeholder="写下动卷意境，点染光影与运镜"
+              />
+            </el-form-item>
+            <view class="prompt-foot">
+              <text class="prompt-count">
+                {{ formData.prompt.length }} / {{ promptLimit }}字
+              </text>
+              <el-button class="polish-button" @click="polishPrompt">
+                <el-icon><MagicStick /></el-icon>
+                润色辞藻
+              </el-button>
+            </view>
 
-        <view class="config-card">
-          <view class="config-title prompt-title">
-            <view><em>叁 ·</em> 意境构想</view>
-            <el-button link class="prompt-clear" @click="clearPrompt">
-              <el-icon><RefreshLeft /></el-icon>
-              清空辞藻
-            </el-button>
+            <view class="suggestion-head">
+              <el-icon><EditPen /></el-icon>
+              <text>笔墨词枕 · 点击引入灵感</text>
+            </view>
+            <view class="suggestions">
+              <el-button
+                v-for="item in suggestions"
+                :key="item"
+                class="suggestion-chip"
+                @click="appendPrompt(item)"
+              >
+                <el-icon><Plus /></el-icon>
+                <text>{{ item }}</text>
+              </el-button>
+            </view>
           </view>
-          <el-form-item prop="prompt" class="prompt-form-item">
-            <el-input
-              v-model="formData.prompt"
-              type="textarea"
-              :maxlength="promptLimit"
-              :rows="4"
-              resize="none"
-              class="prompt-input"
-              placeholder="写下动卷意境，点染光影与运镜"
-            />
-          </el-form-item>
-          <view class="prompt-foot">
-            <text class="prompt-count">
-              {{ formData.prompt.length }} / {{ promptLimit }}字
-            </text>
-            <el-button class="polish-button" @click="polishPrompt">
-              <el-icon><MagicStick /></el-icon>
-              润色辞藻
-            </el-button>
-          </view>
-
-          <view class="suggestion-head">
-            <el-icon><EditPen /></el-icon>
-            <text>笔墨词枕 · 点击引入灵感</text>
-          </view>
-          <view class="suggestions">
-            <el-button
-              v-for="item in suggestions"
-              :key="item"
-              class="suggestion-chip"
-              @click="appendPrompt(item)"
-            >
-              <el-icon><Plus /></el-icon>
-              <text>{{ item }}</text>
-            </el-button>
-          </view>
-        </view>
-      </el-form>
-    </scroll-view>
+        </el-form>
+      </scroll-view>
+    </view>
 
     <view class="bottom-bar" :style="barKeyboardStyle">
       <el-button
@@ -217,10 +219,7 @@ const isSubmitting = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom:
-    keyboardInset.value > 0
-      ? `calc(var(--content-bottom-pad) + ${keyboardInset.value}px)`
-      : undefined,
+  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
@@ -358,8 +357,14 @@ const goNext = async () => {
 
 <style scoped lang="scss">
 .video-creation-page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  /* 为固定底栏预留高度，避免滚动窗下缘被底栏遮挡 */
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 
@@ -373,16 +378,50 @@ const goNext = async () => {
   --el-font-size-base: #{28rpx};
 }
 
+.app-page-header,
+.step-bar {
+  flex: none;
+}
+
+/* 滚动窗：占据页头与底栏之间的全部剩余高度，边缘渐隐弱化切割感 */
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
+}
+
 .content {
-  --content-bottom-pad: #{48rpx};
-  height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
+  height: 100%;
   overflow-x: hidden;
-  padding: 35rpx 32rpx var(--content-bottom-pad);
+  padding: 0 32rpx;
   box-sizing: border-box;
 }
 
 .creation-form {
   width: 100%;
+  /* 呼吸边距放在滚动内容内部，滚动到顶/底时卡片不被贴边硬切 */
+  padding: 35rpx 0 48rpx;
 }
 
 /* 卡片与区块标题：与文字生图页统一样式 */

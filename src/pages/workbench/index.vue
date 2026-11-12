@@ -119,6 +119,7 @@
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
+import AppStateHint from "@/components/AppStateHint/index.vue";
 
 const frames = [
   { frameId: 1, name: "起势·淡雾" },
@@ -179,10 +180,6 @@ const startTool = (name) => {
   padding: 28rpx 40rpx;
   padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
   box-sizing: border-box;
-}
-
-.content-state {
-  margin-bottom: 24rpx;
 }
 
 /* ========== 工具卡片通用结构 ========== */
@@ -379,16 +376,10 @@ const startTool = (name) => {
   }
 }
 
-.film-meta {
-  color: #92a3ac;
-  font-size: 22rpx;
-}
-
 .film-frames {
   display: flex;
   align-items: flex-end;
   gap: 12rpx;
-  /* margin: 20rpx 0; */
 }
 
 /* 从左到右逐渐放大：basis 取 auto 保证最小宽度装得下标签，剩余空间按递增比例分配，
@@ -584,19 +575,6 @@ const startTool = (name) => {
   }
 }
 
-.compare-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 66rpx;
-  background: rgba(124, 130, 153, 0.92);
-  color: #fff;
-  font-size: 24rpx;
-  line-height: 66rpx;
-  text-align: center;
-}
-
 /* ========== 草稿与便签库 ========== */
 .draft-card {
   margin-bottom: 24rpx;
@@ -761,10 +739,6 @@ const startTool = (name) => {
     font-size: $desktop-body;
   }
 
-  .film-meta {
-    font-size: $desktop-caption;
-  }
-
   .film-frames {
     gap: 10px;
     margin: 14px 0;
@@ -817,12 +791,6 @@ const startTool = (name) => {
     bottom: 56px;
     padding: 5px 10px;
     font-size: $desktop-caption;
-  }
-
-  .compare-caption {
-    height: 40px;
-    font-size: $desktop-caption;
-    line-height: 40px;
   }
 
   /* 草稿库 */

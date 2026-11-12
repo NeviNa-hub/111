@@ -9,101 +9,103 @@
       <view class="step-connector"></view>
       <view class="step active"><i>2</i><text>画质与渲染</text></view>
     </view>
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-position="top"
-        class="render-form"
-      >
-        <view class="config-card">
-          <view class="config-title"><em>壹 ·</em> 动卷预览</view>
-          <view class="preview-body">
-            <view class="preview-thumb">
-              <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
-              <text class="preview-badge">影片</text>
-            </view>
-            <view class="preview-info">
-              <view class="preview-head">
-                <text class="preview-title">{{ renderConfig.previewTitle }}</text>
-                <text class="preview-state">已立意</text>
+    <view class="scroll-window">
+      <scroll-view scroll-y :show-scrollbar="false" class="content">
+        <el-form
+          ref="formRef"
+          :model="formData"
+          :rules="formRules"
+          label-position="top"
+          class="render-form"
+        >
+          <view class="config-card">
+            <view class="config-title"><em>壹 ·</em> 动卷预览</view>
+            <view class="preview-body">
+              <view class="preview-thumb">
+                <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
+                <text class="preview-badge">影片</text>
               </view>
-              <view class="preview-tags">
-                <text class="preview-tag">{{ draft.ratioName }}</text>
-                <text class="preview-tag is-accent">
-                  {{ renderConfig.cameraMove }}
-                </text>
-              </view>
-              <text class="preview-desc">“{{ promptText }}”</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="config-card">
-          <view class="config-title"><em>贰 ·</em> 帧率与渲染画质</view>
-          <el-form-item prop="fps" class="fps-form-item">
-            <el-radio-group v-model="formData.fps" class="fps-list">
-              <el-radio
-                v-for="option in fpsOptions"
-                :key="option.fpsId"
-                :value="option.value"
-                class="fps-card"
-                :class="{ 'is-selected': formData.fps === option.value }"
-              >
-                <view class="fps-content">
-                  <view class="fps-head">
-                    <view
-                      class="fps-dot"
-                      :class="{ 'is-active': formData.fps === option.value }"
-                    ></view>
-                    <text class="fps-name">{{ option.name }}</text>
-                    <text class="fps-tag">{{ option.tag }}</text>
-                  </view>
-                  <text class="fps-desc">{{ option.description }}</text>
+              <view class="preview-info">
+                <view class="preview-head">
+                  <text class="preview-title">{{ renderConfig.previewTitle }}</text>
+                  <text class="preview-state">已立意</text>
                 </view>
-                <el-icon v-if="formData.fps === option.value" class="fps-check">
-                  <Check />
-                </el-icon>
-                <view v-else class="fps-radio"></view>
-              </el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </view>
+                <view class="preview-tags">
+                  <text class="preview-tag">{{ draft.ratioName }}</text>
+                  <text class="preview-tag is-accent">
+                    {{ renderConfig.cameraMove }}
+                  </text>
+                </view>
+                <text class="preview-desc">“{{ promptText }}”</text>
+              </view>
+            </view>
+          </view>
 
-        <view class="config-card">
-          <view class="config-title resource-title">
-            <view><em>叁 ·</em> 渲染资源结算</view>
-            <el-button class="boost-button" @click="showBoostTip">
-              <el-icon><Lightning /></el-icon>
-              尊享加速通道
-            </el-button>
+          <view class="config-card">
+            <view class="config-title"><em>贰 ·</em> 帧率与渲染画质</view>
+            <el-form-item prop="fps" class="fps-form-item">
+              <el-radio-group v-model="formData.fps" class="fps-list">
+                <el-radio
+                  v-for="option in fpsOptions"
+                  :key="option.fpsId"
+                  :value="option.value"
+                  class="fps-card"
+                  :class="{ 'is-selected': formData.fps === option.value }"
+                >
+                  <view class="fps-content">
+                    <view class="fps-head">
+                      <view
+                        class="fps-dot"
+                        :class="{ 'is-active': formData.fps === option.value }"
+                      ></view>
+                      <text class="fps-name">{{ option.name }}</text>
+                      <text class="fps-tag">{{ option.tag }}</text>
+                    </view>
+                    <text class="fps-desc">{{ option.description }}</text>
+                  </view>
+                  <el-icon v-if="formData.fps === option.value" class="fps-check">
+                    <Check />
+                  </el-icon>
+                  <view v-else class="fps-radio"></view>
+                </el-radio>
+              </el-radio-group>
+            </el-form-item>
           </view>
-          <view class="resource-grid">
-            <view class="resource-item">
-              <text class="resource-label">本次消耗</text>
-              <view class="resource-value">
-                {{ renderConfig.cost }}
-                <text class="resource-unit">灵感点</text>
-              </view>
+
+          <view class="config-card">
+            <view class="config-title resource-title">
+              <view><em>叁 ·</em> 渲染资源结算</view>
+              <el-button class="boost-button" @click="showBoostTip">
+                <el-icon><Lightning /></el-icon>
+                尊享加速通道
+              </el-button>
             </view>
-            <view class="resource-item">
-              <text class="resource-label">当前可用</text>
-              <view class="resource-value">
-                {{ renderConfig.power }}
-                <text class="resource-unit">点</text>
+            <view class="resource-grid">
+              <view class="resource-item">
+                <text class="resource-label">本次消耗</text>
+                <view class="resource-value">
+                  {{ renderConfig.cost }}
+                  <text class="resource-unit">灵感点</text>
+                </view>
               </view>
-            </view>
-            <view class="resource-item">
-              <text class="resource-label">渲染预估</text>
-              <view class="resource-value">
-                {{ renderConfig.estimatedTime }}
+              <view class="resource-item">
+                <text class="resource-label">当前可用</text>
+                <view class="resource-value">
+                  {{ renderConfig.power }}
+                  <text class="resource-unit">点</text>
+                </view>
+              </view>
+              <view class="resource-item">
+                <text class="resource-label">渲染预估</text>
+                <view class="resource-value">
+                  {{ renderConfig.estimatedTime }}
+                </view>
               </view>
             </view>
           </view>
-        </view>
-      </el-form>
-    </scroll-view>
+        </el-form>
+      </scroll-view>
+    </view>
 
     <view class="bottom-bar">
       <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
@@ -165,7 +167,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  InfoFilled,
   Lightning,
   VideoPlay,
 } from "@element-plus/icons-vue";
@@ -176,7 +177,6 @@ import { createVideoGeneration, getVideoTaskStatus } from "@/apis/video-creation
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import AppStateHint from "@/components/AppStateHint/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useTaskPolling from "@/hooks/useTaskPolling";
@@ -376,8 +376,14 @@ onShow(() => {
 
 <style scoped lang="scss">
 .video-render-page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  /* 为固定底栏预留高度，避免滚动窗下缘被底栏遮挡 */
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 
@@ -391,19 +397,50 @@ onShow(() => {
   --el-font-size-base: #{28rpx};
 }
 
-.content {
-  height: calc(100vh - 350rpx - var(--status-bar-height, 0px));
-  overflow-x: hidden;
-  padding: 35rpx 32rpx 48rpx;
-  box-sizing: border-box;
+.app-page-header,
+.step-bar {
+  flex: none;
 }
 
-.render-state {
-  margin: 16rpx 0;
+/* 滚动窗：占据页头与底栏之间的全部剩余高度，边缘渐隐弱化切割感 */
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
+}
+
+.content {
+  height: 100%;
+  overflow-x: hidden;
+  padding: 0 32rpx;
+  box-sizing: border-box;
 }
 
 .render-form {
   width: 100%;
+  /* 呼吸边距放在滚动内容内部，滚动到顶/底时卡片不被贴边硬切 */
+  padding: 35rpx 0 48rpx;
 }
 
 /* 步骤条：与文字生图页统一样式 */
@@ -785,21 +822,6 @@ onShow(() => {
   color: #4e665e;
   font-size: 22rpx;
   font-weight: 400;
-}
-
-.resource-tip {
-  display: flex;
-  gap: 12rpx;
-  margin-top: 16rpx;
-  color: $color-muted;
-  font-size: 22rpx;
-  line-height: 1.6;
-}
-
-.tip-icon {
-  flex-shrink: 0;
-  color: #8a6840;
-  font-size: 22rpx;
 }
 
 /* 底部操作 */

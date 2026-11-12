@@ -1,56 +1,60 @@
 <template>
   <view class="page">
     <app-page-header title="图片优化" />
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <view class="config-card">
-        <view class="config-title"><em>壹 ·</em> 导入原图</view>
-        <view class="file">
-          <text v-if="selectedImage">{{ selectedImage.name }}</text>
-          <text v-else>请先导入需要优化的图片</text>
-          <button @click="chooseImage">
-            <!-- #ifdef H5 -->
-            <el-icon class="file-icon"><Upload /></el-icon>
-            <!-- #endif -->
-            {{ selectedImage ? "更换图片" : "导入图片" }}
-          </button>
-        </view>
-        <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
-          <app-image
-            v-if="selectedImage"
-            class="preview-media"
-            :src="selectedImage.url || selectedImage.path"
-            mode="aspectFit"
-          />
-          <view v-else class="empty-tip">
-            <!-- #ifdef H5 -->
-            <el-icon class="empty-icon"><Plus /></el-icon>
-            <!-- #endif -->
-            <text>从相册选择或拍摄图片</text>
+    <view class="scroll-window">
+      <scroll-view scroll-y :show-scrollbar="false" class="content">
+        <view class="creation-body">
+          <view class="config-card">
+            <view class="config-title"><em>壹 ·</em> 导入原图</view>
+            <view class="file">
+              <text v-if="selectedImage">{{ selectedImage.name }}</text>
+              <text v-else>请先导入需要优化的图片</text>
+              <button @click="chooseImage">
+                <!-- #ifdef H5 -->
+                <el-icon class="file-icon"><Upload /></el-icon>
+                <!-- #endif -->
+                {{ selectedImage ? "更换图片" : "导入图片" }}
+              </button>
+            </view>
+            <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
+              <app-image
+                v-if="selectedImage"
+                class="preview-media"
+                :src="selectedImage.url || selectedImage.path"
+                mode="aspectFit"
+              />
+              <view v-else class="empty-tip">
+                <!-- #ifdef H5 -->
+                <el-icon class="empty-icon"><Plus /></el-icon>
+                <!-- #endif -->
+                <text>从相册选择或拍摄图片</text>
+              </view>
+              <text v-if="selectedImage" class="cover">已选封面</text>
+              <view v-if="selectedImage" class="zoom">
+                <!-- #ifdef H5 -->
+                <el-icon><ZoomIn /></el-icon>
+                <!-- #endif -->
+              </view>
+            </view>
+            <text class="hint">点击预览可从系统相册重新导入或拍摄</text>
           </view>
-          <text v-if="selectedImage" class="cover">已选封面</text>
-          <view v-if="selectedImage" class="zoom">
-            <!-- #ifdef H5 -->
-            <el-icon><ZoomIn /></el-icon>
-            <!-- #endif -->
-          </view>
-        </view>
-        <text class="hint">点击预览可从系统相册重新导入或拍摄</text>
-      </view>
 
-      <view class="config-card">
-        <view class="config-title prompt-head">
-          <view><em>贰 ·</em> 优化提示词</view>
-          <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
+          <view class="config-card">
+            <view class="config-title prompt-head">
+              <view><em>贰 ·</em> 优化提示词</view>
+              <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
+            </view>
+            <textarea
+              v-model="prompt"
+              :maxlength="promptLimit"
+              class="prompt-input"
+              placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
+            />
+            <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
+          </view>
         </view>
-        <textarea
-          v-model="prompt"
-          :maxlength="promptLimit"
-          class="prompt-input"
-          placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
-        />
-        <text class="fixed-tip">重绘强度与面部细节保留由系统统一设定</text>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
     <view class="actions">
       <button :disabled="!selectedImage || isSubmitting" @click="startOptimization">
         <!-- #ifdef H5 -->
@@ -229,21 +233,60 @@ const goLibrary = () => {
 
 <style scoped lang="scss">
 .page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  /* 为固定底栏预留高度，避免滚动窗下缘被底栏遮挡 */
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
 }
 
+.app-page-header {
+  flex: none;
+}
+
+/* 滚动窗：占据页头与底栏之间的全部剩余高度，边缘渐隐弱化切割感 */
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
+}
+
 .content {
-  height: calc(100vh - 220rpx - var(--status-bar-height, 0px));
+  height: 100%;
   overflow-x: hidden;
-  padding: 35rpx 32rpx 260rpx;
+  padding: 0 32rpx;
   box-sizing: border-box;
 }
 
-.content-state {
-  margin-bottom: 24rpx;
+.creation-body {
+  /* 呼吸边距放在滚动内容内部，滚动到顶/底时卡片不被贴边硬切 */
+  padding: 35rpx 0 48rpx;
 }
 
 /* 卡片与区块标题：与创作页统一样式 */
@@ -345,30 +388,18 @@ const goLibrary = () => {
 }
 
 .cover,
-.ready,
 .zoom {
   position: absolute;
   background: rgba(22, 53, 47, 0.82);
   color: #fff;
 }
 
-.cover,
-.ready {
+.cover {
   padding: 8rpx 16rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
-}
-
-.cover {
   top: 16rpx;
   left: 16rpx;
-}
-
-.ready {
-  bottom: 16rpx;
-  left: 16rpx;
-  max-width: calc(100% - 110rpx);
-  @include text-ellipsis;
 }
 
 .zoom {
@@ -421,15 +452,6 @@ const goLibrary = () => {
 }
 
 /* 底部操作 */
-.cost {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 8rpx 16rpx;
-  color: $color-muted;
-  font-size: 22rpx;
-}
-
 .actions {
   @include action-bar;
   text-align: center;
@@ -463,12 +485,5 @@ const goLibrary = () => {
 
 .action-icon {
   font-size: 26rpx;
-}
-
-.actions > text {
-  display: block;
-  margin-top: 16rpx;
-  color: $color-muted;
-  font-size: 22rpx;
 }
 </style>

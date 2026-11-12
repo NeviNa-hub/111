@@ -108,8 +108,6 @@ onMounted(() => {
   align-items: center;
   border-bottom: 1rpx solid rgba(190, 140, 70, 0.18);
   background: #ffecd2;
-  // background: #ffdaa6f8;
-  // color: #b3712a;
   color: #b3712a;
 }
 

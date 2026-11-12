@@ -254,67 +254,6 @@ onMounted(() => {
   text-align: center;
 }
 
-.generating {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 120rpx;
-  margin-top: 28rpx;
-  padding: 20rpx 24rpx 20rpx 16rpx;
-  border: 1rpx solid $color-line;
-  border-radius: 20rpx;
-  background: $color-surface;
-  box-shadow: 0 5rpx 14rpx rgba(39, 76, 96, 0.08);
-}
-
-.generating-label {
-  flex-shrink: 0;
-  width: 64rpx;
-  padding: 8rpx 4rpx;
-  border-radius: 8rpx;
-  background: #fdf0ef;
-  color: #c84b31;
-  font-size: 22rpx;
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-}
-
-.generating-body {
-  flex: 1;
-  min-width: 0;
-  margin-left: 16rpx;
-}
-
-.generating-body > text {
-  display: block;
-  font-size: 26rpx;
-  font-weight: 700;
-  @include text-ellipsis;
-}
-
-.generating-body > text:first-child {
-  color: $color-ink;
-  font-size: 26rpx;
-}
-
-.generating-body .status {
-  margin-top: 12rpx;
-  color: $color-primary;
-  font-size: 24rpx;
-  font-weight: 600;
-}
-
-.close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  @include tap-area(64rpx);
-  color: $color-muted;
-  font-size: 34rpx;
-  line-height: 1;
-}
-
 .section-title {
   display: flex;
   align-items: center;

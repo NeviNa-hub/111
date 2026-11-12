@@ -8,41 +8,45 @@
       <view class="step-connector"></view>
       <view class="step active"><i>3</i><text>设定画幅</text></view>
     </view>
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <text class="step-count">步骤 3 / 3</text>
-      <text class="page-title">第三步：设定画幅并落墨</text>
-      <text class="page-desc">厘定画幅比例，即将落笔成卷</text>
-      <view>
-        <view class="summary-card">
-          <view class="summary-title">
-            创作意念回溯 <text @click="editPrompt">修改内容</text>
+    <view class="scroll-window">
+      <scroll-view scroll-y :show-scrollbar="false" class="content">
+        <view class="creation-body">
+          <text class="step-count">步骤 3 / 3</text>
+          <text class="page-title">第三步：设定画幅并落墨</text>
+          <text class="page-desc">厘定画幅比例，即将落笔成卷</text>
+          <view>
+            <view class="summary-card">
+              <view class="summary-title">
+                创作回溯 <text @click="editPrompt">修改内容</text>
+              </view>
+              <view class="summary-row">构想意境　{{ options.prompt }}</view>
+              <view class="summary-row">甄选画风　{{ options.style }}</view>
+            </view>
+            <view class="section-title"> 画幅比例 <text>影响构图与空间意象</text> </view>
+            <view class="ratio-grid">
+              <view
+                v-for="ratio in options.ratios"
+                :key="ratio.value"
+                class="ratio-card"
+                :class="{ selected: selectedRatio === ratio.value }"
+                @click="selectedRatio = ratio.value"
+              >
+                <view class="ratio-icon"></view>
+                <text class="ratio-name">{{ ratio.name }}</text>
+                <text class="ratio-desc">{{ ratio.description }}</text>
+                <text v-if="selectedRatio === ratio.value" class="chosen"> 已选 </text>
+              </view>
+            </view>
+            <view class="cost-card">
+              当前剩余灵感点 <b>{{ pointsText }}</b>
+              <text>
+                本次需量扣除 <b>{{ selectedCost }} 点</b>
+              </text>
+            </view>
           </view>
-          <view class="summary-row">构想意境　{{ options.prompt }}</view>
-          <view class="summary-row">甄选画风　{{ options.style }}</view>
         </view>
-        <view class="section-title"> 画幅比例 <text>影响构图与空间意象</text> </view>
-        <view class="ratio-grid">
-          <view
-            v-for="ratio in options.ratios"
-            :key="ratio.value"
-            class="ratio-card"
-            :class="{ selected: selectedRatio === ratio.value }"
-            @click="selectedRatio = ratio.value"
-          >
-            <view class="ratio-icon"></view>
-            <text class="ratio-name">{{ ratio.name }}</text>
-            <text class="ratio-desc">{{ ratio.description }}</text>
-            <text v-if="selectedRatio === ratio.value" class="chosen"> 已选 </text>
-          </view>
-        </view>
-        <view class="cost-card">
-          当前剩余灵感点 <b>{{ pointsText }}</b>
-          <text>
-            本次需量扣除 <b>{{ selectedCost }} 点</b>
-          </text>
-        </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
     <view class="bottom-actions">
       <button class="previous" @click="goBack">修改画风</button>
       <button class="generate" :disabled="isSubmitting" @click="generate">
@@ -145,11 +149,52 @@ onShow(() => {
 </script>
 
 <style scoped lang="scss">
+.creation-body {
+  padding: 34rpx 0 48rpx;
+}
+
 .canvas-page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
+}
+
+.app-page-header,
+.step-bar {
+  flex: none;
+}
+
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
 }
 
 .step-bar {
@@ -217,9 +262,9 @@ onShow(() => {
 }
 
 .content {
-  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  height: 100%;
   overflow-x: hidden;
-  padding: 34rpx 32rpx 170rpx;
+  padding: 0 32rpx;
   box-sizing: border-box;
 }
 
@@ -236,10 +281,6 @@ onShow(() => {
   font-size: 38rpx;
   font-weight: 700;
   line-height: 1.3;
-}
-
-.content-state {
-  margin-top: 28rpx;
 }
 
 .page-desc {

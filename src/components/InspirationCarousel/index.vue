@@ -176,22 +176,6 @@ const handleTouchEnd = (event) => {
   width: 100%;
 }
 
-/* 区块标题：与首页“壹 ·/贰 ·”序号样式统一 */
-.config-title {
-  padding-bottom: 24rpx;
-  color: #8a6840;
-  font-size: 34rpx;
-  font-weight: 700;
-}
-
-.config-title em {
-  color: #d9be9b;
-}
-
-.workshop-title {
-  margin-top: 32rpx;
-}
-
 .carousel-state {
   margin-top: 28rpx;
 }

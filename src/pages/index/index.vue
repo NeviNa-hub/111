@@ -20,7 +20,6 @@
             <view class="hero-caption">AI 大模型</view>
             <view class="hero-hint">提示词：温馨治愈，青绿设色，微风拂动 ...</view>
           </view>
-          <view class="hero-meta"> </view>
           <view class="hero-actions">
             <button class="action-primary" @click="goWorkbench">开始创作</button>
             <button class="action-secondary" @click="browseIdeas">
@@ -98,9 +97,7 @@ import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 
 const homeData = {
-  weather_text: "今日谷雨",
   quote: "造法自然 · 意致千里",
-  generated_count: 1280,
 };
 const creationModes = [
   {
@@ -127,11 +124,7 @@ const creationModes = [
 ];
 const scrollIntoId = ref("");
 
-const weatherText = computed(() => homeData.weather_text);
 const quote = computed(() => homeData.quote);
-const generatedCountText = computed(() =>
-  String(homeData.generated_count).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-);
 
 // 进入创作台开始创作
 const goWorkbench = () => {
@@ -181,44 +174,6 @@ const openMode = (url) => {
 
 .page-body {
   padding-top: 12rpx;
-}
-
-/* 问候语 */
-.greeting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-.greeting-left {
-  display: flex;
-  flex: 1;
-  align-items: baseline;
-  gap: 16rpx;
-  min-width: 0;
-}
-
-.greeting-title {
-  flex-shrink: 0;
-  color: #8a6840;
-  font-size: 28rpx;
-  font-weight: 600;
-}
-
-.greeting-desc {
-  flex: 1;
-  min-width: 0;
-  color: $color-muted;
-  font-size: 24rpx;
-  @include text-ellipsis;
-}
-
-.weather {
-  flex-shrink: 0;
-  color: $color-muted;
-  font-size: 24rpx;
 }
 
 /* 主视觉 */
@@ -299,47 +254,6 @@ const openMode = (url) => {
   font-size: 24rpx;
   opacity: 0.86;
   @include text-ellipsis;
-}
-
-.hero-meta {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  width: 100%;
-  margin-top: 20rpx;
-  padding: 0 8rpx;
-  box-sizing: border-box;
-}
-
-.meta-title {
-  color: #6b4423;
-  font-size: 34rpx;
-  font-weight: 700;
-}
-
-.meta-subtitle {
-  flex: 1;
-  min-width: 0;
-  color: #b3a08a;
-  font-size: 24rpx;
-  @include numeric;
-}
-
-.try-button {
-  @include tap-area(64rpx);
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0 20rpx;
-  border: 0;
-  border-radius: 999rpx;
-  background: $color-primary;
-  color: #fff;
-  font-size: 24rpx;
-  line-height: 1;
-}
-
-.try-button:after {
-  border: 0;
 }
 
 .hero-actions {

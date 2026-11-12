@@ -4,7 +4,7 @@
 import { reactive } from "vue";
 
 import { clearLastPage } from "@/router";
-import { getToken, removeToken, setToken } from "@/utils/auth";
+import { removeToken, setToken } from "@/utils/auth";
 
 const SESSION_USER_STORAGE_KEY = "magic_app_session_user";
 
@@ -43,6 +43,3 @@ export const clearSession = () => {
   uni.removeStorageSync(SESSION_USER_STORAGE_KEY);
   clearLastPage();
 };
-
-// 判断本地是否存在登录凭据。
-export const isAuthenticated = () => Boolean(getToken());

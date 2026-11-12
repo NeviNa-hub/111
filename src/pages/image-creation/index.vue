@@ -6,49 +6,53 @@
       <view class="step-connector"></view>
       <view class="step inactive"><i>2</i><text>甄选画风</text></view>
     </view>
-    <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <view class="config-card">
-        <view class="config-title"><em>壹 ·</em> 风格定品</view>
-        <view class="option-grid">
-          <view
-            v-for="(style, index) in styleOptions"
-            :key="style.styleId"
-            class="option-card"
-            :class="[
-              `is-style-${index + 1}`,
-              { selected: selectedStyleId === style.styleId },
-            ]"
-            @click="selectedStyleId = style.styleId"
-          >
-            <!-- #ifdef H5 -->
-            <el-icon class="option-icon">
-              <component :is="style.icon" />
-            </el-icon>
-            <!-- #endif -->
-            <text class="option-name">{{ style.name }}</text>
+    <view class="scroll-window">
+      <scroll-view scroll-y :show-scrollbar="false" class="content">
+        <view class="creation-body">
+          <view class="config-card">
+            <view class="config-title"><em>壹 ·</em> 风格定品</view>
+            <view class="option-grid">
+              <view
+                v-for="(style, index) in styleOptions"
+                :key="style.styleId"
+                class="option-card"
+                :class="[
+                  `is-style-${index + 1}`,
+                  { selected: selectedStyleId === style.styleId },
+                ]"
+                @click="selectedStyleId = style.styleId"
+              >
+                <!-- #ifdef H5 -->
+                <el-icon class="option-icon">
+                  <component :is="style.icon" />
+                </el-icon>
+                <!-- #endif -->
+                <text class="option-name">{{ style.name }}</text>
+              </view>
+            </view>
+          </view>
+          <view class="config-card">
+            <view class="config-title"><em>贰 ·</em> 画幅比例</view>
+            <view class="option-grid four">
+              <view
+                v-for="(ratio, index) in ratios"
+                :key="ratio.ratioId"
+                class="option-card compact"
+                :class="[
+                  `is-ratio-${index + 1}`,
+                  { selected: selectedRatio === ratio.value },
+                ]"
+                @click="selectedRatio = ratio.value"
+              >
+                <i class="ratio-glyph"></i>
+                <text class="ratio-value">{{ ratio.value }}</text>
+                <text class="ratio-label">{{ ratio.label }}</text>
+              </view>
+            </view>
           </view>
         </view>
-      </view>
-      <view class="config-card">
-        <view class="config-title"><em>贰 ·</em> 画幅比例</view>
-        <view class="option-grid four">
-          <view
-            v-for="(ratio, index) in ratios"
-            :key="ratio.ratioId"
-            class="option-card compact"
-            :class="[
-              `is-ratio-${index + 1}`,
-              { selected: selectedRatio === ratio.value },
-            ]"
-            @click="selectedRatio = ratio.value"
-          >
-            <i class="ratio-glyph"></i>
-            <text class="ratio-value">{{ ratio.value }}</text>
-            <text class="ratio-label">{{ ratio.label }}</text>
-          </view>
-        </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
     <view class="next-card">
       <button @click="goNext">
         下一步：构想意象
@@ -107,10 +111,48 @@ const goNext = () => {
 
 <style scoped lang="scss">
 .creation-page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
+}
+
+.app-page-header,
+.step-bar {
+  flex: none;
+}
+
+/* 滚动窗：占据页头与底栏之间的全部剩余高度，边缘渐隐弱化切割感 */
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
 }
 
 .step-bar {
@@ -169,10 +211,14 @@ const goNext = () => {
 }
 
 .content {
-  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  height: 100%;
   overflow-x: hidden;
-  padding: 35rpx;
+  padding: 0 35rpx;
   box-sizing: border-box;
+}
+
+.creation-body {
+  padding: 35rpx 0 48rpx;
 }
 
 .content-state {

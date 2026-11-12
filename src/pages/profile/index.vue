@@ -185,7 +185,6 @@ const menuItems = [
 
 const pointsBalance = ref(null);
 const usedPoints = ref(null);
-const total = ref(null);
 const pointsItems = ref([]);
 const isPointsDialogVisible = ref(false);
 const isPointsLoading = ref(false);
@@ -200,7 +199,6 @@ const pointsText = computed(() =>
 const usedPointsText = computed(() =>
   usedPoints.value === null ? "—" : usedPoints.value
 );
-const totalText = computed(() => (total.value === null ? "—" : total.value));
 
 /**
  * 加载灵感点余额与流水。
@@ -215,7 +213,6 @@ const loadPointsInfo = async () => {
 
     pointsBalance.value = data.points_balance;
     usedPoints.value = data.used_points;
-    total.value = data.total;
     pointsItems.value = data.items;
   } catch (error) {
     pointsLoadError.value = true;

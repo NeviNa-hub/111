@@ -6,71 +6,65 @@
       <view class="step-connector"></view>
       <view class="step active"><i>2</i><text>甄选画风</text></view>
     </view>
-    <scroll-view
-      scroll-y
-      :show-scrollbar="false"
-      class="content"
-      :style="contentKeyboardStyle"
-    >
-      <view class="config-card">
-        <view class="config-title"> <em>壹 ·</em> 画面主旨 </view>
-        <view class="prompt-head">
-          <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
-        </view>
-        <textarea
-          v-model="prompt"
-          :maxlength="promptLimit"
-          class="prompt-input"
-          placeholder="写下你想描绘的意象"
-        />
-        <view class="prompt-tools"
-          ><button @click="polishPrompt">
-            <!-- #ifdef H5 -->
-            <el-icon class="tool-icon"><MagicStick /></el-icon>
-            <!-- #endif -->
-            灵感润色</button
-          ><button @click="randomPrompt">
-            <!-- #ifdef H5 -->
-            <el-icon class="tool-icon"><RefreshLeft /></el-icon>
-            <!-- #endif -->
-            随机意象</button
-          ><text @click="prompt = ''">清空</text></view
-        >
-      </view>
+    <view class="scroll-window">
+      <scroll-view
+        scroll-y
+        :show-scrollbar="false"
+        class="content"
+        :style="contentKeyboardStyle"
+      >
+        <view class="creation-body">
+          <view class="config-card">
+            <view class="config-title"> <em>壹 ·</em> 画面主旨 </view>
+            <view class="prompt-head">
+              <text>{{ prompt.length }} / {{ promptLimit }} 字</text>
+            </view>
+            <textarea
+              v-model="prompt"
+              :maxlength="promptLimit"
+              class="prompt-input"
+              placeholder="写下你想描绘的意象"
+            />
+            <view class="prompt-tools">
+              <button @click="polishPrompt">
+                <!-- #ifdef H5 -->
+                <el-icon class="tool-icon"><MagicStick /></el-icon>
+                <!-- #endif -->
+                灵感润色
+              </button>
+              <button @click="randomPrompt">
+                <!-- #ifdef H5 -->
+                <el-icon class="tool-icon"><RefreshLeft /></el-icon>
+                <!-- #endif -->
+                随机意象
+              </button>
+              <text @click="prompt = ''">清空</text>
+            </view>
+          </view>
 
-      <view class="config-card">
-        <view class="config-title"><em>贰 ·</em> 灵感引线</view>
-        <view class="suggestions">
-          <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
-            ＋ {{ item }}
-          </button>
-        </view>
-      </view>
+          <view class="config-card">
+            <view class="config-title"><em>贰 ·</em> 灵感引线</view>
+            <view class="suggestions">
+              <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
+                ＋ {{ item }}
+              </button>
+            </view>
+          </view>
 
-      <view class="config-card">
-        <view class="config-title"><em>叁 ·</em> 画境点睛</view>
-        <view class="tuning-row">
-          <text class="tuning-label">意境基调</text>
-          <text class="tuning-value">清润淡雅　墨韵沉静</text>
+          <view class="config-card">
+            <view class="config-title"><em>叁 ·</em> 画境点睛</view>
+            <view class="tuning-row">
+              <text class="tuning-label">意境基调</text>
+              <text class="tuning-value">清润淡雅　墨韵沉静</text>
+            </view>
+            <view class="tuning-row">
+              <text class="tuning-label">留白比例</text>
+              <text class="tuning-value">迂阔（60%）　虚实均亭</text>
+            </view>
+          </view>
         </view>
-        <view class="tuning-row">
-          <text class="tuning-label">留白比例</text>
-          <text class="tuning-value">迂阔（60%）　虚实均亭</text>
-        </view>
-      </view>
-
-      <view class="detail-card">
-        <view class="detail-title">风格特征细调 <text>针对当前画风</text></view>
-        <view class="select-row">
-          <text>墨色浓淡</text>
-          <text>选中</text>
-        </view>
-        <view class="select-row">
-          <text>留白意趣</text>
-          <text>三成留白</text>
-        </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
     <view class="bottom-actions" :style="barKeyboardStyle">
       <button class="previous" @click="goBack">上一步</button>
       <button class="next" :disabled="isSubmitting" @click="handleSubmit">
@@ -153,10 +147,7 @@ const taskResultUrl = ref("");
 const { keyboardInset } = useKeyboardInset();
 
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom:
-    keyboardInset.value > 0
-      ? `calc(var(--content-bottom-pad) + ${keyboardInset.value}px)`
-      : undefined,
+  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 
 const barKeyboardStyle = computed(() => ({
@@ -327,10 +318,49 @@ onShow(() => {
 
 <style scoped lang="scss">
 .style-page {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  /* 为固定底栏预留高度，避免滚动窗下缘被底栏遮挡 */
+  padding-bottom: calc(132rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(132rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: linear-gradient(180deg, #ffecd2 0%, #fff8ec 48%, #fffdfb 100%);
   color: $color-ink;
+}
+
+.app-page-header,
+.step-bar {
+  flex: none;
+}
+
+/* 滚动窗：占据页头与底栏之间的全部剩余高度，边缘渐隐弱化切割感 */
+.scroll-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 28rpx;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, #fff3e0, rgba(255, 243, 224, 0));
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, #fffdfb, rgba(255, 253, 251, 0));
+  }
 }
 
 .step-bar {
@@ -397,20 +427,16 @@ onShow(() => {
   }
 }
 
-.content-state {
-  margin-top: 28rpx;
-}
-
 .content {
-  --content-bottom-pad: 160rpx;
-  height: calc(100vh - 270rpx - var(--status-bar-height, 0px));
+  height: 100%;
   overflow-x: hidden;
-  padding: 35rpx 32rpx var(--content-bottom-pad);
+  padding: 0 32rpx;
   box-sizing: border-box;
 }
 
-.detail-card {
-  display: none;
+.creation-body {
+  /* 呼吸边距放在滚动内容内部，滚动到顶/底时卡片不被贴边硬切 */
+  padding: 8rpx 0 48rpx;
 }
 
 /* 卡片与区块标题：与构思页统一样式 */
