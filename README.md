@@ -92,7 +92,8 @@ src/
 
 ### 我的
 <img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/19737a85-74ef-4788-843a-8d67e8db4263" />
-![Uploading image.png…]()
+<img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/0c375e12-1b1b-460e-aa5b-d9640961c670" />
+
 
 
 
