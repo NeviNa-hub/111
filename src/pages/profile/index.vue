@@ -3,60 +3,62 @@
     <app-page-header title="我的" />
 
     <scroll-view scroll-y :show-scrollbar="false" class="content">
-      <!-- 用户信息卡 -->
-      <view class="profile-card">
-        <view class="identity">
-          <view class="avatar">
-            <!-- #ifdef H5 -->
-            <el-icon><User /></el-icon>
-            <!-- #endif -->
-          </view>
-          <view class="identity-copy">
-            <view class="identity-name">
-              <text class="username">{{ usernameText }}</text>
-              <text class="identity-tag">灵感创作者</text>
+      <view class="profile-layout">
+        <!-- 用户信息卡 -->
+        <view class="profile-card">
+          <view class="identity">
+            <view class="avatar">
+              <!-- #ifdef H5 -->
+              <el-icon><User /></el-icon>
+              <!-- #endif -->
             </view>
-            <text class="account">账号 {{ accountText }}</text>
+            <view class="identity-copy">
+              <view class="identity-name">
+                <text class="username">{{ usernameText }}</text>
+                <text class="identity-tag">灵感创作者</text>
+              </view>
+              <text class="account">账号 {{ accountText }}</text>
+            </view>
+          </view>
+
+          <view class="points-entry" @tap="openPointsDialog">
+            <view class="points-badge">
+              <!-- #ifdef H5 -->
+              <el-icon><Coin /></el-icon>
+              <!-- #endif -->
+            </view>
+            <view class="points-copy">
+              <text class="points-label">灵感点</text>
+              <text class="points-value">{{ pointsText }}</text>
+            </view>
+            <view class="points-action">
+              <text>积分流水</text>
+              <!-- #ifdef H5 -->
+              <el-icon class="points-action-icon"><ArrowRight /></el-icon>
+              <!-- #endif -->
+            </view>
           </view>
         </view>
 
-        <view class="points-entry" @tap="openPointsDialog">
-          <view class="points-badge">
+        <!-- 常用功能 -->
+        <view class="menu-card">
+          <view class="menu-title">常用功能</view>
+          <view
+            v-for="item in menuItems"
+            :key="item.key"
+            class="menu-row"
+            @tap="openMenu(item)"
+          >
+            <view class="menu-icon" :class="`is-${item.key}`">
+              <!-- #ifdef H5 -->
+              <el-icon><component :is="item.icon" /></el-icon>
+              <!-- #endif -->
+            </view>
+            <text class="menu-label">{{ item.label }}</text>
             <!-- #ifdef H5 -->
-            <el-icon><Coin /></el-icon>
+            <el-icon class="menu-arrow"><ArrowRight /></el-icon>
             <!-- #endif -->
           </view>
-          <view class="points-copy">
-            <text class="points-label">灵感点</text>
-            <text class="points-value">{{ pointsText }}</text>
-          </view>
-          <view class="points-action">
-            <text>积分流水</text>
-            <!-- #ifdef H5 -->
-            <el-icon class="points-action-icon"><ArrowRight /></el-icon>
-            <!-- #endif -->
-          </view>
-        </view>
-      </view>
-
-      <!-- 常用功能 -->
-      <view class="menu-card">
-        <view class="menu-title">常用功能</view>
-        <view
-          v-for="item in menuItems"
-          :key="item.key"
-          class="menu-row"
-          @tap="openMenu(item)"
-        >
-          <view class="menu-icon" :class="`is-${item.key}`">
-            <!-- #ifdef H5 -->
-            <el-icon><component :is="item.icon" /></el-icon>
-            <!-- #endif -->
-          </view>
-          <text class="menu-label">{{ item.label }}</text>
-          <!-- #ifdef H5 -->
-          <el-icon class="menu-arrow"><ArrowRight /></el-icon>
-          <!-- #endif -->
         </view>
       </view>
     </scroll-view>
@@ -470,10 +472,28 @@ onMounted(() => {
  * ============================================================ */
 @media (min-width: $breakpoint-desktop) {
   .content {
+    height: calc(100vh - 50px - 100px);
+    padding: 32px;
+  }
+
+  .profile-layout {
     display: grid;
-    grid-template-columns: 420rpx 1fr;
-    gap: 24rpx;
+    grid-template-columns: minmax(300px, 400px) minmax(0, 600px);
+    justify-content: center;
+    gap: 24px;
     align-items: start;
+  }
+
+  .profile-card,
+  .menu-card {
+    box-sizing: border-box;
+    padding: 24px;
+  }
+
+  .identity-tag,
+  .menu-label,
+  .points-action {
+    white-space: nowrap;
   }
 
   .menu-card {
@@ -489,6 +509,10 @@ onMounted(() => {
 
   .menu-row + .menu-row {
     border-top: 0;
+  }
+
+  .menu-row {
+    padding: 16px 12px;
   }
 }
 
@@ -533,6 +557,11 @@ onMounted(() => {
 
   &::after {
     border: 0;
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    width: min(100%, 1024px);
+    margin: 0 auto;
   }
 }
 
