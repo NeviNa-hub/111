@@ -30,7 +30,11 @@
             :placeholder="isRegister ? '请输入账号' : '请输入登录账号'"
             maxlength="64"
             autocomplete="username"
-          />
+          >
+            <template #prefix>
+              <view class="field-icon"></view>
+            </template>
+          </el-input>
         </el-form-item>
 
         <view v-if="isRegister" class="field-label">用户名</view>
@@ -40,7 +44,11 @@
             class="field-input"
             placeholder="请输入用户名"
             maxlength="64"
-          />
+          >
+            <template #prefix>
+              <view class="field-icon"></view>
+            </template>
+          </el-input>
         </el-form-item>
 
         <view class="label-row">
@@ -56,6 +64,9 @@
             :type="isPasswordVisible ? 'text' : 'password'"
             autocomplete="current-password"
           >
+            <template #prefix>
+              <view class="field-icon"></view>
+            </template>
             <template #suffix>
               <text class="eye-toggle" @tap="isPasswordVisible = !isPasswordVisible">
                 {{ isPasswordVisible ? "◉" : "◎" }}
@@ -73,7 +84,11 @@
             maxlength="128"
             :type="isConfirmVisible ? 'text' : 'password'"
             autocomplete="new-password"
-          />
+          >
+            <template #prefix>
+              <view class="field-icon"></view>
+            </template>
+          </el-input>
         </el-form-item>
         <view class="agreement-row" @tap="hasAgreed = !hasAgreed">
           <view class="checkbox" :class="{ 'is-checked': hasAgreed }">
@@ -91,8 +106,6 @@
       </el-form>
 
       <view class="switch-row">
-        <text class="help-icon">◉</text>
-        <view class="switch-divider"></view>
         <text class="switch-copy" @tap="toggleMode">
           {{ isRegister ? "已有账号？立即登录" : "初来乍到 · 新客注册" }}
           <text>→</text>
@@ -256,10 +269,10 @@ const handleSubmit = async () => {
 
 .auth-eyebrow {
   display: block;
-  color: #3f6656;
-  font-size: 34rpx;
+  color: #2f2517;
+  font-size: 40rpx;
   font-weight: 700;
-  letter-spacing: 4rpx;
+  letter-spacing: 2rpx;
 }
 
 .landscape {
@@ -353,8 +366,8 @@ const handleSubmit = async () => {
 
 .brand-subtitle {
   display: block;
-  margin-top: 10rpx;
-  color: #64778a;
+  margin-top: 12rpx;
+  color: #8a7a5f;
   font-size: 28rpx;
 }
 
@@ -370,32 +383,34 @@ const handleSubmit = async () => {
 }
 
 .form-card {
-  padding: 32rpx;
-  border-radius: 24rpx;
-  background: #fff;
+  @include card-surface(24rpx, 32rpx);
 }
 
 .auth-form-item {
-  margin-bottom: 20rpx;
+  margin-bottom: 28rpx;
 
   :deep(.el-form-item__content) {
     line-height: normal;
   }
 
   :deep(.el-input__wrapper) {
-    min-height: 80rpx;
+    min-height: 88rpx;
     padding: 0 24rpx;
-    border-radius: 20rpx;
-    background: #eff3ff;
+    border-radius: 16rpx;
+    background: $color-primary-light;
     box-shadow: none;
+
+    &.is-focus {
+      box-shadow: 0 0 0 2rpx rgba(184, 134, 78, 0.4);
+    }
   }
 
   :deep(.el-input__inner) {
-    color: #233d52;
+    color: #3d3021;
     font-size: 28rpx;
 
     &::placeholder {
-      color: #aab9c6;
+      color: #b3a58c;
     }
   }
 
@@ -406,11 +421,45 @@ const handleSubmit = async () => {
   }
 }
 
+.field-icon {
+  position: relative;
+  width: 32rpx;
+  height: 32rpx;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+  color: #c2a06a;
+
+  &::before {
+    position: absolute;
+    top: 1rpx;
+    left: 50%;
+    width: 12rpx;
+    height: 12rpx;
+    border: 2rpx solid currentColor;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    content: "";
+  }
+
+  &::after {
+    position: absolute;
+    bottom: 1rpx;
+    left: 50%;
+    width: 26rpx;
+    height: 13rpx;
+    border: 2rpx solid currentColor;
+    border-bottom: 0;
+    border-radius: 13rpx 13rpx 0 0;
+    transform: translateX(-50%);
+    content: "";
+  }
+}
+
 .field-label {
   display: block;
   margin-bottom: 16rpx;
-  color: #203c50;
-  font-size: 24rpx;
+  color: #3d3021;
+  font-size: 26rpx;
   font-weight: 600;
 }
 
@@ -426,7 +475,7 @@ const handleSubmit = async () => {
 }
 
 .link-text {
-  color: #007d7b;
+  color: #b3712a;
   font-size: 24rpx;
   font-weight: 600;
 }
@@ -434,8 +483,10 @@ const handleSubmit = async () => {
 .eye-toggle {
   display: flex;
   align-items: center;
-  color: #224056;
-  font-size: 36rpx;
+  min-width: 48rpx;
+  justify-content: center;
+  color: #c2a06a;
+  font-size: 34rpx;
 }
 
 .agreement-row {
@@ -452,7 +503,7 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid #a9bbb5;
+  border: 2rpx solid #cbbb96;
   border-radius: 8rpx;
   color: #fff;
   font-size: 26rpx;
@@ -465,14 +516,14 @@ const handleSubmit = async () => {
 
 .agreement-text {
   flex: 1;
-  color: #28475a;
+  color: #6b5c44;
   font-size: 24rpx;
   line-height: 1.8;
 }
 
 .submit-button {
   width: 100%;
-  height: 88rpx;
+  height: 92rpx;
   padding: 0;
   display: flex;
   align-items: center;
@@ -480,11 +531,12 @@ const handleSubmit = async () => {
   gap: 16rpx;
   border: 0;
   border-radius: 20rpx;
-  background: $color-primary;
-  box-shadow: 0 8rpx 14rpx rgba(156, 110, 56, 0.22);
+  background: linear-gradient(135deg, #dfb56f 0%, #c29250 52%, #b8864e 100%);
+  box-shadow: 0 10rpx 22rpx rgba(184, 134, 78, 0.38);
   color: #fff;
   font-size: 30rpx;
   font-weight: 700;
+  letter-spacing: 2rpx;
   line-height: 1;
 
   &::after {
@@ -500,25 +552,12 @@ const handleSubmit = async () => {
   min-height: 100rpx;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 16rpx;
 }
 
-.help-icon {
-  color: #285268;
-  font-size: 30rpx;
-}
-
-.switch-divider {
-  width: 1rpx;
-  height: 40rpx;
-  margin-left: auto;
-  background: #d6dde7;
-}
-
 .switch-copy {
-  margin-left: 24rpx;
-  color: #007d7b;
+  color: #b3712a;
   font-size: 28rpx;
   font-weight: 600;
 }
