@@ -36,9 +36,14 @@
         @action="loadLibraryData(true)"
       />
       <view v-else class="library-body">
-        <view class="section-title">历史画卷 <text>长按可批量导出</text></view>
+        <view class="section-title">历史画卷</view>
         <view class="work-list">
-          <view v-for="work in works" :key="work.workId" class="work-card">
+          <view
+            v-for="work in works"
+            :key="work.workId"
+            class="work-card"
+            @click="openWork(work)"
+          >
             <text class="work-type">{{ work.typeName }}</text>
             <view class="work-info">
               <text class="work-title">{{ work.title }}</text>
@@ -61,7 +66,8 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
+import { onShow } from "@dcloudio/uni-app";
 
 import { getLibraryData } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
@@ -129,6 +135,9 @@ const loadLibraryData = async (reset = false) => {
           workId: item.work_id,
           title: item.title || "",
           typeName: item.type_name || "",
+          status: item.status || "",
+          taskId: item.task_id || "",
+          mediaUrl: item.media_url || "",
           time: item.created_at || "",
         }))
       : [];
@@ -178,7 +187,27 @@ const loadMore = () => {
   loadLibraryData();
 };
 
-onMounted(() => {
+/**
+ * 打开生成中的图片任务或预览已完成的图片。
+ * @param {Object} work 作品库记录。
+ * @returns {void}
+ */
+const openWork = (work) => {
+  if (work.status === "creating" && work.taskId && work.typeName === "文字生图") {
+    uni.navigateTo({
+      url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
+        work.taskId
+      )}`,
+    });
+    return;
+  }
+
+  if (work.status === "completed" && work.mediaUrl && work.typeName !== "视频创作") {
+    uni.previewImage({ urls: [work.mediaUrl] });
+  }
+};
+
+onShow(() => {
   loadLibraryData(true);
 });
 </script>

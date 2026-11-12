@@ -62,7 +62,7 @@ import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 import { getPointsInfo } from "@/apis/points";
-import { createImageGeneration } from "@/apis/text-to-image";
+import { submitImageGeneration } from "@/utils/image-generation";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
 import { getErrorMessage, isApiError } from "@/utils/request";
@@ -118,7 +118,7 @@ const generate = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createImageGeneration({
+    const task = await submitImageGeneration({
       prompt: requestData.prompt,
       style: requestData.style,
       ratio: requestData.ratio,

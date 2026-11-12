@@ -108,7 +108,8 @@ import { MagicStick, RefreshLeft } from "@element-plus/icons-vue";
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
-import { createImageGeneration, getImageTaskStatus } from "@/apis/text-to-image";
+import { getImageTaskStatus } from "@/apis/text-to-image";
+import { submitImageGeneration } from "@/utils/image-generation";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
@@ -273,7 +274,7 @@ const confirmGenerate = async () => {
   isSubmitting.value = true;
 
   try {
-    const task = await createImageGeneration({
+    const task = await submitImageGeneration({
       prompt: requestData.prompt,
       style: requestData.style,
       ratio: requestData.ratio,

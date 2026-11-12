@@ -164,6 +164,11 @@ const exactRoutes = {
 const taskRoutes = [
   {
     method: "GET",
+    pattern: /^\/tasks\/([^/]+)$/,
+    handler: (taskId) => resolveTaskStatus(taskId, buildImageTaskStatus, "image"),
+  },
+  {
+    method: "GET",
     pattern: /^\/text-to-image\/tasks\/([^/]+)$/,
     handler: (taskId) =>
       resolveTaskStatus(taskId, buildImageTaskStatus, "image"),
