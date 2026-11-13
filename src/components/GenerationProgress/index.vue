@@ -280,14 +280,9 @@ const goWorkbench = () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：页头、卡片与操作栏统一对齐到侧边导航右侧的居中窄栏
+ * 桌面 H5 适配：卡片与操作栏使用居中窄栏，页头沿用全局左右贴边布局
  * ============================================================ */
 @media (min-width: $breakpoint-desktop) {
-  .generation-progress :deep(.app-page-header) {
-    padding-right: max(32px, calc(50% - 380px));
-    padding-left: max(32px, calc(50% - 380px));
-  }
-
   .generation-content {
     max-width: 760px;
     margin: 0 auto;
@@ -377,7 +372,7 @@ const goWorkbench = () => {
     font-size: 15px;
   }
 
-  .secondary-action {
+  .generation-actions .secondary-action {
     margin-top: 0;
   }
 }
@@ -393,10 +388,8 @@ const goWorkbench = () => {
   width: 100%;
   height: $tap-size;
   padding: 0;
-  border: 0;
-  border-radius: 32rpx;
+  border-radius: 16rpx;
   font-size: 28rpx;
-  font-weight: 700;
   line-height: 1;
 }
 
@@ -405,15 +398,17 @@ const goWorkbench = () => {
 }
 
 .primary-action {
+  border: 0;
   background: $color-primary;
   color: #fff;
+  font-weight: 700;
 }
 
 .secondary-action {
   margin-top: 16rpx;
+  border: 1rpx solid $color-line;
   background: $color-surface;
   color: #4e665e;
-  box-shadow: 0 2rpx 12rpx rgba(30, 58, 70, 0.06);
 }
 
 .is-optimization .generation-content,

@@ -49,9 +49,29 @@
               <text class="work-title">{{ work.title }}</text>
               <text class="work-time">{{ work.time }}</text>
             </view>
-            <view class="work-enter">
-              <text class="work-enter-arrow">›</text>
-              <text class="work-enter-label">详情</text>
+            <view class="work-actions">
+              <view class="work-enter">
+                <!-- #ifdef H5 -->
+                <el-icon class="work-action-icon"><View /></el-icon>
+                <!-- #endif -->
+                <!-- #ifndef H5 -->
+                <text class="work-enter-arrow">›</text>
+                <!-- #endif -->
+                <text class="work-enter-label">详情</text>
+              </view>
+              <view
+                v-if="work.status === 'completed'"
+                class="work-delete"
+                :class="{ 'is-deleting': deletingWorkId === work.workId }"
+                @click.stop="handleDelete(work)"
+              >
+                <!-- #ifdef H5 -->
+                <el-icon class="work-action-icon"><Delete /></el-icon>
+                <!-- #endif -->
+                <text class="work-delete-label">
+                  {{ deletingWorkId === work.workId ? "删除中" : "删除" }}
+                </text>
+              </view>
             </view>
           </view>
         </view>
@@ -74,8 +94,11 @@
 <script setup>
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
+// #ifdef H5
+import { Delete, View } from "@element-plus/icons-vue";
+// #endif
 
-import { getLibraryData } from "@/apis/creation";
+import { getLibraryData, deleteLibraryWork } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
@@ -97,6 +120,7 @@ const pageInfo = ref({ page: 1, pageSize: PAGE_SIZE, total: 0 });
 const isLoading = ref(true);
 const isLoadingMore = ref(false);
 const loadError = ref(false);
+const deletingWorkId = ref(null);
 
 let requestToken = 0;
 
@@ -230,6 +254,46 @@ const openWork = (work) => {
   }
 };
 
+/**
+ * 二次确认后删除本人作品，成功后刷新当前列表。
+ * @param {Object} work 作品库记录。
+ * @returns {Promise<void>}
+ */
+const handleDelete = async (work) => {
+  if (deletingWorkId.value !== null) {
+    return;
+  }
+
+  const isConfirmed = await new Promise((resolve) => {
+    uni.showModal({
+      title: "删除作品",
+      content: `删除「${work.title || "该作品"}」后无法恢复，确认继续吗？`,
+      confirmText: "删除",
+      confirmColor: "#b93a2f",
+      success: (result) => resolve(Boolean(result.confirm)),
+      fail: () => resolve(false),
+    });
+  });
+
+  if (!isConfirmed) {
+    return;
+  }
+
+  deletingWorkId.value = work.workId;
+
+  try {
+    await deleteLibraryWork({ workId: work.workId });
+  } catch {
+    // 请求层已统一提示错误；这里只结束删除状态，保留当前列表供重试
+    deletingWorkId.value = null;
+    return;
+  }
+
+  deletingWorkId.value = null;
+  uni.showToast({ title: "已删除", icon: "none" });
+  await loadLibraryData(true);
+};
+
 onShow(() => {
   loadLibraryData(true);
 });
@@ -329,39 +393,6 @@ onShow(() => {
   gap: 16rpx;
 }
 
-/* ============================================================
- * 桌面 H5 适配：1200px 以上作品列表三列排布
- * ============================================================ */
-@media (min-width: $breakpoint-desktop) {
-  .work-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .work-enter {
-    margin-left: 12px;
-    padding: 6px 16px;
-    border: 1px solid rgba(184, 134, 78, 0.35);
-    border-radius: 999px;
-    color: $color-primary;
-    font-size: 13px;
-    line-height: 1.4;
-    transition: background 0.2s ease;
-  }
-
-  .work-enter:hover {
-    background: $color-primary-light;
-  }
-
-  .work-enter-arrow {
-    display: none;
-  }
-
-  .work-enter-label {
-    display: block;
-  }
-}
-
 .work-card {
   display: flex;
   align-items: center;
@@ -407,13 +438,22 @@ onShow(() => {
   @include numeric;
 }
 
-/* 移动端用箭头提示可进入详情，桌面端换成明确的“详情”入口 */
-.work-enter {
+/* 移动端只显示图标并竖向排布，桌面端改为图标加文字的横向胶囊 */
+.work-actions {
   display: flex;
   flex-shrink: 0;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-left: 8rpx;
+  gap: 6rpx;
+}
+
+.work-action-icon {
+  font-size: 38rpx;
+}
+
+.work-enter {
+  @include tap-area(60rpx);
   color: #c9b79b;
 }
 
@@ -422,7 +462,85 @@ onShow(() => {
   line-height: 1;
 }
 
-.work-enter-label {
+.work-enter-label,
+.work-delete-label {
   display: none;
+}
+
+.work-delete {
+  @include tap-area(60rpx);
+  color: #b93a2f;
+  font-size: 22rpx;
+  line-height: 1;
+
+  &.is-deleting {
+    opacity: 0.55;
+  }
+}
+
+/* #ifndef H5 */
+/* 非 H5 端没有 Element 图标，删除操作回退为文字按钮 */
+.work-delete-label {
+  display: block;
+}
+/* #endif */
+
+/* ============================================================
+ * 桌面 H5 适配：1200px 以上作品列表三列排布
+ * 必须排在基础样式之后，否则“详情”文字会被基础样式的 display: none 覆盖
+ * ============================================================ */
+@media (min-width: $breakpoint-desktop) {
+  .work-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .work-actions {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .work-action-icon {
+    font-size: 15px;
+  }
+
+  .work-enter,
+  .work-delete {
+    min-width: auto;
+    min-height: auto;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: background 0.2s ease;
+  }
+
+  .work-enter {
+    border: 1px solid rgba(184, 134, 78, 0.35);
+    color: $color-primary;
+  }
+
+  .work-enter:hover {
+    background: $color-primary-light;
+  }
+
+  .work-delete {
+    border: 1px solid rgba(185, 58, 47, 0.28);
+    color: #b93a2f;
+  }
+
+  .work-delete:hover {
+    background: rgba(185, 58, 47, 0.1);
+  }
+
+  .work-enter-arrow {
+    display: none;
+  }
+
+  .work-enter-label,
+  .work-delete-label {
+    display: block;
+  }
 }
 </style>

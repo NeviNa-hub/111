@@ -25,3 +25,15 @@ export const getLibraryData = (params = {}) => {
     params: { ...params },
   });
 };
+
+/**
+ * 删除本人作品。
+ * @param {Object} params 删除参数，包含 workId。
+ * @returns {Promise<Object>} 删除结果。
+ */
+export const deleteLibraryWork = (params = {}) => {
+  return request({
+    url: `/library/works/${encodeURIComponent(params.workId)}`,
+    method: "DELETE",
+  });
+};
