@@ -150,7 +150,13 @@ import { getPointsInfo } from "@/apis/points";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
-import { clearSession, sessionState } from "@/stores";
+import {
+  clearSession,
+  loadPointsBalance,
+  pointsState,
+  sessionState,
+  setPointsBalance,
+} from "@/stores";
 
 const POINTS_PAGE_SIZE = 20;
 
@@ -185,8 +191,6 @@ const menuItems = [
   },
 ];
 
-const pointsBalance = ref(null);
-const usedPoints = ref(null);
 const pointsItems = ref([]);
 const isPointsDialogVisible = ref(false);
 const isPointsLoading = ref(false);
@@ -196,14 +200,14 @@ const isLoggingOut = ref(false);
 const usernameText = computed(() => sessionState.user?.username || "—");
 const accountText = computed(() => sessionState.user?.account || "—");
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value
+  pointsState.balance === null ? "—" : pointsState.balance
 );
 const usedPointsText = computed(() =>
-  usedPoints.value === null ? "—" : usedPoints.value
+  pointsState.usedPoints === null ? "—" : pointsState.usedPoints
 );
 
 /**
- * 加载灵感点余额与流水。
+ * 加载灵感点流水，并顺带回填共享的余额缓存。
  * @returns {Promise<void>}
  */
 const loadPointsInfo = async () => {
@@ -213,8 +217,7 @@ const loadPointsInfo = async () => {
   try {
     const data = await getPointsInfo({ page: 1, page_size: POINTS_PAGE_SIZE });
 
-    pointsBalance.value = data.points_balance;
-    usedPoints.value = data.used_points;
+    setPointsBalance({ balance: data.points_balance, usedPoints: data.used_points });
     pointsItems.value = data.items;
   } catch (error) {
     pointsLoadError.value = true;
@@ -272,7 +275,8 @@ const handleLogout = async () => {
 };
 
 onMounted(() => {
-  loadPointsInfo();
+  // 余额走共享缓存（登录时已拉取），本页不再额外请求积分接口。
+  loadPointsBalance();
 });
 </script>
 

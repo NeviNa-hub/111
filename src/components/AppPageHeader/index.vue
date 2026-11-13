@@ -6,7 +6,9 @@
       <text class="points-icon">✦</text>
       <text class="points-label">积分</text>
       <text class="points-value">{{ pointsText }}</text>
-      <text v-if="pointsBalance !== null" class="points-detail">明细</text>
+      <text v-if="pointsState.balance !== null" class="points-detail">
+      明细
+      </text>
     </view>
   </view>
 </template>
@@ -14,7 +16,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 
-import { getPointsInfo } from "@/apis/points";
+import { loadPointsBalance, pointsState } from "@/stores";
 
 /**
  * @property {string} title 页头标题。
@@ -35,10 +37,9 @@ const TOP_LEVEL_ROUTES = [
   "pages/profile/index",
 ];
 
-const pointsBalance = ref(null);
 const canGoBack = ref(false);
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value
+  pointsState.balance === null ? "—" : pointsState.balance,
 );
 
 // 判断当前页面是否为底部导航主页面。
@@ -59,7 +60,8 @@ const updateBackState = () => {
   }
 
   // #ifdef H5
-  canGoBack.value = getCurrentPages().length > 1 || Boolean(window.history.state?.back);
+  canGoBack.value =
+    getCurrentPages().length > 1 || Boolean(window.history.state?.back);
   // #endif
   // #ifndef H5
   canGoBack.value = getCurrentPages().length > 1;
@@ -79,20 +81,10 @@ const handleBack = () => {
   // #endif
 };
 
-// 读取当前积分余额，与「我的」页共用同一接口。
-const loadPointsBalance = async () => {
-  try {
-    const data = await getPointsInfo({ page: 1, page_size: 1 });
-
-    pointsBalance.value = data.points_balance;
-  } catch {
-    // 请求层已统一提示错误，这里保留占位符。
-  }
-};
-
 onMounted(() => {
   updateBackState();
 
+  // 积分余额由登录与任务创建驱动刷新，这里只兜底读取会话内未加载时的首次缓存。
   if (props.showPoints) {
     loadPointsBalance();
   }

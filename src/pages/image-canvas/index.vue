@@ -22,7 +22,9 @@
               <view class="summary-row">构想意境　{{ options.prompt }}</view>
               <view class="summary-row">甄选画风　{{ options.style }}</view>
             </view>
-            <view class="section-title"> 画幅比例 <text>影响构图与空间意象</text> </view>
+            <view class="section-title">
+              画幅比例 <text>影响构图与空间意象</text>
+            </view>
             <view class="ratio-grid">
               <view
                 v-for="ratio in options.ratios"
@@ -34,7 +36,9 @@
                 <view class="ratio-icon"></view>
                 <text class="ratio-name">{{ ratio.name }}</text>
                 <text class="ratio-desc">{{ ratio.description }}</text>
-                <text v-if="selectedRatio === ratio.value" class="chosen"> 已选 </text>
+                <text v-if="selectedRatio === ratio.value" class="chosen">
+                  已选
+                </text>
               </view>
             </view>
             <view class="cost-card">
@@ -63,10 +67,14 @@
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
-import { getPointsInfo } from "@/apis/points";
 import { submitImageGeneration } from "@/utils/image-generation";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
-import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import { loadPointsBalance, pointsState } from "@/stores";
+import {
+  DRAFT_KEYS,
+  readCreationDraft,
+  saveCreationDraft,
+} from "@/utils/creation-draft";
 import { getErrorMessage, isApiError } from "@/utils/request";
 
 const options = ref({
@@ -80,11 +88,10 @@ const options = ref({
   ],
 });
 const selectedRatio = ref("1:1");
-const pointsBalance = ref(null);
 const isSubmitting = ref(false);
 
 const pointsText = computed(() =>
-  pointsBalance.value === null ? "—" : pointsBalance.value
+  pointsState.balance === null ? "—" : pointsState.balance,
 );
 
 const selectedCost = 2;
@@ -132,9 +139,11 @@ const generate = async () => {
     }
 
     saveCreationDraft(DRAFT_KEYS.image, requestData);
+    // 创建任务已扣减灵感点，刷新共享缓存供页头与各页展示。
+    loadPointsBalance({ force: true });
     uni.navigateTo({
       url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
-        task.task_id
+        task.task_id,
       )}`,
     });
   } catch (error) {
@@ -149,7 +158,7 @@ const generate = async () => {
   }
 };
 
-onShow(async () => {
+onShow(() => {
   const draft = readCreationDraft(DRAFT_KEYS.image);
 
   if (!draft?.prompt || !draft?.style) {
@@ -157,12 +166,8 @@ onShow(async () => {
     uni.redirectTo({ url: "/pages/image-creation/index" });
     return;
   }
-  try {
-    const result = await getPointsInfo({ page: 1, page_size: 1 });
-    pointsBalance.value = result.points_balance;
-  } catch {
-    pointsBalance.value = null;
-  }
+
+  loadPointsBalance();
 });
 </script>
 

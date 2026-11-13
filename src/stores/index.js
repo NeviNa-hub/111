@@ -6,6 +6,8 @@ import { reactive } from "vue";
 import { clearLastPage } from "@/router";
 import { removeToken, setToken } from "@/utils/auth";
 
+import { pointsState } from "./points";
+
 const SESSION_USER_STORAGE_KEY = "magic_app_session_user";
 
 // 读取展示所需的用户身份字段。
@@ -42,4 +44,10 @@ export const clearSession = () => {
   sessionState.user = null;
   uni.removeStorageSync(SESSION_USER_STORAGE_KEY);
   clearLastPage();
+  // 切换账号时清空积分缓存，避免展示上一个账号的余额。
+  pointsState.balance = null;
+  pointsState.usedPoints = null;
+  pointsState.loaded = false;
 };
+
+export * from "./points";

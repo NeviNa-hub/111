@@ -16,53 +16,40 @@
       @library="goLibrary"
     />
     <scroll-view scroll-y :show-scrollbar="false" class="generation-content">
-      <view class="progress-card">
-        <text class="progress-heading">{{ data.progressTitle }}</text>
-        <text class="progress-label">{{ data.stageLabel }}</text>
-        <text class="progress-type">{{ data.typeLabel }}</text>
-        <view class="progress-ring">
-          <text>{{ data.progress }}<small>%</small></text>
-          <label>{{ data.progressLabel }}</label>
+      <view class="progress-body">
+        <view class="progress-card">
+          <view class="progress-head">
+            <text class="progress-heading">{{ data.progressTitle }}</text>
+            <text class="progress-cost">
+              {{ data.cost === null ? "—" : data.cost }} 灵感点
+            </text>
+          </view>
+          <view class="progress-ring">
+            <text>{{ data.progress }}<small>%</small></text>
+            <label>{{ data.progressLabel }}</label>
+          </view>
+          <view class="progress-track"
+            ><view :style="{ width: `${data.progress}%` }"></view
+          ></view>
         </view>
-        <view class="progress-status">
-          {{ data.statusText }} <text>{{ data.progress }}% / 100%</text>
+        <view v-if="data.resultUrl" class="result-card">
+          <image
+            class="result-image"
+            :src="data.resultUrl"
+            mode="aspectFit"
+            @tap="previewResult"
+          />
+          <text class="result-hint"
+            >轻触图片放大查看；图片链接约 1 小时后失效，请及时保存</text
+          >
         </view>
-        <view class="progress-track"
-          ><view :style="{ width: `${data.progress}%` }"></view
-        ></view>
+        <view class="cloud-tip">{{ data.tip }}</view>
       </view>
-      <view v-if="data.resultUrl" class="result-card">
-        <image
-          class="result-image"
-          :src="data.resultUrl"
-          mode="aspectFit"
-          @tap="previewResult"
-        />
-        <text class="result-hint"
-          >轻触图片放大查看；图片链接约 1 小时后失效，请及时保存</text
-        >
-      </view>
-      <view class="task-card">
-        <view class="task-title">
-          <text class="task-mark">印</text>
-          <strong>{{ data.workName }}</strong>
-          <small>{{ data.detail }}</small>
-        </view>
-        <view class="task-tags">
-          <text v-for="tag in data.tags" :key="tag">{{ tag }}</text>
-          <text class="task-cost">
-            {{ data.cost === null ? "—" : data.cost }} 灵感点
-          </text>
-        </view>
-        <view class="task-footer">
-          {{ data.description }}
-          <text>{{ data.estimatedTime }} </text>
-        </view>
-      </view>
-      <view class="cloud-tip">{{ data.tip }}</view>
     </scroll-view>
     <view class="generation-actions">
-      <button class="primary-action" @tap="goLibrary">前往作品库查看进度</button>
+      <button class="primary-action" @tap="goLibrary">
+        前往作品库查看进度
+      </button>
       <button class="secondary-action" @tap="goWorkbench">返回工作台</button>
     </view>
   </view>
@@ -107,86 +94,69 @@ const goWorkbench = () => {
 
 .generation-content {
   height: calc(100vh - #{100rpx} - var(--status-bar-height, 0px));
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
-  padding: 28rpx 32rpx calc(250rpx + constant(safe-area-inset-bottom));
+  padding: 0 32rpx;
+  padding-bottom: calc(250rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(250rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
-.progress-card {
-  position: relative;
-  height: 500rpx;
-  overflow: hidden;
-  border: 1rpx solid #e4dccb;
-  border-radius: 42rpx;
-  background: linear-gradient(145deg, #e4f1ee, #f3f0e6 48%, #e0e9e2);
+/* 进度模块整体垂直居中，内容较矮时不在顶部留出大片空白 */
+.progress-body {
+  width: 100%;
+  margin: auto 0;
 }
 
-.progress-card::after {
-  position: absolute;
-  inset: 42rpx 26rpx 26rpx;
-  border: 4rpx solid rgba(255, 255, 255, 0.78);
-  border-radius: 38rpx;
-  content: "";
+.progress-card {
+  padding: 36rpx 40rpx 44rpx;
+  border-radius: 32rpx;
+  background: $color-surface;
+  box-shadow: 0 10rpx 30rpx rgba(95, 133, 117, 0.06);
+  text-align: center;
+}
+
+.progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
 .progress-heading {
-  position: absolute;
-  z-index: 2;
-  top: 36rpx;
-  right: 200rpx;
-  left: 200rpx;
   overflow: hidden;
   color: $color-ink;
   font-size: 34rpx;
   font-weight: 700;
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.progress-label,
-.progress-type,
-.progress-status,
-.progress-track {
-  position: absolute;
-  z-index: 2;
-}
-
-.progress-label {
-  top: 40rpx;
-  left: 48rpx;
-  padding: 12rpx 16rpx;
-  border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.82);
-  color: #4e665e;
-  font-size: 24rpx;
-}
-
-.progress-type {
-  top: 48rpx;
-  right: 48rpx;
-  color: $color-muted;
-  font-size: 24rpx;
+.progress-cost {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border: 1rpx solid #86e5dc;
+  border-radius: 999rpx;
+  color: $color-primary;
+  font-size: 22rpx;
+  line-height: 1.4;
+  @include numeric;
 }
 
 .progress-ring {
-  position: absolute;
-  z-index: 2;
-  top: 150rpx;
-  left: 50%;
-  width: 220rpx;
-  height: 220rpx;
-  transform: translateX(-50%);
+  margin: 48rpx auto 0;
+  width: 240rpx;
+  height: 240rpx;
   border: 2rpx dashed #abd9d5;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(228, 241, 238, 0.45);
   text-align: center;
 }
 
 .progress-ring text {
   display: block;
-  margin-top: 62rpx;
+  margin-top: 68rpx;
   color: $color-ink;
   font-size: 68rpx;
   font-weight: 700;
@@ -205,26 +175,12 @@ const goWorkbench = () => {
   font-size: 24rpx;
 }
 
-.progress-status {
-  right: 44rpx;
-  bottom: 70rpx;
-  left: 44rpx;
-  display: flex;
-  justify-content: space-between;
-  gap: 16rpx;
-  color: #8a6840;
-  font-size: 24rpx;
-  @include numeric;
-}
-
 .progress-track {
-  right: 44rpx;
-  bottom: 40rpx;
-  left: 44rpx;
-  height: 10rpx;
+  height: 12rpx;
+  margin-top: 48rpx;
   overflow: hidden;
   border-radius: 8rpx;
-  background: rgba(255, 255, 255, 0.5);
+  background: #edf2ef;
 }
 
 .progress-track view {
@@ -253,86 +209,6 @@ const goWorkbench = () => {
   font-size: 22rpx;
 }
 
-.task-card {
-  margin-top: 24rpx;
-  padding: 24rpx 28rpx;
-  border-radius: 24rpx;
-  background: $color-surface;
-  box-shadow: 0 6rpx 18rpx rgba(47, 75, 90, 0.06);
-}
-
-.task-title,
-.task-tags {
-  display: flex;
-  align-items: center;
-}
-
-.task-mark {
-  flex-shrink: 0;
-  width: 36rpx;
-  height: 36rpx;
-  margin-right: 16rpx;
-  background: #c84b31;
-  color: #fff;
-  font-size: 22rpx;
-  text-align: center;
-  line-height: 36rpx;
-}
-
-.task-title strong {
-  flex: 1;
-  min-width: 0;
-  font-size: 26rpx;
-  @include text-ellipsis;
-}
-
-.task-title small {
-  flex-shrink: 0;
-  margin-left: auto;
-  color: #a3b1ab;
-  font-size: 22rpx;
-}
-
-.task-tags {
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 20rpx;
-}
-
-.task-tags text {
-  padding: 8rpx 12rpx;
-  border: 1rpx solid $color-line;
-  border-radius: 20rpx;
-  color: #4e665e;
-  font-size: 22rpx;
-}
-
-.task-tags .task-cost {
-  margin-left: auto;
-  border-color: #86e5dc;
-  color: $color-primary;
-  @include numeric;
-}
-
-.task-footer {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-top: 20rpx;
-  padding-top: 16rpx;
-  border-top: 1rpx solid #edf0f0;
-  color: $color-muted;
-  font-size: 24rpx;
-  line-height: 1.6;
-}
-
-.task-footer text {
-  flex-shrink: 0;
-  color: #a3b1ab;
-  @include numeric;
-}
-
 .cloud-tip {
   margin-top: 20rpx;
   padding: 16rpx;
@@ -346,33 +222,12 @@ const goWorkbench = () => {
 }
 
 /* ============================================================
- * 桌面 H5 适配：1200px 以上进度卡与结果图左右分栏，任务详情通栏
+ * 桌面 H5 适配：宽屏下内容限宽居中，卡片不被拉满全屏
  * ============================================================ */
 @media (min-width: $breakpoint-desktop) {
   .generation-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20rpx;
-    align-content: start;
-  }
-
-  .progress-card {
-    height: 440rpx;
-    margin-top: 0;
-  }
-
-  .result-card {
-    margin-top: 0;
-  }
-
-  .task-card,
-  .cloud-tip {
-    grid-column: 1 / -1;
-  }
-
-  .task-card,
-  .cloud-tip {
-    margin-top: 0;
+    max-width: 720px;
+    margin: 0 auto;
   }
 }
 
@@ -381,8 +236,12 @@ const goWorkbench = () => {
 }
 
 .generation-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: $tap-size;
+  padding: 0;
   border: 0;
   border-radius: 32rpx;
   font-size: 28rpx;

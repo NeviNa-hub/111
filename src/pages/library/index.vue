@@ -58,7 +58,9 @@
           title="暂无画卷"
           description="完成一次生图任务后，作品会自动归档到这里"
         />
-        <view v-else-if="isLoadingMore" class="load-more">正在载入更多作品…</view>
+        <view v-else-if="isLoadingMore" class="load-more"
+          >正在载入更多作品…</view
+        >
       </view>
     </scroll-view>
     <app-bottom-nav active="works" />
@@ -187,22 +189,36 @@ const loadMore = () => {
   loadLibraryData();
 };
 
+// 各类型创建中任务对应的进度页入口，任务标识由作品库列表接口返回
+const CREATING_ROUTES = {
+  文字生图: (taskId) =>
+    `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(taskId)}`,
+  图片优化: (taskId) =>
+    `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(taskId)}`,
+  视频创作: (taskId) =>
+    `/pages/video-render/index?taskId=${encodeURIComponent(taskId)}`,
+};
+
 /**
- * 打开生成中的图片任务或预览已完成的图片。
+ * 打开生成中的任务进度页，或预览已完成的图片作品。
  * @param {Object} work 作品库记录。
  * @returns {void}
  */
 const openWork = (work) => {
-  if (work.status === "creating" && work.taskId && work.typeName === "文字生图") {
-    uni.navigateTo({
-      url: `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
-        work.taskId
-      )}`,
-    });
-    return;
+  if (work.status === "creating" && work.taskId) {
+    const buildProgressUrl = CREATING_ROUTES[work.typeName];
+
+    if (buildProgressUrl) {
+      uni.navigateTo({ url: buildProgressUrl(work.taskId) });
+      return;
+    }
   }
 
-  if (work.status === "completed" && work.mediaUrl && work.typeName !== "视频创作") {
+  if (
+    work.status === "completed" &&
+    work.mediaUrl &&
+    work.typeName !== "视频创作"
+  ) {
     uni.previewImage({ urls: [work.mediaUrl] });
   }
 };

@@ -16,12 +16,18 @@
             <view class="config-title"><em>壹 ·</em> 动卷预览</view>
             <view class="preview-body">
               <view class="preview-thumb">
-                <app-image class="preview-image" :src="previewSource" mode="aspectFill" />
+                <app-image
+                  class="preview-image"
+                  :src="previewSource"
+                  mode="aspectFill"
+                />
                 <text class="preview-badge">影片</text>
               </view>
               <view class="preview-info">
                 <view class="preview-head">
-                  <text class="preview-title">{{ renderConfig.previewTitle }}</text>
+                  <text class="preview-title">{{
+                    renderConfig.previewTitle
+                  }}</text>
                   <text class="preview-state">已立意</text>
                 </view>
                 <view class="preview-tags">
@@ -71,7 +77,11 @@
     </view>
 
     <view class="bottom-bar">
-      <el-button class="previous-button" :disabled="isSubmitting" @click="goPreviousStep">
+      <el-button
+        class="previous-button"
+        :disabled="isSubmitting"
+        @click="goPreviousStep"
+      >
         <el-icon><ArrowLeft /></el-icon>
         上一步
       </el-button>
@@ -126,10 +136,15 @@
 
 <script setup>
 import { computed, reactive, ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 
 // #ifdef H5
-import { ArrowLeft, ArrowRight, Lightning, VideoPlay } from "@element-plus/icons-vue";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Lightning,
+  VideoPlay,
+} from "@element-plus/icons-vue";
 // #endif
 
 import { TASK_STATUS } from "@/apis/constants";
@@ -140,6 +155,7 @@ import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { loadPointsBalance } from "@/stores";
 import { DRAFT_KEYS, readCreationDraft } from "@/utils/creation-draft";
 import { getErrorMessage } from "@/utils/request";
 import { submitVideoGeneration } from "@/utils/video-generation";
@@ -161,14 +177,19 @@ const taskStatus = ref(TASK_STATUS.PENDING);
 const taskResultUrl = ref("");
 const taskStatusData = ref(null);
 
+// 作品库携带任务标识重进时为 true，跳过规制草稿校验
+let isTaskEntry = false;
+
 const previewSource = computed(() => draft.value.imagePath || previewFallback);
 
-const taskStage = computed(() => taskStatusData.value?.stageLabel || "云端逐帧重绘");
+const taskStage = computed(
+  () => taskStatusData.value?.stageLabel || "云端逐帧重绘",
+);
 
 const taskNote = computed(
   () =>
     taskStatusData.value?.note ||
-    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。"
+    "动卷已进入云端渲染池，退出或锁屏均不影响进度，完成后自动归档至作品库。",
 );
 
 const { start: startPolling } = useTaskPolling({
@@ -196,6 +217,7 @@ const { start: startPolling } = useTaskPolling({
     };
   },
   onFailed: (error) => {
+    taskStatus.value = TASK_STATUS.FAILED;
     uni.showToast({
       title: getErrorMessage(error, "任务状态查询失败，请稍后重试"),
       icon: "none",
@@ -254,6 +276,8 @@ const confirmRender = async () => {
 
     confirmVisible.value = false;
     progressVisible.value = true;
+    // 创建任务已扣减灵感点，刷新共享缓存供页头展示。
+    loadPointsBalance({ force: true });
     taskId.value = task.task_id;
     taskProgress.value = 0;
     taskStatusData.value = null;
@@ -278,7 +302,29 @@ const goLibrary = () => {
   uni.navigateTo({ url: "/pages/library/index" });
 };
 
+/**
+ * 作品库重进：携带任务标识时直接进入渲染进度，不再校验规制草稿。
+ * @param {{taskId?: string}} query 页面查询参数。
+ * @returns {void}
+ */
+onLoad((query) => {
+  if (!query.taskId) {
+    return;
+  }
+
+  isTaskEntry = true;
+  taskId.value = query.taskId;
+  progressVisible.value = true;
+  taskStatus.value = TASK_STATUS.PROCESSING;
+  startPolling();
+});
+
 onShow(() => {
+  // 从作品库进入的进度查看不依赖规制草稿
+  if (isTaskEntry) {
+    return;
+  }
+
   const stored = readCreationDraft(DRAFT_KEYS.video);
 
   if (!stored?.ratio) {

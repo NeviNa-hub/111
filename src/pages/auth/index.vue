@@ -128,7 +128,7 @@ import { computed, nextTick, reactive, ref } from "vue";
 
 import { PAGE_PATHS } from "@/apis/constants";
 import { loginUser, registerUser } from "@/apis/auth";
-import { initializeSession } from "@/stores";
+import { initializeSession, loadPointsBalance } from "@/stores";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 
 const formRef = ref(null);
@@ -246,6 +246,8 @@ const handleSubmit = async () => {
     const data = await loginUser(params);
 
     initializeSession(data);
+    // 登录成功即刷新一次积分缓存，后续页面页头直接读取，不再逐个请求。
+    loadPointsBalance({ force: true });
     uni.showToast({ title: "登录成功", icon: "none" });
     uni.reLaunch({ url: PAGE_PATHS.HOME });
   } catch (error) {

@@ -13,10 +13,20 @@
                 <!-- #ifdef H5 -->
                 <el-icon class="file-icon"><Upload /></el-icon>
                 <!-- #endif -->
-                {{ isUploading ? "正在上传…" : selectedImage ? "更换图片" : "导入图片" }}
+                {{
+                  isUploading
+                    ? "正在上传…"
+                    : selectedImage
+                      ? "更换图片"
+                      : "导入图片"
+                }}
               </button>
             </view>
-            <view class="preview" :class="{ empty: !selectedImage }" @click="chooseImage">
+            <view
+              class="preview"
+              :class="{ empty: !selectedImage }"
+              @click="chooseImage"
+            >
               <app-image
                 v-if="selectedImage"
                 class="preview-media"
@@ -51,7 +61,8 @@
               placeholder="描述希望优化的效果，例如：提升清晰度，修复噪点，保留原有构图"
             />
             <text class="fixed-tip"
-              >提交扣除 1 积分，生成失败暂不退还；结果链接约 1 小时后失效。</text
+              >提交扣除 1 积分，生成失败暂不退还；结果链接约 1
+              小时后失效。</text
             >
           </view>
         </view>
@@ -65,7 +76,9 @@
         <!-- #ifdef H5 -->
         <el-icon class="action-icon"><MagicStick /></el-icon>
         <!-- #endif -->
-        {{ isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）` }}
+        {{
+          isSubmitting ? "正在提交，请稍候…" : `开始淬炼重绘（耗${costText}点）`
+        }}
       </button>
     </view>
     <generation-dialog
@@ -97,6 +110,7 @@ import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { loadPointsBalance } from "@/stores";
 import { chooseSingleImage } from "@/utils/image-picker";
 import { submitImageOptimization } from "@/utils/image-optimization";
 import { getErrorMessage, isApiError } from "@/utils/request";
@@ -152,6 +166,7 @@ const { start: startPolling } = useTaskPolling({
   onFailed: (error) => {
     const isRequestError = isApiError(error);
 
+    taskStatus.value = TASK_STATUS.FAILED;
     taskNote.value = isRequestError
       ? "任务状态查询失败，请稍后在作品库确认结果。"
       : getErrorMessage(error, "任务进度获取失败，请稍后重试");
@@ -223,6 +238,8 @@ const startOptimization = async () => {
     taskResultUrl.value = "";
     taskNote.value = progressNote;
     isProgressVisible.value = true;
+    // 创建任务已扣减灵感点，刷新共享缓存供页头展示。
+    loadPointsBalance({ force: true });
     startPolling();
   } catch (error) {
     if (!isApiError(error)) {

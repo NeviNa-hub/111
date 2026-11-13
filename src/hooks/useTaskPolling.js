@@ -1,7 +1,7 @@
 /**
  * 通用任务轮询
  */
-import { onHide, onShow, onUnload } from "@dcloudio/uni-app";
+import { onUnload } from "@dcloudio/uni-app";
 import { onUnmounted, ref } from "vue";
 
 const DEFAULT_INTERVAL = 3000;
@@ -31,8 +31,9 @@ export default function useTaskPolling(defaultOptions = {}) {
   let attempts = 0;
   let retryCount = 0;
   let isRequesting = false;
-  let isPaused = false;
   let currentOptions = null;
+  // 启动轮询时所在的页面实例；页面切走后停止发请求，回到该页后下一轮自动恢复
+  let ownerPage = null;
 
   // 清理定时器，避免重复定时器叠加
   const clearTimer = () => {
@@ -48,20 +49,19 @@ export default function useTaskPolling(defaultOptions = {}) {
     clearTimer();
     isPolling.value = false;
     isRequesting = false;
-    isPaused = false;
     currentOptions = null;
-  };
-
-  // 补排定时器，用于从页面隐藏恢复后继续轮询
-  const schedule = () => {
-    if (!timerId && isPolling.value) {
-      timerId = setInterval(run, currentOptions.interval);
-    }
   };
 
   // 执行一次任务状态拉取
   const run = async () => {
-    if (!isPolling.value || isRequesting || isPaused || !currentOptions) {
+    if (!isPolling.value || isRequesting || !currentOptions) {
+      return;
+    }
+
+    // 页面已切走时本轮不发请求；不依赖 onHide，回到该页后按原间隔自动恢复
+    const pages = getCurrentPages();
+
+    if (ownerPage && pages[pages.length - 1] !== ownerPage) {
       return;
     }
 
@@ -153,8 +153,11 @@ export default function useTaskPolling(defaultOptions = {}) {
     };
     attempts = 0;
     retryCount = 0;
-    isPaused = false;
     isPolling.value = true;
+
+    const pages = getCurrentPages();
+
+    ownerPage = pages[pages.length - 1] || null;
 
     run();
     timerId = setInterval(run, currentOptions.interval);
@@ -162,25 +165,6 @@ export default function useTaskPolling(defaultOptions = {}) {
     return stop;
   };
 
-  // 页面隐藏时暂停轮询，避免后台无意义请求
-  const pause = () => {
-    isPaused = true;
-    clearTimer();
-  };
-
-  // 页面重新可见时恢复轮询
-  const resume = () => {
-    if (!isPolling.value) {
-      return;
-    }
-
-    isPaused = false;
-    run();
-    schedule();
-  };
-
-  onHide(pause);
-  onShow(resume);
   onUnload(stop);
   onUnmounted(stop);
 

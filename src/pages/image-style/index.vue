@@ -115,6 +115,7 @@ import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { loadPointsBalance } from "@/stores";
 import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
 import { getErrorMessage, isApiError } from "@/utils/request";
@@ -288,6 +289,8 @@ const confirmGenerate = async () => {
     confirmVisible.value = false;
     draft.value = { ...draft.value, ...requestData };
     saveCreationDraft(DRAFT_KEYS.image, draft.value);
+    // 创建任务已扣减灵感点，刷新共享缓存供页头展示。
+    loadPointsBalance({ force: true });
     taskId.value = task.task_id;
     progressVisible.value = true;
     startTaskPolling();
