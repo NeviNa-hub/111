@@ -90,7 +90,8 @@ src/
 
 ### 作品库
 <img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/253c74b8-300d-426b-8bcd-35ffc6aba7ac" />
-<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/00ba9d8a-71ff-4494-b427-3dd7f9ffdc03" />
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/8996f635-7f96-462a-8afc-46cf5d4297e0" />
+
 
 
 ### 我的
