@@ -1,4 +1,4 @@
-# 妙笔生花 · AI 创作前端
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/22f76196-c6d8-47ff-89fa-a375bea7e607" /># 妙笔生花 · AI 创作前端
 
 基于 uni-app（Vue 3）的 AI 创作应用前端，覆盖「文字生图 / 视频创作 / 图片优化」三条创作链路，支持 H5 与微信小程序等多端编译。整体采用茶金 + 暖杏的国风暖色视觉。
 
@@ -89,9 +89,8 @@ src/
 
 
 ### 作品库
-<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/253c74b8-300d-426b-8bcd-35ffc6aba7ac" />
 <img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/8996f635-7f96-462a-8afc-46cf5d4297e0" />
-
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/ff48babe-a3de-4b77-981b-70e9407de1b0" />
 
 
 ### 我的
