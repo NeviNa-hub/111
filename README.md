@@ -63,7 +63,8 @@ src/
 
 
 ### 创作台
-<img width="375" height="812" alt="image" src="https://github.com/user-attachments/assets/54be160d-e951-40f1-9add-b41ff51ee2a1" />
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/55566962-d640-495c-8fef-2c65aee366d8" />
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/8d803e2e-992d-4b99-865b-48dc7d22b2c0" />
 
 
 
@@ -88,7 +89,7 @@ src/
 
 
 ### 作品库
-<img width="450" height="1013" alt="image" src="https://github.com/user-attachments/assets/ceaefe49-3798-4b4d-b322-5eec5259eb3b" />
+<img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/253c74b8-300d-426b-8bcd-35ffc6aba7ac" />
 <img width="452" height="1013" alt="image" src="https://github.com/user-attachments/assets/00ba9d8a-71ff-4494-b427-3dd7f9ffdc03" />
 
 
