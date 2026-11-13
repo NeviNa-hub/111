@@ -64,12 +64,20 @@
     </scroll-view>
 
     <view class="logout-bar">
-      <button class="logout-button" :disabled="isLoggingOut" @tap="handleLogout">
+      <button
+        class="logout-button"
+        :disabled="isLoggingOut"
+        @tap="handleLogout"
+      >
         退出登录
       </button>
     </view>
 
-    <view v-if="isPointsDialogVisible" class="points-mask" @tap="closePointsDialog">
+    <view
+      v-if="isPointsDialogVisible"
+      class="points-mask"
+      @tap="closePointsDialog"
+    >
       <view class="points-sheet" @tap.stop>
         <view class="points-header">
           <text class="points-title">积分使用流水</text>
@@ -108,9 +116,18 @@
           :show-scrollbar="false"
           class="points-list"
         >
-          <view v-for="item in pointsItems" :key="item.ledger_id" class="points-item">
-            <text class="points-item-time">{{ item.created_at }}</text>
-            <text class="points-item-value" :class="{ 'is-used': item.delta < 0 }">
+          <view
+            v-for="item in pointsItems"
+            :key="item.ledger_id"
+            class="points-item"
+          >
+            <text class="points-item-time">
+              {{ formatDateTime(item.created_at) }}
+            </text>
+            <text
+              class="points-item-value"
+              :class="{ 'is-used': item.delta < 0 }"
+            >
               {{ item.delta }}
             </text>
           </view>
@@ -157,6 +174,7 @@ import {
   sessionState,
   setPointsBalance,
 } from "@/stores";
+import { formatDateTime } from "@/utils/date";
 
 const POINTS_PAGE_SIZE = 20;
 
@@ -200,10 +218,10 @@ const isLoggingOut = ref(false);
 const usernameText = computed(() => sessionState.user?.username || "—");
 const accountText = computed(() => sessionState.user?.account || "—");
 const pointsText = computed(() =>
-  pointsState.balance === null ? "—" : pointsState.balance
+  pointsState.balance === null ? "—" : pointsState.balance,
 );
 const usedPointsText = computed(() =>
-  pointsState.usedPoints === null ? "—" : pointsState.usedPoints
+  pointsState.usedPoints === null ? "—" : pointsState.usedPoints,
 );
 
 /**
@@ -217,7 +235,10 @@ const loadPointsInfo = async () => {
   try {
     const data = await getPointsInfo({ page: 1, page_size: POINTS_PAGE_SIZE });
 
-    setPointsBalance({ balance: data.points_balance, usedPoints: data.used_points });
+    setPointsBalance({
+      balance: data.points_balance,
+      usedPoints: data.used_points,
+    });
     pointsItems.value = data.items;
   } catch (error) {
     pointsLoadError.value = true;
@@ -289,7 +310,9 @@ onMounted(() => {
 }
 
 .content {
-  height: calc(100vh - #{100rpx} - #{102rpx} - 120rpx - var(--status-bar-height, 0px));
+  height: calc(
+    100vh - #{100rpx} - #{102rpx} - 120rpx - var(--status-bar-height, 0px)
+  );
   overflow-x: hidden;
   padding: 28rpx 32rpx;
   box-sizing: border-box;
@@ -574,23 +597,25 @@ onMounted(() => {
   z-index: 30;
   inset: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding: 0 48rpx;
   background: rgba(20, 28, 27, 0.52);
+  box-sizing: border-box;
 }
 
 .points-sheet {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-height: 80vh;
+  max-height: 72vh;
   padding: 32rpx 28rpx;
-  padding-bottom: calc(#{24rpx} + env(safe-area-inset-bottom));
-  border-radius: 32rpx 32rpx 0 0;
+  border-radius: 32rpx;
   background: $color-surface;
   box-sizing: border-box;
 
-  /* 宽屏下与页面内容区同宽居中，避免底部弹板横跨整屏 */
   @media (min-width: 768px) {
-    max-width: 750px;
-    margin: 0 auto;
+    max-width: 640px;
   }
 }
 
@@ -648,8 +673,10 @@ onMounted(() => {
   margin-top: 24rpx;
 }
 
+/* 列表占满弹窗剩余高度，仅在内容超过弹窗最大高度时滚动 */
 .points-list {
-  max-height: 46vh;
+  flex: 1;
+  min-height: 0;
   margin-top: 16rpx;
 }
 

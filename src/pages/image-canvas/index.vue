@@ -60,6 +60,7 @@
         研墨成画（扣除 {{ selectedCost }} 点）
       </button>
     </view>
+    <app-bottom-nav active="creation" desktop-only />
   </view>
 </template>
 
@@ -68,6 +69,7 @@ import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 import { submitImageGeneration } from "@/utils/image-generation";
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import { loadPointsBalance, pointsState } from "@/stores";
 import {

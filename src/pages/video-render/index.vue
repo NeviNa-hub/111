@@ -121,6 +121,7 @@
       @back="goWorkbench"
       @library="goLibrary"
     />
+    <app-bottom-nav active="creation" desktop-only />
   </view>
   <!-- #endif -->
 
@@ -150,6 +151,7 @@ import {
 import { TASK_STATUS } from "@/apis/constants";
 import { getVideoTaskStatus } from "@/apis/video-creation";
 import previewFallback from "@/assets/theme/theme-videos-1.jpg";
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";

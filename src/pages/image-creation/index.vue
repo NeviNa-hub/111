@@ -61,6 +61,7 @@
         <!-- #endif -->
       </button>
     </view>
+    <app-bottom-nav active="creation" desktop-only />
   </view>
 </template>
 
@@ -68,9 +69,16 @@
 import { computed, ref } from "vue";
 
 // #ifdef H5
-import { ArrowRight, Brush, Camera, MagicStick, Sunny } from "@element-plus/icons-vue";
+import {
+  ArrowRight,
+  Brush,
+  Camera,
+  MagicStick,
+  Sunny,
+} from "@element-plus/icons-vue";
 // #endif
 
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import { DRAFT_KEYS, saveCreationDraft } from "@/utils/creation-draft";
 
@@ -90,7 +98,9 @@ const selectedStyleId = ref(1);
 const selectedRatio = ref("1:1");
 
 const selectedStyleName = computed(
-  () => styleOptions.find((style) => style.styleId === selectedStyleId.value)?.name || ""
+  () =>
+    styleOptions.find((style) => style.styleId === selectedStyleId.value)
+      ?.name || "",
 );
 
 // 校验并保存构思草稿，进入画风挑选页
@@ -280,7 +290,10 @@ const goNext = () => {
   background: linear-gradient(135deg, #fcfcfa 0%, #fafbf9 100%);
   color: $color-ink;
   font-size: 30rpx;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .option-icon {
@@ -294,7 +307,9 @@ const goNext = () => {
   background: #f7edde;
   color: $color-primary;
   font-size: 30rpx;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 /* 各画风图标的识别色，选中时统一归为主色 */

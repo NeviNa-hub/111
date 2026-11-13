@@ -15,13 +15,21 @@
           <text class="hero-title">妙笔生花 一念成画</text>
           <text class="hero-subtitle">AI 帮你把灵感变成作品</text>
           <view class="hero-art">
-            <app-image class="hero-image" src="/static/home/home.jpg" mode="aspectFill" />
+            <app-image
+              class="hero-image"
+              src="/static/home/home.jpg"
+              mode="aspectFill"
+            />
             <view class="hero-label">今日推荐</view>
             <view class="hero-caption">AI 大模型</view>
-            <view class="hero-hint">提示词：温馨治愈，青绿设色，微风拂动 ...</view>
+            <view class="hero-hint"
+              >提示词：温馨治愈，青绿设色，微风拂动 ...</view
+            >
           </view>
           <view class="hero-actions">
-            <button class="action-primary" @click="goWorkbench">开始创作</button>
+            <button class="action-primary" @click="goWorkbench">
+              开始创作
+            </button>
             <button class="action-secondary" @click="browseIdeas">
               <!-- #ifdef H5 -->
               <el-icon class="action-star"><Star /></el-icon>
@@ -92,7 +100,13 @@
 import { computed, onUnmounted, ref } from "vue";
 
 // #ifdef H5
-import { Brush, EditPen, MagicStick, Star, VideoPlay } from "@element-plus/icons-vue";
+import {
+  Brush,
+  EditPen,
+  MagicStick,
+  Star,
+  VideoPlay,
+} from "@element-plus/icons-vue";
 // #endif
 
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
@@ -173,13 +187,16 @@ const runTypewriter = (ideaIndex = 0, charIndex = 0, isErasing = false) => {
     typedPrompt.value = idea.slice(0, charIndex + 1);
 
     if (charIndex + 1 >= idea.length) {
-      typeTimer = setTimeout(() => runTypewriter(ideaIndex, charIndex, true), HOLD_FULL);
+      typeTimer = setTimeout(
+        () => runTypewriter(ideaIndex, charIndex, true),
+        HOLD_FULL,
+      );
       return;
     }
 
     typeTimer = setTimeout(
       () => runTypewriter(ideaIndex, charIndex + 1, false),
-      TYPE_SPEED
+      TYPE_SPEED,
     );
     return;
   }
@@ -188,13 +205,16 @@ const runTypewriter = (ideaIndex = 0, charIndex = 0, isErasing = false) => {
 
   if (charIndex <= 0) {
     const nextIndex = (ideaIndex + 1) % PROMPT_IDEAS.length;
-    typeTimer = setTimeout(() => runTypewriter(nextIndex, 0, false), HOLD_EMPTY);
+    typeTimer = setTimeout(
+      () => runTypewriter(nextIndex, 0, false),
+      HOLD_EMPTY,
+    );
     return;
   }
 
   typeTimer = setTimeout(
     () => runTypewriter(ideaIndex, charIndex - 1, true),
-    ERASE_SPEED
+    ERASE_SPEED,
   );
 };
 
@@ -283,7 +303,11 @@ const openMode = (url) => {
   position: absolute;
   inset: 10rpx;
   border-radius: 28rpx;
-  background: linear-gradient(180deg, transparent 40%, rgba(45, 53, 50, 0.55) 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    rgba(45, 53, 50, 0.55) 100%
+  );
 }
 
 .hero-label,
@@ -324,6 +348,7 @@ const openMode = (url) => {
   display: flex;
   align-items: center;
   gap: 40rpx;
+  margin-top: 20rpx;
 }
 
 .action-primary {
@@ -378,7 +403,8 @@ const openMode = (url) => {
   border: 1rpx solid rgba(255, 255, 255, 0.9);
   border-radius: 32rpx;
   background: #fff;
-  box-shadow: 0 16rpx 40rpx rgba(190, 140, 70, 0.1),
+  box-shadow:
+    0 16rpx 40rpx rgba(190, 140, 70, 0.1),
     inset 0 1rpx 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -417,7 +443,9 @@ const openMode = (url) => {
   border-radius: 24rpx;
   box-sizing: border-box;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 /* 一道高光从左上角扫到右下角，循环播放 */

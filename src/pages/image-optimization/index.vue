@@ -92,6 +92,7 @@
       @back="goWorkbench"
       @library="goLibrary"
     />
+    <app-bottom-nav active="creation" desktop-only />
   </view>
 </template>
 
@@ -106,6 +107,7 @@ import { USE_MOCK } from "@/apis/config";
 import { TASK_STATUS } from "@/apis/constants";
 import { uploadImage } from "@/apis/upload";
 import { getImageOptimizationTaskStatus } from "@/apis/image-optimization";
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";

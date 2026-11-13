@@ -83,7 +83,9 @@
                 </view>
                 <el-button class="image-pick-button" @click="chooseImage">
                   <el-icon><Upload /></el-icon>
-                  {{ isUploading ? "上传中…" : selectedImage ? "更换" : "选图" }}
+                  {{
+                    isUploading ? "上传中…" : selectedImage ? "更换" : "选图"
+                  }}
                 </el-button>
               </view>
             </el-form-item>
@@ -149,6 +151,7 @@
         <el-icon v-if="!isSubmitting" class="next-icon"><ArrowRight /></el-icon>
       </el-button>
     </view>
+    <app-bottom-nav active="creation" desktop-only />
   </view>
   <!-- #endif -->
 
@@ -179,6 +182,7 @@ import {
 // #endif
 
 import { uploadImage } from "@/apis/upload";
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppImage from "@/components/AppImage/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
@@ -218,7 +222,8 @@ const isUploading = ref(false);
 const formRef = ref(null);
 const { keyboardInset } = useKeyboardInset();
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
+  paddingBottom:
+    keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
@@ -234,7 +239,7 @@ const imageTitle = computed(() => selectedImage.value?.name || "传入一张图�
 const imageHint = computed(() =>
   selectedImage.value
     ? "点击更换图卷，将以图卷起点延展运镜"
-    : "从相册选择或拍摄，作为动卷起点"
+    : "从相册选择或拍摄，作为动卷起点",
 );
 
 /**
@@ -302,7 +307,7 @@ const polishPrompt = () => {
   formData.prompt = polishPromptText(
     formData.prompt.trim(),
     suffix,
-    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`
+    `寒江孤舟，雪意朦胧，水波缓缓流动，${suffix}`,
   );
 };
 
@@ -344,7 +349,9 @@ const goNext = async () => {
     return;
   }
 
-  const selectedRatioItem = ratios.find((ratio) => ratio.value === formData.ratio);
+  const selectedRatioItem = ratios.find(
+    (ratio) => ratio.value === formData.ratio,
+  );
 
   isSubmitting.value = true;
   saveCreationDraft(DRAFT_KEYS.video, {

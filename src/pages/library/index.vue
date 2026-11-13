@@ -49,6 +49,10 @@
               <text class="work-title">{{ work.title }}</text>
               <text class="work-time">{{ work.time }}</text>
             </view>
+            <view class="work-enter">
+              <text class="work-enter-arrow">›</text>
+              <text class="work-enter-label">详情</text>
+            </view>
           </view>
         </view>
         <app-state-hint
@@ -75,6 +79,7 @@ import { getLibraryData } from "@/apis/creation";
 import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import AppStateHint from "@/components/AppStateHint/index.vue";
+import { formatDateTime } from "@/utils/date";
 import { getErrorMessage } from "@/utils/request";
 
 const PAGE_SIZE = 10;
@@ -140,7 +145,7 @@ const loadLibraryData = async (reset = false) => {
           status: item.status || "",
           taskId: item.task_id || "",
           mediaUrl: item.media_url || "",
-          time: item.created_at || "",
+          time: formatDateTime(item.created_at),
         }))
       : [];
     works.value = reset ? pageWorks : works.value.concat(pageWorks);
@@ -189,29 +194,31 @@ const loadMore = () => {
   loadLibraryData();
 };
 
-// 各类型创建中任务对应的进度页入口，任务标识由作品库列表接口返回
-const CREATING_ROUTES = {
-  文字生图: (taskId) =>
-    `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(taskId)}`,
-  图片优化: (taskId) =>
-    `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(taskId)}`,
-  视频创作: (taskId) =>
+// 各类型任务对应的详情页入口，任务标识由作品库列表接口返回
+const DETAIL_ROUTES = {
+  文字生图: ({ taskId, title }) =>
+    `/pages/image-generation/index?mode=creation&taskId=${encodeURIComponent(
+      taskId,
+    )}&title=${encodeURIComponent(title)}`,
+  图片优化: ({ taskId, title }) =>
+    `/pages/image-generation/index?mode=optimization&taskId=${encodeURIComponent(
+      taskId,
+    )}&title=${encodeURIComponent(title)}`,
+  视频创作: ({ taskId }) =>
     `/pages/video-render/index?taskId=${encodeURIComponent(taskId)}`,
 };
 
 /**
- * 打开生成中的任务进度页，或预览已完成的图片作品。
+ * 打开作品详情页（创作中查看进度、已完成查看结果），没有详情入口时预览图片。
  * @param {Object} work 作品库记录。
  * @returns {void}
  */
 const openWork = (work) => {
-  if (work.status === "creating" && work.taskId) {
-    const buildProgressUrl = CREATING_ROUTES[work.typeName];
+  const buildDetailUrl = DETAIL_ROUTES[work.typeName];
 
-    if (buildProgressUrl) {
-      uni.navigateTo({ url: buildProgressUrl(work.taskId) });
-      return;
-    }
+  if (work.taskId && buildDetailUrl) {
+    uni.navigateTo({ url: buildDetailUrl(work) });
+    return;
   }
 
   if (
@@ -330,6 +337,29 @@ onShow(() => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .work-enter {
+    margin-left: 12px;
+    padding: 6px 16px;
+    border: 1px solid rgba(184, 134, 78, 0.35);
+    border-radius: 999px;
+    color: $color-primary;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: background 0.2s ease;
+  }
+
+  .work-enter:hover {
+    background: $color-primary-light;
+  }
+
+  .work-enter-arrow {
+    display: none;
+  }
+
+  .work-enter-label {
+    display: block;
+  }
 }
 
 .work-card {
@@ -375,5 +405,24 @@ onShow(() => {
   font-size: 22rpx;
   line-height: 1.4;
   @include numeric;
+}
+
+/* 移动端用箭头提示可进入详情，桌面端换成明确的“详情”入口 */
+.work-enter {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8rpx;
+  color: #c9b79b;
+}
+
+.work-enter-arrow {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.work-enter-label {
+  display: none;
 }
 </style>

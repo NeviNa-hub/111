@@ -1,5 +1,5 @@
 <template>
-  <view class="app-bottom-nav">
+  <view class="app-bottom-nav" :class="{ 'is-desktop-only': desktopOnly }">
     <view class="nav-brand">妙笔生花</view>
     <view
       v-for="item in NAV_ITEMS"
@@ -20,7 +20,13 @@
 
 <script setup>
 // #ifdef H5
-import { Brush, Document, Grid, PictureFilled, User } from "@element-plus/icons-vue";
+import {
+  Brush,
+  Document,
+  Grid,
+  PictureFilled,
+  User,
+} from "@element-plus/icons-vue";
 // #endif
 
 const NAV_ITEMS = [
@@ -49,8 +55,12 @@ const NAV_ITEMS = [
 /**
  * 当前激活的导航项。
  * @property {"drafts" | "creation" | "works" | "workshop" | "profile"} active 当前导航标识。
+ * @property {boolean} desktopOnly 仅在桌面端显示侧边导航，移动端流程页保留原有操作栏。
  */
-const props = defineProps({ active: { type: String, required: true } });
+const props = defineProps({
+  active: { type: String, required: true },
+  desktopOnly: { type: Boolean, default: false },
+});
 
 /**
  * 切换主导航页面。
@@ -58,7 +68,11 @@ const props = defineProps({ active: { type: String, required: true } });
  * @returns {void}
  */
 const navigateTo = (item) => {
-  if (props.active === item.key) {
+  const pages = getCurrentPages();
+  const currentRoute = pages[pages.length - 1]?.route || "";
+
+  // 流程页会激活所属的导航项但本身不是该主页面，需要允许点击跳转
+  if (`/${currentRoute}` === item.url.split("?")[0]) {
     return;
   }
 
@@ -104,6 +118,15 @@ const navigateTo = (item) => {
     border-top: 0;
     border-right: 1rpx solid $color-line;
     box-shadow: none;
+  }
+}
+
+/* 流程页不展示底部导航，桌面端再切换为常驻侧边导航 */
+.app-bottom-nav.is-desktop-only {
+  display: none;
+
+  @media (min-width: $breakpoint-desktop) {
+    display: flex;
   }
 }
 

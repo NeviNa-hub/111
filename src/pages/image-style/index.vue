@@ -45,7 +45,11 @@
           <view class="config-card">
             <view class="config-title"><em>贰 ·</em> 灵感引线</view>
             <view class="suggestions">
-              <button v-for="item in suggestions" :key="item" @click="appendPrompt(item)">
+              <button
+                v-for="item in suggestions"
+                :key="item"
+                @click="appendPrompt(item)"
+              >
                 ＋ {{ item }}
               </button>
             </view>
@@ -96,6 +100,7 @@
       @back="uni.redirectTo({ url: '/pages/workbench/index' })"
       @library="uni.navigateTo({ url: '/pages/library/index' })"
     />
+    <app-bottom-nav active="creation" desktop-only />
   </view>
 </template>
 
@@ -110,22 +115,34 @@ import { MagicStick, RefreshLeft } from "@element-plus/icons-vue";
 import { TASK_STATUS } from "@/apis/constants";
 import { getImageTaskStatus } from "@/apis/text-to-image";
 import { submitImageGeneration } from "@/utils/image-generation";
+import AppBottomNav from "@/components/AppBottomNav/index.vue";
 import AppPageHeader from "@/components/AppPageHeader/index.vue";
 import ConfirmGenerationDialog from "@/components/ConfirmGenerationDialog/index.vue";
 import GenerationDialog from "@/components/GenerationDialog/index.vue";
 import useKeyboardInset from "@/hooks/useKeyboardInset";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { loadPointsBalance } from "@/stores";
-import { DRAFT_KEYS, readCreationDraft, saveCreationDraft } from "@/utils/creation-draft";
+import {
+  DRAFT_KEYS,
+  readCreationDraft,
+  saveCreationDraft,
+} from "@/utils/creation-draft";
 import { appendPromptText, polishPromptText } from "@/utils/prompt";
 import { getErrorMessage, isApiError } from "@/utils/request";
 
 const selectedStyle = ref("");
 const prompt = ref("");
 const promptLimit = 500;
-const suggestions = ["江南烟雨", "宋代山水", "青绿设色", "晨曦微光", "枯墨留白"];
+const suggestions = [
+  "江南烟雨",
+  "宋代山水",
+  "青绿设色",
+  "晨曦微光",
+  "枯墨留白",
+];
 const polishSuffix = "画面空灵雅致，留白自然，笔触细腻";
-const randomPromptText = "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
+const randomPromptText =
+  "薄雾晨光里的青绿山水，远处层峦叠嶂，近处一叶轻舟掠过溪面";
 const estimatedTime = "约 6~8 秒";
 const generationCost = 2;
 const TASK_STAGE_TEXT = {
@@ -135,7 +152,8 @@ const TASK_STAGE_TEXT = {
   [TASK_STATUS.FAILED]: "生成失败",
 };
 const TASK_NOTE_TEXT = {
-  [TASK_STATUS.PENDING]: "任务已创建，正在排队等待云端处理，离开页面不影响生成。",
+  [TASK_STATUS.PENDING]:
+    "任务已创建，正在排队等待云端处理，离开页面不影响生成。",
   [TASK_STATUS.PROCESSING]: "云端研墨中，离开页面或切换画风不影响生成。",
   [TASK_STATUS.COMPLETED]: "画卷已完成，可轻触画卷放大查看或前往作品库。",
 };
@@ -151,21 +169,26 @@ const taskResultUrl = ref("");
 const { keyboardInset } = useKeyboardInset();
 
 const contentKeyboardStyle = computed(() => ({
-  paddingBottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
+  paddingBottom:
+    keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 
 const barKeyboardStyle = computed(() => ({
   bottom: keyboardInset.value > 0 ? `${keyboardInset.value}px` : undefined,
 }));
 
-const taskStage = computed(() => TASK_STAGE_TEXT[taskStatus.value] || "任务已创建");
+const taskStage = computed(
+  () => TASK_STAGE_TEXT[taskStatus.value] || "任务已创建",
+);
 
 const taskNote = computed(() => {
   if (taskStatus.value === TASK_STATUS.FAILED) {
     return taskMessage.value || "生成失败，请返回重新尝试。";
   }
 
-  return TASK_NOTE_TEXT[taskStatus.value] || TASK_NOTE_TEXT[TASK_STATUS.PENDING];
+  return (
+    TASK_NOTE_TEXT[taskStatus.value] || TASK_NOTE_TEXT[TASK_STATUS.PENDING]
+  );
 });
 
 const { start: startPolling } = useTaskPolling({
@@ -206,7 +229,7 @@ const polishPrompt = () => {
   prompt.value = polishPromptText(
     prompt.value,
     polishSuffix,
-    `江南烟雨中的远山与归舟，${polishSuffix}`
+    `江南烟雨中的远山与归舟，${polishSuffix}`,
   );
 };
 
